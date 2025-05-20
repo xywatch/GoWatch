@@ -1,0 +1,15 @@
+{
+  "files.associations": {
+    "ds3231.h": "c",
+    "led.h": "c",
+    "bme280.h": "c",
+    "chrono": "c",
+    "common.h": "c",
+    "gamelife.h": "c",
+    "delay.h": "c",
+    "i2c_soft.h": "c",
+    "config.h": "c",
+    "nvic.h": "c"
+  },
+  "files.encoding": "gbk"
+}
