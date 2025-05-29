@@ -110,9 +110,9 @@ static void processButtons()
 {
     // Get button pressed states
     BOOL isPressed[BTN_COUNT];
-    isPressed[BTN_1] = KEY0; // right一个按下即可
-    isPressed[BTN_2] = KEY1;
-    isPressed[BTN_3] = KEY2; // left
+    isPressed[BTN_1] = UP_BTN_KEY; // right一个按下即可
+    isPressed[BTN_2] = CONFIRM_BTN_KEY;
+    isPressed[BTN_3] = DOWN_BTN_KEY; // left
 
     // Process each button
 

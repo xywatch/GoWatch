@@ -52,9 +52,9 @@ void cmd2(void)
 // PA7 中
 // PA3 下 左
 // v8:
-// KEY0: PB1 上 右
-// KEY1: PA5 中
-// KEY2: PA4 下 左
+// UP_BTN_KEY: PB1 上 右
+// CONFIRM_BTN_KEY: PA5 中
+// DOWN_BTN_KEY: PA4 下 左
 
 // 按键中断初始化 PA5
 void KEY_INT_INIT(void) 
@@ -81,7 +81,7 @@ void KEY_INT_INIT(void)
     NVIC_Init(&NVIC_InitStruct);
 }
 
-// 中键key要长按才能restart, 因为下降沿触发, 如果弹出了, KEY1读出来就是高电平了
+// 中键key要长按才能restart, 因为下降沿触发, 如果弹出了, CONFIRM_BTN_KEY读出来就是高电平了
 // 外部中断9~5处理程序
 // IO引脚 PA7
 void EXTI9_5_IRQHandler(void)
@@ -89,13 +89,13 @@ void EXTI9_5_IRQHandler(void)
     EXTI_ClearITPendingBit(EXTI_Line5); // 清除 LINE 上的中断标志位
     if (EXTI_GetITStatus(EXTI_Line5) != RESET) // PA5
     {
-        printf("EXTI9_5_IRQHandler KEY1=%d, DeepSleepFlag=%d\n", KEY1, DeepSleepFlag);
-        if (KEY1 == 0 && DeepSleepFlag == 1)
+        printf("EXTI9_5_IRQHandler CONFIRM_BTN_KEY=%d, DeepSleepFlag=%d\n", CONFIRM_BTN_KEY, DeepSleepFlag);
+        if (CONFIRM_BTN_KEY == 0 && DeepSleepFlag == 1)
         {
-            // delay_ms(80); // 为什么要delay? 因为下降沿触发, 如果弹出了, KEY1读出来就是高电平了
+            // delay_ms(80); // 为什么要delay? 因为下降沿触发, 如果弹出了, CONFIRM_BTN_KEY读出来就是高电平了
             // 但是因为stop后, 时钟会变慢, delay不准, 去掉delay后也不用长按了, 屏幕也亮了(不然偶尔会不亮)
             // 判断某个线上的中断是否发生, 
-            if (KEY1 == 0)
+            if (CONFIRM_BTN_KEY == 0)
             {
                 nvic_wake_up(3);
                 printf("wake up by key int\n");
@@ -136,18 +136,18 @@ void KEY_INT_INIT(void)
 
 // 长按才能restart
 // 外部中断9~5处理程序
-// IO引脚 PB1 KEY2
+// IO引脚 PB1 
 void EXTI1_IRQHandler(void)
 {
     if (EXTI_GetITStatus(EXTI_Line1) != RESET)
     {
-        printf("EXTI1_IRQHandler KEY1=%d, DeepSleepFlag=%d\n", KEY2, DeepSleepFlag);
-        if (KEY2 == 0 && DeepSleepFlag == 1)
+        printf("EXTI1_IRQHandler KEY1=%d, DeepSleepFlag=%d\n", , DeepSleepFlag);
+        if ( == 0 && DeepSleepFlag == 1)
         {
             delay_ms(80);
 
             // 判断某个线上的中断是否发生
-            if (KEY2 == 0)
+            if ( == 0)
             {
                 // 如果不重新RCC_Configuration时钟就会很慢!!亲测!!
                 // 进了STOP模式后，PLL停掉了，所以，如果开始的时钟配置，用的是PLL，那么唤醒后，需要重新配置RCC。

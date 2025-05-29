@@ -8,7 +8,6 @@
 #include "i2c_soft.h"
 #include "adc.h"
 #include "ds3231.h"
-#include "rtc.h"
 #include "nvic.h"
 #include "bme280.h"
 #include "oled_driver.h"

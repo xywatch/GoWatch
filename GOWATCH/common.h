@@ -22,7 +22,7 @@
 // #include "wdt.h"
 // #include "spi.h"
 // #include "i2c.h"
-// #include "m_rtc.h"
+// 
 // #include "adc.h"
 // #include "oled.h"
 #include "buttons.h"
@@ -59,6 +59,7 @@
 // #include "system.h"
 #include "global.h"
 #include "display.h"
+#include "rtc.h"
 #include "time.h"
 #include "alarm.h"
 #include "pwrmgr.h"
