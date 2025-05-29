@@ -36,7 +36,7 @@
  */
 
 #include <Arduino.h>
-#include "pcf8563.h"
+#include "Rtc_Pcf8563.h"
 
 Rtc_Pcf8563::Rtc_Pcf8563(void)
 {

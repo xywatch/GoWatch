@@ -95,10 +95,10 @@
 #define RTCC_TIMER_TE       0x80  // Timer 1:enable/0:disable
 
 /* Timer source-clock frequency constants */
-#define TMR_4096HZ      B00000000
-#define TMR_64Hz        B00000001
-#define TMR_1Hz         B00000010
-#define TMR_1MIN        B00000011
+#define TMR_4096HZ      0x00    // 0b00000000
+#define TMR_64Hz        0x01    // 0b00000001
+#define TMR_1Hz         0x02    // 0b00000010
+#define TMR_1MIN        0x03    // 0b00000011
 
 #define RTCC_CENTURY_MASK   0x80
 #define RTCC_VLSEC_MASK     0x80
@@ -112,194 +112,77 @@
 #define RTCC_TIME_HM        0x02
 
 /* square wave constants */
-#define SQW_DISABLE     B00000000
-#define SQW_32KHZ       B10000000
-#define SQW_1024HZ      B10000001
-#define SQW_32HZ        B10000010
-#define SQW_1HZ         B10000011
+#define SQW_DISABLE     0x00    // 0b00000000
+#define SQW_32KHZ       0x80    // 0b10000000
+#define SQW_1024HZ      0x81    // 0b10000001
+#define SQW_32HZ        0x82    // 0b10000010
+#define SQW_1HZ         0x83    // 0b10000011
 
 /* epoch timestamp constants : 01/01/2016 à 00:00:00 : 1451599200 */
 #define epoch_day	1
 #define epoch_month	1
 #define epoch_year	16
 #define EPOCH_TIMESTAMP 1451606400
-const unsigned int months_days[]={31,59,90,120,151,181,212,243,273,304,334};	// days count for each month
+extern const unsigned int months_days[];	// days count for each month
 
-/* stm32 class */
-class Rtc_Pcf8563 {
-    public:
-    Rtc_Pcf8563();
-    Rtc_Pcf8563(int, int); /* Construct using different pins for sda & sdl */
+/* Function declarations */
+void PCF8563_Init(void);
+void PCF8563_ZeroClock(void);
+void PCF8563_ClearStatus(void);
+u8 PCF8563_ReadStatus2(void);
+void PCF8563_ClearVoltLow(void);
+void PCF8563_GetDateTime(void);
+void PCF8563_SetDateTime(u8 day, u8 weekday, u8 month, u8 century, u8 year,
+                     u8 hour, u8 minute, u8 sec);
+void PCF8563_GetAlarm(void);
+u8 PCF8563_AlarmEnabled(void);
+u8 PCF8563_AlarmActive(void);
+void PCF8563_EnableAlarm(void);
+void PCF8563_SetAlarm(u8 min, u8 hour, u8 day, u8 weekday);
+void PCF8563_ClearAlarm(void);
+void PCF8563_ResetAlarm(void);
+u8 PCF8563_TimerEnabled(void);
+u8 PCF8563_TimerActive(void);
+void PCF8563_EnableTimer(void);
+void PCF8563_SetTimer(u8 value, u8 frequency, u8 is_pulsed);
+void PCF8563_ClearTimer(void);
+void PCF8563_ResetTimer(void);
+void PCF8563_SetSquareWave(u8 frequency);
+void PCF8563_ClearSquareWave(void);
+const char *PCF8563_FormatTime(u8 style);
+const char *PCF8563_FormatDate(u8 style);
+u8 PCF8563_GetVoltLow(void);
+u8 PCF8563_GetSecond(void);
+u8 PCF8563_GetMinute(void);
+u8 PCF8563_GetHour(void);
+u8 PCF8563_GetDay(void);
+u8 PCF8563_GetMonth(void);
+u8 PCF8563_GetYear(void);
+u8 PCF8563_GetCentury(void);
+u8 PCF8563_GetWeekday(void);
+u8 PCF8563_GetStatus1(void);
+u8 PCF8563_GetStatus2(void);
+u8 PCF8563_GetAlarmMinute(void);
+u8 PCF8563_GetAlarmHour(void);
+u8 PCF8563_GetAlarmDay(void);
+u8 PCF8563_GetAlarmWeekday(void);
+u8 PCF8563_GetTimerControl(void);
+u8 PCF8563_GetTimerValue(void);
+u32 PCF8563_GetTimestamp(void);
+void PCF8563_InitClock(void);
+void PCF8563_SetTime(u8 hour, u8 minute, u8 sec);
+void PCF8563_GetTime(void);
+void PCF8563_SetDate(u8 day, u8 weekday, u8 month, u8 century, u8 year);
+void PCF8563_GetDate(void);
 
-    void zeroClock();  /* Zero date/time, alarm / timer, default clkout */
-    void clearStatus(); /* set both status bytes to zero */
-    byte readStatus2();
-    void clearVoltLow(void); /* Only clearing is possible */
+/* Helper functions */
+u8 PCF8563_DecToBcd(u8 value);
+u8 PCF8563_BcdToDec(u8 value);
+int PCF8563_LeapDaysBetween(u8 century_start, u8 year_start,
+                        u8 century_end, u8 year_end);
+u8 PCF8563_IsLeapYear(u8 century, int year);
+u8 PCF8563_DaysInMonth(u8 century, u8 year, u8 month);
+u8 PCF8563_DaysInYear(u8 century, u8 year, u8 month, u8 day);
+u8 PCF8563_WhatWeekday(u8 day, u8 month, u8 century, int year);
 
-    void getDateTime();     /* get date and time vals to local vars */
-    void setDateTime(byte day, byte weekday, byte month, bool century, byte year,
-                     byte hour, byte minute, byte sec);
-    void getAlarm();  // same as getDateTime
-    bool alarmEnabled();  // true if alarm interrupt is enabled
-    bool alarmActive();   // true if alarm is active (going off)
-    void enableAlarm(); /* activate alarm flag and interrupt */
-    /* set alarm vals, 99=ignore */
-    void setAlarm(byte min, byte hour, byte day, byte weekday);
-    void clearAlarm(); /* clear alarm flag and interrupt */
-    void resetAlarm();  /* clear alarm flag but leave interrupt unchanged */
-
-    bool timerEnabled();  // true if timer and interrupt is enabled
-    bool timerActive();   // true if timer is active (going off)
-    void enableTimer(void); // activate timer flag and interrupt
-    void setTimer(byte value, byte frequency, bool is_pulsed);  // set value & frequency
-    void clearTimer(void); // clear timer flag, and interrupt, leave value unchanged
-    void resetTimer(void); // same as clearTimer() but leave interrupt unchanged */
-
-    void setSquareWave(byte frequency);
-    void clearSquareWave();
-
-    /* get a output string, these call getTime/getDate for latest vals */
-    const char *formatTime(byte style=RTCC_TIME_HMS);
-    /* date supports 3 styles as listed in the wikipedia page about world date/time. */
-    const char *formatDate(byte style=RTCC_DATE_US);
-
-    /* Return leap-days between start (inclusive) and end (exclusive) */
-    int leapDaysBetween(byte century_start, byte year_start,
-                        byte century_end, byte year_end) const;
-    /* Return True if century (1: 1900, 0:2000) + decade is a leap year. */
-    bool isLeapYear(byte century, int year) const;
-    /* Return number of days in any month of any decade of any year */
-    byte daysInMonth(byte century, byte year, byte month) const;
-    /* Return the number of days since the beginning of a particular year*/
-    byte daysInYear(byte century, byte year, byte month, byte day) const;
-    /* Return the weekday for any date after 1900 */
-    byte whatWeekday(byte day, byte month, byte century, int year) const;
-
-    bool getVoltLow();
-    byte getSecond();
-    byte getMinute();
-    byte getHour();
-    byte getDay();
-    byte getMonth();
-    byte getYear();
-    bool getCentury();
-    byte getWeekday();
-    byte getStatus1();
-    byte getStatus2();
-
-    byte getAlarmMinute();
-    byte getAlarmHour();
-    byte getAlarmDay();
-    byte getAlarmWeekday();
-
-    byte getTimerControl();
-    byte getTimerValue();
-
-    unsigned long getTimestamp();	// return unix timestamp
-
-    // Sets date/time to static fixed values, disable all alarms
-    // use zeroClock() above to guarantee lowest possible values instead.
-    void initClock();
-    // Slightly unsafe, don't use for new code, use above instead!
-    void setTime(byte hour, byte minute, byte sec);
-    void getTime();  // unsafe, don't use
-    void setDate(byte day, byte weekday, byte month, bool century, byte year);
-    void getDate();  // unsafe, don't use
-
-    private:
-    /* methods */
-    byte decToBcd(byte value);
-    byte bcdToDec(byte value);
-    /* time variables */
-    byte hour;
-    byte minute;
-    bool volt_low;
-    byte sec;
-    byte day;
-    byte weekday;
-    byte month;
-    byte year;
-    /* alarm */
-    byte alarm_hour;
-    byte alarm_minute;
-    byte alarm_weekday;
-    byte alarm_day;
-    /* CLKOUT */
-    byte squareWave;
-    /* timer */
-    byte timer_control;
-    byte timer_value;
-    /* support */
-    byte status1;
-    byte status2;
-    bool century;
-
-    char strOut[9];
-    char strDate[11];
-
-    int Rtcc_Addr;
-};
-
-
-inline int Rtc_Pcf8563::leapDaysBetween(byte century_start, byte year_start,
-                                        byte century_end, byte year_end) const {
-    // Credit: Victor Haydin via stackoverflow.com
-    int span_start = 2000 - (century_start * 100) + year_start;
-    int span_end = 2000 - (century_end * 100) + year_end - 1;  // less year_end
-    // Subtract leap-years before span_start, from leap-years before span_end
-    return ((span_end / 4) - (span_end / 100) + (span_end / 400)) -
-           ((span_start / 4) - (span_start / 100) + (span_start / 400));
-}
-
-
-inline bool Rtc_Pcf8563::isLeapYear(byte century, int year) const
-{
-    year = 2000 - (century * 100) + year;
-    if ((year % 4) != 0)
-        return false;
-    else if ((year % 100) != 0)
-        return true;
-    else if ((year % 400) != 0)
-        return false;
-    else
-        return true;
-}
-
-
-inline byte Rtc_Pcf8563::daysInMonth(byte century,
-                                     byte year,
-                                     byte month) const
-{
-    const int days[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    byte dim = days[month];
-    if (month == 2 && isLeapYear(century, year))
-        dim += 1;
-    return dim;
-}
-
-
-inline byte Rtc_Pcf8563::daysInYear(byte century,
-                                    byte year,
-                                    byte month,
-                                    byte day) const
-{
-    const int days[12] = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
-    byte total = days[month - 1] + day;
-    if ((month > 2) and isLeapYear(century, year))
-        total += 1;
-    return total;
-}
-
-
-inline byte Rtc_Pcf8563::whatWeekday(byte day, byte month,
-                                     byte century, int year) const
-{
-    year = 2000 - (century * 100) + year;
-    // Credit: Tomohiko Sakamoto
-    // http://en.wikipedia.org/wiki/Determination_of_the_day_of_the_week
-    year -= month < 3;
-    static int trans[] = {0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4};
-    return (year + year / 4 - year / 100 + year / 400 +
-            trans[month - 1] + day) % 7;
-}
 #endif
