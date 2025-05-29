@@ -28,6 +28,7 @@ extern const char months[12][BUFFSIZE_STR_MONTHS];
 
 extern const byte livesImg[];
 extern const byte stopwatch[];
+extern const byte step[];
 
 extern const byte dowImg[7][8];
 

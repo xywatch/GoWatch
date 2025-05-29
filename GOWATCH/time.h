@@ -33,7 +33,7 @@ byte time_monthDayCount(month_t, byte);
 void time_update(void);
 char *time_timeStr(void);
 void time_timeMode(time_s *, timemode_t);
-// timestamp_t time_getTimestamp(void);
-// timestamp_t time_timeDate2TimeStamp(time_s*);
+uint8_t dayToPcf8563Day(day_t);
+void time_getNextZhengdiao(timeDate_s *);
 
 #endif /* TIME_H_ */

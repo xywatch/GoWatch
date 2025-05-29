@@ -7,7 +7,6 @@
  */
 
 #include "common.h"
-#include "my_menu.h"
 
 #define TIME_POS_X 0
 #define TIME_POS_Y 17
@@ -30,13 +29,19 @@ typedef struct
 
 static display_t draw(void);
 static void drawDate(void);
-#if COMPILE_ANIMATIONS
-// static bool animateIcon(bool, byte*);
-#endif
 static display_t ticker(void);
 static void drawTickerNum(tickerData_t *);
+static void drawBattery(void);
 
 byte seconds = 0;
+
+uint32_t stepCount;
+
+void getBatteryAndOthers () {
+    // VBAT = getBatteryVoltage();
+    // stepCount = sensor.getCounter();
+    // syncWeather();
+}
 
 // watch face
 void watchface_normal()
@@ -46,16 +51,8 @@ void watchface_normal()
     showMeThenRun(NULL); // 设置打开过度动画，（不执行函数）
 }
 
-// extern float DS3231_Temp;
-// extern BME280_Data bme280_data;
-
 static display_t draw()
 {
-#if COMPILE_ANIMATIONS
-    //	static byte usbImagePos = FRAME_HEIGHT;
-    //	static byte chargeImagePos = FRAME_HEIGHT;
-#endif
-
     // console_log(50, "drawDate !");
     // Draw date
     drawDate();
@@ -69,127 +66,41 @@ static display_t draw()
     drawBattery();
     byte x = 35;
 
-#if COMPILE_ANIMATIONS
-    //	if(animateIcon(UDADDR != 0, &usbImagePos))
-    //		if(animateIcon(1, &usbImagePos))
-
-    //	{
-    //		//draw_bitmap(x, usbImagePos, usbIcon, 16, 8, NOINVERT, 0);
-    //		x += 20;
-    //	}
-    if (AlarmEnalbe())
-    {
-        draw_bitmap(x, FRAME_HEIGHT - 8, smallFontAlarm, 8, 8, NOINVERT, 0);
-
-        /*
-        alarm_s nextAlarm;
-
-        // Make sure we're in 24 hour mode
-        time_s time;
-        time.hour = timeDate.time.hour;
-        time.ampm = timeDate.time.ampm;
-        time_timeMode(&time, TIMEMODE_24HR);
-        alarm_getNext(&nextAlarm);
-        if (alarm_dayEnabled(nextAlarm.days, timeDate.date.day)) {
-            draw_bitmap(x + 8, FRAME_HEIGHT - 8, smallFontAlarm, 8, 8, NOINVERT, 0);
-        } else {
-            draw_bitmap(x + 15, FRAME_HEIGHT - 8, smallFontAlarm, 8, 8, NOINVERT, 0);
-        }
-        */
-        /*
-        char temp[8];
-        sprintf((char *)temp, "%d", timeDate.date.day); //
-        draw_string(temp, NOINVERT, FRAME_WIDTH - x + 8, FRAME_HEIGHT - 8);
-        */
-
-        x += 12;
-    }
-
-#else
-    //	if(UDADDR != 0())
-    //	{
-    draw_bitmap(x, FRAME_HEIGHT - 9, usbIcon, 16, 8, NOINVERT, 0);
-    x += 20;
-    //	}
-#endif
-
-    // Draw charging icon
-#if COMPILE_ANIMATIONS
-    //	if(animateIcon(CHARGING(), &chargeImagePos))
-    //		if(animateIcon(1, &chargeImagePos))
-
-    //	{
-    //		//draw_bitmap(x, chargeImagePos, chargeIcon, 8, 8, NOINVERT, 0);
-    //		x += 12;
-    //	}
-#else
-    //	if(CHARGING())
-    {
-        draw_bitmap(x, FRAME_HEIGHT - 9, chargeIcon, 8, 8, NOINVERT, 0);
-        x += 12;
-    }
-#endif
-
 #if COMPILE_STOPWATCH
-
     // Stopwatch icon
     if (stopwatch_active())
     {
         draw_bitmap(x, FRAME_HEIGHT - 8, stopwatch, 8, 8, NOINVERT, 0);
         x += 12;
     }
-
 #endif
 
-    // 显示温度
-    // char temp[8];
-    // sprintf((char *)temp, "%0.1fC", bme280_data.T); //
-    // draw_string(temp, NOINVERT, FRAME_WIDTH - 35, FRAME_HEIGHT - 8);
+    // Draw next alarm
+    alarm_s nextAlarm;
+    if(alarm_getNext(&nextAlarm))
+    {
+        time_s alarmTime;
+        alarmTime.hour = nextAlarm.hour;
+        alarmTime.mins = nextAlarm.min;
+        alarmTime.ampm = CHAR_24;
+        time_timeMode(&alarmTime, appConfig.timeMode);
+        
+        char buff[9];
+        sprintf_P(buff, PSTR("%02hhu:%02hhu%c"), alarmTime.hour, alarmTime.mins, alarmTime.ampm);
+        draw_string(buff, false, x, FRAME_HEIGHT - 8);
 
-    // // BMP280没有湿度
-    // sprintf((char *)temp, "%0.0f%%", bme280_data.H); // 湿度
-    // draw_string(temp, NOINVERT, FRAME_WIDTH - 60, FRAME_HEIGHT - 8);
+        x += (alarmTime.ampm == CHAR_24) ? 35 : 42;
+        draw_bitmap(x, FRAME_HEIGHT - 8, dowImg[alarm_getNextDay()], 8, 8, NOINVERT, 0);
+        x += 10;
+    }
+
+    // drawStep(x);
 
     return busy;
 }
 
 static void drawDate()
 {
-    /*
-    // 为了能正常显示
-    time_s time = {seconds, 12, 18, 'A'};
-    date_s date = {DAY_THU, 12, MONTH_OCT, 22};
-
-    timeDate.time = time;
-    timeDate.date = date;
-    */
-
-    /*
-    char buff2[BUFFSIZE_DATE_FORMAT];
-    // sprintf_P(buff2, PSTR(DATE_FORMAT), 1, 12, 2, 22);
-    sprintf_P(buff2, PSTR(DATE_FORMAT), timeDate.date.day, timeDate.date.date, month, timeDate.date.year)
-    draw_string(buff2, false, 12, 0);
-    return;
-    */
-
-    // console_log(50, "year=%d\n", timeDate.date.year);
-    // console_log(50, "month=%d-day=%d\n", timeDate.date.month, timeDate.date.day);
-    // console_log(50, "DS3231 Init %d", BCD2HEX(DS3231_RD_Byte(0x06)));
-    // return;
-    /*
-    if (timeDate.date.month >= 13) {
-        console_log(50, "set default date\n");
-        time_s time = {seconds, 12, 18, 'A'};
-        date_s date = {DAY_THU, 12, MONTH_OCT, 22};
-
-        timeDate_s timeDate2;
-        timeDate2.time = time;
-        timeDate2.date = date;
-
-        time_set(&timeDate2);
-    }
-    */
-
     // Get day string
     char day[BUFFSIZE_STR_DAYS];
     strcpy(day, days[timeDate.date.day]);
@@ -445,30 +356,101 @@ static void drawTickerNum(tickerData_t *data)
         draw_bitmap(x, y, &data->bitmap[prev * arraySize], data->w, data->h, NOINVERT, yPos);
     }
 }
-/*
-static void drawTickerNum(byte x, byte y, byte val, byte maxValue, bool moving, const byte* font, byte w, byte h, byte yPos)
+
+float BatteryVol;
+
+// 电池电量百分比计算
+static int calcBatteryPercentage(float voltage) {
+    // 锂电池电压范围
+    const float VBAT_MAX = 4.2f;  // 满电电压
+    const float VBAT_MIN = 3.2f;  // 最低电压
+    const float VBAT_FULL = 4.15f; // 认为完全充满的电压
+    
+    // 电压限幅
+    if(voltage > VBAT_MAX) voltage = VBAT_MAX;
+    if(voltage < VBAT_MIN) voltage = VBAT_MIN;
+    
+    // 非线性映射计算电量百分比
+    float percentage;
+    if(voltage >= VBAT_FULL) {
+        percentage = 100.0f;
+    }
+    else if(voltage >= 3.9f) { // 4.15V-3.9V 映射到 100%-80%
+        percentage = 80.0f + (voltage - 3.9f) * 20.0f / (VBAT_FULL - 3.9f);
+    }
+    else if(voltage >= 3.7f) { // 3.9V-3.7V 映射到 80%-55%
+        percentage = 55.0f + (voltage - 3.7f) * 25.0f / 0.2f;
+    }
+    else if(voltage >= 3.5f) { // 3.7V-3.5V 映射到 55%-30%
+        percentage = 30.0f + (voltage - 3.5f) * 25.0f / 0.2f;
+    }
+    else { // 3.5V-3.2V 映射到 30%-0%
+        percentage = (voltage - VBAT_MIN) * 30.0f / 0.3f;
+    }
+    
+    return (int)(percentage + 0.5f); // 四舍五入
+}
+
+static void drawBattery()
 {
-    byte arraySize = (w * h) / 8;
-    if(yPos == 255)
-        yPos = 0;
+    int bat;
+    char ad[5];
+    const byte *battIcon;
 
-    s_image img = newImage(x, y, &font[val * arraySize], w, h, WHITE, false, 0);
-    draw_bitmap_set(&img);
-
-    if(!moving || yPos == 0)
-    {
-        draw_bitmap_s2(&img);
-        return;
+    // 根据电量百分比选择电池图标
+    bat = calcBatteryPercentage(BatteryVol);
+    
+    if (bat < 10) {
+        battIcon = battIconEmpty;
+    }
+    else if (bat < 30) {
+        battIcon = battIconLow;
+    }
+    else if (bat < 60) {
+        battIcon = battIconHigh;
+    }
+    else if (bat < 90) {
+        battIcon = battIconHigh;  // 可以添加更多图标
+    }
+    else {
+        battIcon = battIconFull;
     }
 
-    byte prev = val - 1;
-    if(prev == 255)
-        prev = maxValue;
+    // 绘制电池图标
+    draw_bitmap(0, FRAME_HEIGHT - 8, battIcon, 16, 8, NOINVERT, 0);
 
-    img.offsetY = yPos - h - TICKER_GAP;
-    draw_bitmap_s2(&img);
+    if (bat >= 100) {
+        bat = 99;
+    }
 
-    img.offsetY = yPos;
-    img.bitmap = &font[prev * arraySize];
-    draw_bitmap_s2(&img);
-}*/
+    // 显示电量百分比
+    sprintf((char *)ad, "%d", bat);
+    draw_string(ad, NOINVERT, 18, FRAME_HEIGHT - 8);
+}
+
+static void drawStep(byte x) {
+    char ad[5];
+    // uint32_t stepCount = sensor.getCounter();
+    sprintf((char *)ad, "%d", (int)stepCount);
+    // draw_string(ad, NOINVERT, x, FRAME_HEIGHT - 8);
+
+    // 靠右显示
+    u8 len = 10;
+    if (stepCount < 10) {
+        len = 1;
+    } else if (stepCount < 100) {
+        len = 2;
+    } else if (stepCount < 1000) {
+        len = 3;
+    } else if (stepCount < 10000) {
+        len = 4;
+    }
+     else if (stepCount < 100000) {
+        len = 5;
+    }
+
+    x = 127 - len * 7 - 10; // 每一个字5像素宽
+    draw_bitmap(x, FRAME_HEIGHT - 8, step, 8, 8, NOINVERT, 0);
+    x += 10;
+    draw_string(ad, NOINVERT, x, FRAME_HEIGHT - 8);
+}

@@ -42,8 +42,7 @@
 #include "gamelife.h"
 #include "stopwatch.h"
 #include "torch.h"
-#include "normal.h"
-#include "ui.h"
+#include "watchface.h"
 #include "tunemaker.h"
 #include "calendar.h"
 

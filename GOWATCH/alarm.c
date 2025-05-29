@@ -8,26 +8,26 @@
 
 #include "common.h"
 
-// #include "stmflash.h"
-
 #define NOALARM UCHAR_MAX
 
-static byte nextAlarm;
-static byte nextAlarmDay; // 下一个闹钟的星期, 0-6, 0:周一, 6:周日
-bool isAlarmTriggered; // 移除static，使其成为全局变量
 static draw_f oldDrawFunc;
 static button_f oldBtn1Func;
 static button_f oldBtn2Func;
 static button_f oldBtn3Func;
 
-// 所有闹钟
+byte nextAlarmIndex;
+byte nextAlarmDay; // 下一个闹钟的星期, 0-6, 0:周一, 6:周日
+bool isAlarmTriggered; // 
+
 alarm_s eepAlarms[ALARM_COUNT] EEMEM = {
-    {10, 42, 255}, // 22:45:00, 127 = 1111111, 表示星期1,2,3,4,5,6,7, 255=1(开启) 111111(周二)1(周一), 表示所有星期且开启
-    {10, 43, 255}, 
+    {8, 0, 63}, // 22:45:00, 127 = 1111111, 表示星期1,2,3,4,5,6,7, 255=1(开启) 111111(周二)1(周一), 表示所有星期且开启
+    {9, 0, 63}, 
     {7, 45, 63},  // 63 = 111111, 表示星期1,2,3,4,5,6
     {9, 4, 0}, 
     {3, 1, 7} // 7 = 111, 表示星期1,2,3
 };
+bool isAlarmInited = false;
+static bool need_updateAlarm_in_nextLoop = false;
 
 static bool isAlarmTimeReached(void);
 static void getNextAlarm(void);
@@ -35,7 +35,9 @@ static uint toMinutes(byte, byte, byte);
 static bool stopAlarm(void);
 static display_t draw(void);
 
-bool AlarmEnalbe()
+extern bool keep_on;
+
+bool alarm_is_enabled()
 {
     u8 i;
 
@@ -50,43 +52,35 @@ bool AlarmEnalbe()
     return 0;
 }
 
+// 初始化闹钟, 只执行一次, 在setup中调用
+// 即使唤醒后, 也不会重新初始化
+// 因为可能是因为RTC唤醒, 如果再执行这里, 闹钟就会变成下一个闹钟
 void alarm_init()
 {
-    getNextAlarm();
+    if (!isAlarmInited) {
+        isAlarmInited = true;
+        getNextAlarm();
+    }
 }
 
 void alarm_reset()
 {
-    // Set bytes individually, uses less flash space
-    //??????
     memset(&eepAlarms, 0x00, ALARM_COUNT * sizeof(alarm_s));
-
-    // alarm_s alarm;
-    // memset(&alarm, 0, sizeof(alarm_s));
-    // LOOPR(ALARM_COUNT, i)
-    //	eeprom_update_block(&alarm, &eepAlarms[i], sizeof(alarm_s));
 }
 
 void alarm_get(byte num, alarm_s *alarm)
 {
-    //	alarm=&eepAlarms[num];
     memcpy(alarm, &eepAlarms[num], sizeof(alarm_s));
-
-    //  	STMFLASH_Read((const u8)&eepAlarms[num],(u32*)alarm,sizeof(alarm_s));
-
-    //	eeprom_read_block(alarm, &eepAlarms[num], sizeof(alarm_s));
-    //	if(alarm->hour > 23)
-    //		memset(alarm, 0, sizeof(alarm_s));
 }
 
 bool alarm_getNext(alarm_s *alarm)
 {
-    if (nextAlarm == NOALARM)
+    if (nextAlarmIndex == NOALARM)
     {
         return false;
     }
 
-    alarm_get(nextAlarm, alarm);
+    alarm_get(nextAlarmIndex, alarm);
     return true;
 }
 
@@ -97,10 +91,7 @@ byte alarm_getNextDay()
 
 void alarm_save(byte num, alarm_s *alarm)
 {
-    //	eeprom_update_block(alarm, &eepAlarms[num], sizeof(alarm_s));
     memcpy(&eepAlarms[num], alarm, sizeof(alarm_s));
-    
-    // eepAlarms[num]=*alarm;
     getNextAlarm();
 }
 
@@ -113,12 +104,17 @@ void alarm_update()
     bool wasTriggered = isAlarmTriggered; // 之前为false
     bool alarmNow = isAlarmTimeReached(); // 调用这个方法后, isAlarmTriggered 会变为true
 
+    // Serial.printf("alarm_update isAlarmTriggered: %d, alarmNow: %d\n", isAlarmTriggered, alarmNow);
+
     if (isAlarmTriggered) // 0秒闹钟触发
     {
         if (alarmNow) // 到达闹钟时间 1分钟内
         {
             if (!wasTriggered && isAlarmTriggered) // 闹钟第一次触发
             {
+                keep_on = true;
+                need_updateAlarm_in_nextLoop = false; // 下一次loop时不要getNextAlarm， 应该在stop时再getNextAlarm
+                // Serial.printf("alarm_update isAlarmTriggered: %d, alarmNow: %d\n", isAlarmTriggered, alarmNow);
                 oldDrawFunc = display_setDrawFunc(draw);
                 oldBtn1Func = buttons_setFunc(BTN_1, NULL);
                 oldBtn2Func = buttons_setFunc(BTN_2, stopAlarm);
@@ -131,6 +127,20 @@ void alarm_update()
             stopAlarm();
         }
     }
+
+    // 重新获取下一个alarm
+    // 这里更新了alarm导致一下就stopAlarm了
+    if (need_updateAlarm_in_nextLoop) {
+        need_updateAlarm_in_nextLoop = false;
+        getNextAlarm();
+    }
+}
+
+// RTC中断时调用, 在下一个loop等alarm_update后再更新
+// 因为RTC中断可能是由于整点报时, 所以这个中断后需要更新alarm
+// 但也有可能真的是alarm, 所以需要等alarm_update后再更新
+void alarm_need_updateAlarm_in_nextLoop () {
+    need_updateAlarm_in_nextLoop = true;
 }
 
 void alarm_updateNextAlarm()
@@ -141,7 +151,6 @@ void alarm_updateNextAlarm()
 // 判断是否到达闹钟时间
 static bool isAlarmTimeReached()
 {
-
     alarm_s nextAlarm;
 
     // Make sure we're in 24 hour mode
@@ -163,6 +172,77 @@ static bool isAlarmTimeReached()
     }
 
     return false;
+}
+
+void rtc_set_pcf8563_alarm (byte hour, byte min, day_t day) {
+    byte pcf8563_day = dayToPcf8563Day(day);
+    // Serial.printf("set alarm for %02d:%02d, nextAlarmDay: %d -> pcf8563_day: %d\n", hour, min, day, pcf8563_day);
+    // delay(100);
+    RTC_Set_Alarm(min, hour, pcf8563_day);
+    RTC_PrintAlarm();
+}
+
+void rtc_set_alarm(void)
+{
+    // PCF8563只能设置一个闹钟
+    // 要实现整点报时, 需要将下一个整点报时的时间设置到RTC中
+    // 比如现在是12:01, 下一个整点报时是13:00, 则将13:00设置到RTC中
+    // 得到下一个整点报时的时间
+    timeDate_s nextZhengdian;
+    time_getNextZhengdiao(&nextZhengdian);
+    // Serial.printf("nextZhengdian %02d:%02d, day:%d\n", nextZhengdian.time.hour, nextZhengdian.time.mins, nextZhengdian.date.day);
+
+    alarm_s alarm;
+    if (!alarm_getNext(&alarm))
+    {
+        // 清空闹钟
+        // RTC.clearAlarm();
+
+        // 没有闹钟, 则直接用下一个整点
+        // Serial.printf("没有闹钟, 则直接用下一个整点\n");
+        rtc_set_pcf8563_alarm(nextZhengdian.time.hour, nextZhengdian.time.mins, nextZhengdian.date.day);
+        return;
+    }
+    // Serial.printf("nextAlarm %02d:%02d, day:%d\n", alarm.hour, alarm.min, nextAlarmDay);
+
+    // 有设置闹钟, 则判断当前闹钟是否比整点早, 如果早, 则用闹钟的, 否则用整点的
+    time_s timeNow;
+    timeNow.hour = timeDate.time.hour;
+    timeNow.ampm = timeDate.time.ampm;
+    time_timeMode(&timeNow, TIMEMODE_24HR);
+
+    // Now in minutes from start of week
+    uint now = toMinutes(timeNow.hour, timeDate.time.mins + 1, timeDate.date.day);
+    uint nextZhengdianMins = toMinutes(nextZhengdian.time.hour, nextZhengdian.time.mins + 1, nextZhengdian.date.day);
+    uint nextAlarmMins = toMinutes(alarm.hour, alarm.min + 1, nextAlarmDay);
+
+    // 整点比下一个闹钟早, 且比当前时间晚
+    // now zd alarm
+    if (now < nextZhengdianMins && nextZhengdianMins < nextAlarmMins)
+    {
+        // Serial.println("now zd alarm");
+        rtc_set_pcf8563_alarm(nextZhengdian.time.hour, nextZhengdian.time.mins, nextZhengdian.date.day);
+        return;
+    }
+
+    // alarm now zd
+    if (nextAlarmMins < now && now < nextZhengdianMins)
+    {
+        // Serial.println("alarm now zd");
+        rtc_set_pcf8563_alarm(nextZhengdian.time.hour, nextZhengdian.time.mins, nextZhengdian.date.day);
+        return;
+    }
+
+    // zd alarm now
+    if (nextZhengdianMins < nextAlarmMins && nextAlarmMins < now)
+    {
+        // Serial.println("zd alarm now");
+        rtc_set_pcf8563_alarm(nextZhengdian.time.hour, nextZhengdian.time.mins, nextZhengdian.date.day);
+        return;
+    }
+
+    // Serial.println("use alarm");
+    rtc_set_pcf8563_alarm(alarm.hour, alarm.min, (day_t)nextAlarmDay);
 }
 
 // This func needs to be ran when an alarm has changed, time has changed or an active alarm has been turned off
@@ -226,9 +306,9 @@ static void getNextAlarm()
     }
 
     // Set next alarm
-    nextAlarm = next;
+    nextAlarmIndex = next;
 
-    DS3231_Set_alarm1(); // 存入ds3231闹钟1中
+    rtc_set_alarm();
 }
 
 static uint toMinutes(byte hours, byte mins, byte dow)
@@ -248,15 +328,14 @@ static bool stopAlarm()
     //	pwrmgr_setState(PWR_ACTIVE_ALARM, PWR_STATE_NONE);
     tune_stop(PRIO_ALARM);
     isAlarmTriggered = false;
+
+    keep_on = false;
     return true;
 }
 
 static display_t draw()
 {
-    if ((millis8_t)millis() < 128)
-    {
-        draw_bitmap(16, 16, menu_alarm, 32, 32, NOINVERT, 0);
-    }
+    draw_bitmap(16, 16, menu_alarm, 32, 32, NOINVERT, 0);
 
     // Draw time
     draw_string(time_timeStr(), NOINVERT, 79, 20);
