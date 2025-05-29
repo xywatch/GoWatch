@@ -15,7 +15,9 @@
     "rtc.h": "c",
     "buttons.h": "c",
     "altitude_display.h": "c",
-    "my_menu.h": "c"
+    "my_menu.h": "c",
+    "bma423.h": "c",
+    "bma.h": "c"
   },
   "files.encoding": "gbk"
 }

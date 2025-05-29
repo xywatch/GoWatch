@@ -16,5 +16,6 @@ bool menu_down(void);
 bool menu_up(void);
 bool menu_isOpen(void);
 void menu_close(void);
+void back_to_watchface(void);
 
 #endif /* MENU_H_ */

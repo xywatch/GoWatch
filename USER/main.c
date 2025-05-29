@@ -20,57 +20,19 @@ void showSpace()
     u16 delayMs = 100;
     byte count = 2; // 循环次数
 
+    const u8 *space_images[] = {
+        space_image1, space_image2, space_image3, space_image4, space_image5,
+        space_image6, space_image7, space_image8, space_image9, space_image10};
+  
     while (count--)
     {
-        draw_bitmap(x, y, space_image1, width, height, NOINVERT, 0);
+      for (int i = 0; i < 10; i++)
+      {
+        draw_bitmap(x, y, space_images[i], width, height, NOINVERT, 0);
         OLED_Flush();
         OLED_ClearScreenBuffer();
         delay_ms(delayMs);
-
-        draw_bitmap(x, y, space_image2, width, height, NOINVERT, 0);
-        OLED_Flush();
-        OLED_ClearScreenBuffer();
-        delay_ms(delayMs);
-
-        draw_bitmap(x, y, space_image3, width, height, NOINVERT, 0);
-        OLED_Flush();
-        OLED_ClearScreenBuffer();
-        delay_ms(delayMs);
-
-        draw_bitmap(x, y, space_image4, width, height, NOINVERT, 0);
-        OLED_Flush();
-        OLED_ClearScreenBuffer();
-        delay_ms(delayMs);
-
-        draw_bitmap(x, y, space_image5, width, height, NOINVERT, 0);
-        OLED_Flush();
-        OLED_ClearScreenBuffer();
-        delay_ms(delayMs);
-
-        draw_bitmap(x, y, space_image6, width, height, NOINVERT, 0);
-        OLED_Flush();
-        OLED_ClearScreenBuffer();
-        delay_ms(delayMs);
-
-        draw_bitmap(x, y, space_image7, width, height, NOINVERT, 0);
-        OLED_Flush();
-        OLED_ClearScreenBuffer();
-        delay_ms(delayMs);
-
-        draw_bitmap(x, y, space_image8, width, height, NOINVERT, 0);
-        OLED_Flush();
-        OLED_ClearScreenBuffer();
-        delay_ms(delayMs);
-
-        draw_bitmap(x, y, space_image9, width, height, NOINVERT, 0);
-        OLED_Flush();
-        OLED_ClearScreenBuffer();
-        delay_ms(delayMs);
-
-        draw_bitmap(x, y, space_image10, width, height, NOINVERT, 0);
-        OLED_Flush();
-        OLED_ClearScreenBuffer();
-        delay_ms(delayMs);
+      }
     }
 }
 
@@ -96,22 +58,21 @@ void c_setup()
 
     milliseconds = 0;
 
+    appconfig_init();
+
     I2C_GPIO_Config(); // I2C初始化
     RTC_Init();
     console_log(50, "RTC Init OK");
-
-    appconfig_init();
+    
+    alarm_init(); // 无法储存闹钟，每次重启以后需要自定义
+    
     // led_init();              // 初始化LED
     buzzer_init();
     buttons_init();
-
-    // global_init();
-    alarm_init(); // 无法储存闹钟，每次重启以后需要自定义
-
+    
     pwrmgr_init();
     console_log(50, "START !");
 
-    // memset(&oledBuffer, 0x00, FRAME_BUFFER_SIZE);
     OLED_ClearScreenBuffer();
 
     // Set watchface
