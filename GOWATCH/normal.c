@@ -8,8 +8,6 @@
 
 #include "common.h"
 #include "my_menu.h"
-#include "bme280.h"
-#include "altitude_display.h"
 
 #define TIME_POS_X 0
 #define TIME_POS_Y 17
@@ -44,12 +42,12 @@ byte seconds = 0;
 void watchface_normal()
 {
     display_setDrawFunc(draw);
-    buttons_setFuncs(altitude_open2, menu_select, my_menu_open2);
+    // buttons_setFuncs(altitude_open2, menu_select, my_menu_open2);
     showMeThenRun(NULL); // 设置打开过度动画，（不执行函数）
 }
 
-extern float DS3231_Temp;
-extern BME280_Data bme280_data;
+// extern float DS3231_Temp;
+// extern BME280_Data bme280_data;
 
 static display_t draw()
 {
@@ -144,13 +142,13 @@ static display_t draw()
 #endif
 
     // 显示温度
-    char temp[8];
-    sprintf((char *)temp, "%0.1fC", bme280_data.T); //
-    draw_string(temp, NOINVERT, FRAME_WIDTH - 35, FRAME_HEIGHT - 8);
+    // char temp[8];
+    // sprintf((char *)temp, "%0.1fC", bme280_data.T); //
+    // draw_string(temp, NOINVERT, FRAME_WIDTH - 35, FRAME_HEIGHT - 8);
 
-    // BMP280没有湿度
-    sprintf((char *)temp, "%0.0f%%", bme280_data.H); // 湿度
-    draw_string(temp, NOINVERT, FRAME_WIDTH - 60, FRAME_HEIGHT - 8);
+    // // BMP280没有湿度
+    // sprintf((char *)temp, "%0.0f%%", bme280_data.H); // 湿度
+    // draw_string(temp, NOINVERT, FRAME_WIDTH - 60, FRAME_HEIGHT - 8);
 
     return busy;
 }

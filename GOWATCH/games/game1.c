@@ -7,7 +7,6 @@
  */
 
 #include "common.h"
-#include "mpu6050.h"
 
 #if COMPILE_GAME1
 
@@ -90,7 +89,7 @@ void game1_start()
 
     keep_on = 1;
     // 因为在PCB上MPU方向焊反了, 所以要变下
-    mpu_dmp_get_data(&Middle, &temp, &temp);
+    // mpu_dmp_get_data(&Middle, &temp, &temp);
     // mpu_dmp_get_data(&temp, &Middle, &temp);
 
     ball.x = FRAME_WIDTH / 2;
@@ -153,7 +152,7 @@ display_t game1_draw()
     }
 
     // u8 roll_direction = MPU_Roll_Detect(Middle);
-    u8 roll_direction = MPU_Roll_Detect(Middle);
+    u8 roll_direction = 0; // MPU_Roll_Detect(Middle);
 
     if (roll_direction == 1)
     {

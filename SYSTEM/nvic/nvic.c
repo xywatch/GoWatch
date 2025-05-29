@@ -1,6 +1,5 @@
 #include "common.h"
 #include "nvic.h"
-#include "DS3231.h"
 #include "oled_driver.h"
 
 bool DeepSleepFlag = 0;

@@ -9,7 +9,13 @@
     "delay.h": "c",
     "i2c_soft.h": "c",
     "config.h": "c",
-    "nvic.h": "c"
+    "nvic.h": "c",
+    "oled.h": "c",
+    "usart.h": "c",
+    "rtc.h": "c",
+    "buttons.h": "c",
+    "altitude_display.h": "c",
+    "my_menu.h": "c"
   },
   "files.encoding": "gbk"
 }

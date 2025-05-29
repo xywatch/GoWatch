@@ -7,8 +7,6 @@
  */
 
 #include "common.h"
-#include "led.h"
-#include "mpu6050.h"
 
 #if COMPILE_GAME3
 
@@ -189,10 +187,10 @@ static display_t draw() // 还差一部是无法判断人物和管道是否重叠
 
     if (gameState)
     {
-        if (MPU_Pitch_Detect())
-        {
-            bounce = true;
-        }
+        // if (MPU_Pitch_Detect())
+        // {
+        //     bounce = true;
+        // }
 
         if (bounce)
         {

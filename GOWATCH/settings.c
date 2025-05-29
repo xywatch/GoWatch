@@ -8,7 +8,7 @@
 
 #include "common.h"
 
-#define OPTION_COUNT 5
+#define OPTION_COUNT 4
 
 static prev_menu_s prevMenuData;
 
@@ -38,7 +38,7 @@ static void itemLoader(byte num)
     setMenuOption_P(1, PSTR(STR_SLEEP), menu_sleep, mSleepOpen); // 这里有bug！！！  可以再增加一个图标就可以解决
     setMenuOption_P(2, PSTR(STR_SOUND), menu_sound, mSoundOpen);
     setMenuOption_P(3, PSTR(STR_DISPLAY), menu_display, mDisplayOpen);
-    setMenuOption_P(4, PSTR(STR_DIAGNOSTICS), menu_diagnostic, mDiagOpen);
+    // setMenuOption_P(4, PSTR(STR_DIAGNOSTICS), menu_diagnostic, mDiagOpen);
 
     //	setMenuOption_P(5, PSTR(STR_UI), NULL, NULL);
     //	setMenuOption_P(6, PSTR(STR_RCSETTINGS), NULL, NULL);

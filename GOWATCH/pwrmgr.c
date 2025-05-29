@@ -9,7 +9,6 @@
 // Deals with sleeping and waking up/电源管理
 
 #include "common.h"
-#include "delay.h"
 
 #define BATTERY_CUTOFF 2800
 
@@ -48,44 +47,7 @@ void pwrmgr_init()
 }
 
 bool keep_on = 0;
-short pitch_a, roll_a, yaw_a;
-/*************************检测滚转******************************************/
-// 看是不是绕y旋转
-/*
-    |
-    |
- -------y
-    |
-    |
-    x
-*/
-// 抬腕
-void movecheck(void)
-{
-    if (MPU_Get_Gyroscope(&pitch_a, &roll_a, &yaw_a) == 0)
-    {
-        // pitch_a = roll_a; // 因为PCB画错了
-        if (pitch_a > 2300 || pitch_a < -2300)
-        {
-            delay_ms(300);
 
-            while (MPU_Get_Gyroscope(&pitch_a, &roll_a, &yaw_a))
-            {
-            };
-
-            // pitch_a = roll_a; // 因为PCB画错了
-            if (pitch_a > 2300 || pitch_a < -2300)
-            {
-                userWake();
-            }
-        }
-    }
-
-    // if(threshold>45||threshold<45)
-    //	userWake();
-}
-
-extern bool MoveCheckFlag; // 这个参数是在sleep设置里控制的, 默认是打开的
 bool SleepRequested; // 是否请求休眠, 在息屏结束会认为就可以休眠了, 然后在main.c里会执行休眠
 
 // c_loop()里循环执行
@@ -151,14 +113,6 @@ void pwrmgr_update()
             if (time_wake() == RTCWAKE_SYSTEM) // Woken by button press, USB plugged in or by RTC user alarm
             {
                 userWake();
-            }
-
-            // 如果MoveCheckFlag为真，则执行movecheck()
-            // 这个函数是用来检测用户是否在移动设备的，如果检测到用户在移动设备，则唤醒设备
-            // 但是因为已STOP, 所以不会执行
-            if (MoveCheckFlag)
-            {
-                movecheck();
             }
         }
     }

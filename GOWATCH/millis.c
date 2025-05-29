@@ -9,11 +9,6 @@
 #ifndef ARDUINO
 
 #include "common.h"
-#include "sys.h"
-#include "led.h"
-#include "adc.h"
-#include "bme280.h"
-// #include "misc.h"
 
 extern float BatteryVol; // 改成u16会导致无法正常显示
 millis_t milliseconds;
@@ -101,14 +96,10 @@ millis_t millis_get()
 }
 
 extern char imu_run;
-u8 HistoryCount = 0;
-extern HistoryData historydat[12];
-extern float DS3231_Temp;
 extern int altitude;
 bool bme_flag = 0;
 u8 bme_time = 5;
 u8 log_time = 1;
-extern bool bme_enable;
 
 // 电池电压滤波
 static float batteryFilter(float newValue) {
@@ -157,7 +148,6 @@ static float calibrateVoltage(float rawVoltage) {
 // 定时器中断函数处理。 //TIM2通用定时器
 void TIM3_IRQHandler(void)
 {
-    static u8 count = 0;
     static u8 adcCount = 0;
     static float voltageSum = 0;
     const u8 ADC_AVERAGE_COUNT = 5;  // 每5次采样取平均
@@ -201,35 +191,6 @@ void TIM3_IRQHandler(void)
                 
                 voltageSum = 0;
                 adcCount = 0;
-            }
-
-            if (bme_enable)
-            {
-                count++;
-            }
-        }
-
-        if (count > 6 * log_time)
-        { // 每10分钟更新一次数据
-            count = 0;
-            historydat[HistoryCount].hour = timeDate.time.hour;
-            historydat[HistoryCount].min = timeDate.time.mins;
-            historydat[HistoryCount].temp = bme280_data.T;  // DS3231_Temp ? 温度
-            historydat[HistoryCount].shidu = bme280_data.H; // 湿度
-            historydat[HistoryCount].height = altitude;
-
-            if (++HistoryCount > 11)
-            {
-                HistoryCount = 0;
-            }
-        }
-
-        if (milliseconds % 20 == 0) // 5 太小了, 会卡死时钟
-        {
-            // 有时会卡死, imu_run 在 mpu_task.c中, 卡死ds3231时钟
-            if (imu_run)
-            {
-                mpu_dmp_get_data(&pitch, &roll, &yaw);
             }
         }
     }

@@ -7,7 +7,6 @@
  */
 
 #include "common.h"
-#include "mpu6050.h"
 
 #if COMPILE_GAME2
 
@@ -169,7 +168,7 @@ static display_t draw()
     u8 pitch_detect;
 
     // Change lane
-    pitch_detect = MPU_Pitch_Detect();
+    pitch_detect = 0; //MPU_Pitch_Detect();
 
     if (pitch_detect == 2)
     {
