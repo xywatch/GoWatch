@@ -80,7 +80,6 @@
 #include "inv_mpu_dmp_motion_driver.h"
 #include "mpu_task.h"
 
-#include "wait_data_clock.h"
 #include "gui_log_console.h"
 
 #endif /* COMMON_H_ */
