@@ -48,57 +48,19 @@ void showSpace()
     u16 delayMs = 100;
     byte count = 2; // Ñ­»·´ÎÊý
 
+    const u8 *space_images[] = {
+        space_image1, space_image2, space_image3, space_image4, space_image5,
+        space_image6, space_image7, space_image8, space_image9, space_image10};
+  
     while (count--)
     {
-        draw_bitmap(x, y, space_image1, width, height, NOINVERT, 0);
+      for (int i = 0; i < 10; i++)
+      {
+        draw_bitmap(x, y, space_images[i], width, height, NOINVERT, 0);
         OLED_Flush();
         OLED_ClearScreenBuffer();
         delay_ms(delayMs);
-
-        draw_bitmap(x, y, space_image2, width, height, NOINVERT, 0);
-        OLED_Flush();
-        OLED_ClearScreenBuffer();
-        delay_ms(delayMs);
-
-        draw_bitmap(x, y, space_image3, width, height, NOINVERT, 0);
-        OLED_Flush();
-        OLED_ClearScreenBuffer();
-        delay_ms(delayMs);
-
-        draw_bitmap(x, y, space_image4, width, height, NOINVERT, 0);
-        OLED_Flush();
-        OLED_ClearScreenBuffer();
-        delay_ms(delayMs);
-
-        draw_bitmap(x, y, space_image5, width, height, NOINVERT, 0);
-        OLED_Flush();
-        OLED_ClearScreenBuffer();
-        delay_ms(delayMs);
-
-        draw_bitmap(x, y, space_image6, width, height, NOINVERT, 0);
-        OLED_Flush();
-        OLED_ClearScreenBuffer();
-        delay_ms(delayMs);
-
-        draw_bitmap(x, y, space_image7, width, height, NOINVERT, 0);
-        OLED_Flush();
-        OLED_ClearScreenBuffer();
-        delay_ms(delayMs);
-
-        draw_bitmap(x, y, space_image8, width, height, NOINVERT, 0);
-        OLED_Flush();
-        OLED_ClearScreenBuffer();
-        delay_ms(delayMs);
-
-        draw_bitmap(x, y, space_image9, width, height, NOINVERT, 0);
-        OLED_Flush();
-        OLED_ClearScreenBuffer();
-        delay_ms(delayMs);
-
-        draw_bitmap(x, y, space_image10, width, height, NOINVERT, 0);
-        OLED_Flush();
-        OLED_ClearScreenBuffer();
-        delay_ms(delayMs);
+      }
     }
 }
 
@@ -123,7 +85,7 @@ void c_setup()
     delay_ms(50);
     showSpace();
 
-    console_log(50, "Init MPU:...");
+    console_log(50, "Init MPU...");
     // console_log(50, "SS %d", SystemCoreClock);
 
     char i = 0;
