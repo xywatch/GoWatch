@@ -35,7 +35,6 @@ static void mSelect()
     bool isExiting = exitSelected();
 
     if (isExiting)
-
     {
         appconfig_save();
     }

@@ -74,13 +74,13 @@ void c_setup()
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2); // 设置系统中断优先级分组2
 
     uart_init(115200);
-    // printf("goxxx1");
+    printf("goxxx1");
 
     OLED_Init(); // 初始化OLED接口
     Adc_Init();  // ADC初始化
     KEY_INT_INIT(); // 按键中断
     millis_init();
-    // printf("goxxx2");
+    printf("goxxx2");
 
     delay_ms(50);
     showSpace();
@@ -129,7 +129,6 @@ void c_setup()
 
     milliseconds = 0;
 
-#ifndef RTC_SRC
     // 先初始化中断引脚
     DS3231_INT_INIT();  // 初始化DS3231中断引脚
     delay_ms(10);       // 等待引脚配置稳定
@@ -155,25 +154,6 @@ void c_setup()
         DS3231_Set_Date();
         DS3231_Set_Time();
     }
-#endif
-
-#ifdef RTC_SRC
-    count = 0;
-    while (count++ < 500)
-    {
-        u8 rtcInitRet = RTC_Init();
-
-        if (!rtcInitRet)
-        {
-            console_log(50, "RTC Init OK");
-            break;
-        }
-        else
-        {
-            console_log(50, "RTC Init Error: %d", rtcInitRet);
-        }
-    }
-#endif
 
     appconfig_init();
     // led_init();              // 初始化LED

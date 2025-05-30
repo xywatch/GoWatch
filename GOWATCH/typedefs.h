@@ -150,6 +150,7 @@ typedef struct
 // Could use bitfields for the bools to save a few bytes of RAM and EEPROM, but uses an extra ~82 bytes of flash
 typedef struct
 {
+	byte flashCheck;
 	// byte sleepMode;
 	// byte sleepBrightness;
 	byte sleepTimeout;
