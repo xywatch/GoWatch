@@ -10,8 +10,6 @@
 #define ALARM_H_
 #include "typedefs.h"
 
-#define ALARM_COUNT 5
-
 #define _BV(bit) (1 << (bit))
 #define alarm_dayEnabled(days, day) (days & _BV(day))
 

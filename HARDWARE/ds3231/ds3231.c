@@ -10,7 +10,6 @@ Calendar_OBJ calendar;
 u8 test1, test2, test3;
 u8 alarm1_flag;
 u8 alarm_hour, alarm_min, alarm_sec, alarm_week;
-extern alarm_s eepAlarms[ALARM_COUNT];
 extern bool DeepSleepFlag;
 u8 BCD2HEX(u8 val)
 {

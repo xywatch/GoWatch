@@ -1,6 +1,5 @@
 #include "common.h"
-// #include "stmflash.h"
-#include "stm32f10x_flash.h"
+#include "stmflash.h"
 
 #define EEPROM_CHECK_NUM 0x68 // Any 8 bit number that isn't 0 or 255
 
@@ -30,46 +29,15 @@ Page 7	0x0801 C000 - 0x0801 FFFF	16 KB	额外存储空间（非官方保证）
 */
 
 // 这是额外64k的地址了
-#define eepCheck_SAVE_ADDR 0x08018000  // 0X080E0000 设置FLASH 保存地址(必须为偶数，且所在扇区,要大于本代码所占用到的扇区.
+#define appConfig_SAVE_ADDR 0x08018000  // 0X080E0000 设置FLASH 保存地址(必须为偶数，且所在扇区,要大于本代码所占用到的扇区.
 // 否则,写操作的时候,可能会导致擦除整个扇区,从而引起部分程序丢失.引起死机.
-#define appConfig_SAVE_ADDR eepCheck_SAVE_ADDR + 16 // 设置FLASH 保存地址(必须为偶数，且所在扇区,要大于本代码所占用到的扇区.
-// 否则,写操作的时候,可能会导致擦除整个扇区,从而引起部分程序丢失.引起死机.
-
-appconfig_s appConfig; // appconfig_s的长度为8
-static byte eepCheck;//= EEPROM_CHECK_NUM;
-
-void appconfig_initOld()
-{
-    STMFLASH_Read(eepCheck_SAVE_ADDR, (u32 *)(&eepCheck), sizeof(byte));
-    appConfig = *((appconfig_s *)malloc(sizeof(appconfig_s)));
-    memset(&appConfig, 0x00, sizeof(appconfig_s));
-
-    // 如果之前设置过appconfig, 则读取appconfig
-    if (eepCheck == EEPROM_CHECK_NUM)
-    {
-        STMFLASH_Read(appConfig_SAVE_ADDR, (u32 *)(&appConfig), sizeof(appconfig_s));
-        printf("之前有 appconfig_init: appConfig: %d\n", appConfig.sleepTimeout);
-    }
-    else
-    {
-        printf("之前没有 appconfig_init: appConfig: %d, eepCheck=%d\n", appConfig.sleepTimeout, eepCheck);
-        eepCheck = EEPROM_CHECK_NUM;
-        STMFLASH_Write(eepCheck_SAVE_ADDR, (u32 *)(&eepCheck), sizeof(byte));
-
-        appconfig_reset();
-    }
-
-    if (appConfig.sleepTimeout > 12)
-    {
-        appConfig.sleepTimeout = 0;
-    }
-}
+appconfig_s appConfig;
 
 void appconfig_init()
 {
     appConfig = *((appconfig_s *)malloc(sizeof(appconfig_s)));
     memset(&appConfig, 0x00, sizeof(appconfig_s));
-    STMFLASH_Read(appConfig_SAVE_ADDR, (u32 *)(&appConfig), sizeof(appconfig_s));
+    STMFLASH_Read(appConfig_SAVE_ADDR, (u16 *)(&appConfig), sizeof(appconfig_s));
 
     // 如果之前设置过appconfig, 则使用之
     if (appConfig.flashCheck == EEPROM_CHECK_NUM)
@@ -85,7 +53,7 @@ void appconfig_init()
 
 void appconfig_save()
 {
-    STMFLASH_Write(appConfig_SAVE_ADDR, (u32*)(&appConfig), sizeof(appconfig_s));
+    STMFLASH_Write(appConfig_SAVE_ADDR, (u16*)(&appConfig), sizeof(appconfig_s));
     printf("保存成功\n");
 }
 
@@ -106,6 +74,29 @@ void appconfig_reset()
     appConfig.volUI = 1;
     appConfig.volAlarm = 2;
     appConfig.volHour = 1;
+
+    // alarms
+    // 22:45:00, 127 = 1111111, 表示星期1,2,3,4,5,6,7, 255=1(开启) 111111(周二)1(周一), 表示所有星期且开启
+    // 63 = 111111, 表示星期1,2,3,4,5,6   7 = 111, 表示星期1,2,3
+    appConfig.alarms[0].hour = 10;
+    appConfig.alarms[0].min = 42;
+    appConfig.alarms[0].days = 255;
+
+    appConfig.alarms[1].hour = 10;
+    appConfig.alarms[1].min = 43;
+    appConfig.alarms[1].days = 255;
+
+    appConfig.alarms[2].hour = 7;
+    appConfig.alarms[2].min = 45;
+    appConfig.alarms[2].days = 63;
+
+    appConfig.alarms[3].hour = 9;
+    appConfig.alarms[3].min = 4;
+    appConfig.alarms[3].days = 0;
+
+    appConfig.alarms[4].hour = 3;
+    appConfig.alarms[4].min = 1;
+    appConfig.alarms[4].days = 7;
 
     appconfig_save();
 }
