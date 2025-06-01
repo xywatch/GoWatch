@@ -236,4 +236,12 @@ typedef struct
 	byte offsetY;
 } image_s;
 
+typedef struct
+{
+    byte year;
+	month_t month;
+	byte date;
+	uint32_t stepCount;
+} stepLogData_s;
+
 #endif /* TYPEDEFS_H_ */

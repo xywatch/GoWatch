@@ -232,8 +232,8 @@ void time_update()
 
         // 如果是在0点0分, 则需要reset step count
         if (hour == 0) {
-            // addStepLog();
-            // resetStepCounter();
+            addStepLog();
+            resetStepCounter();
         }
     }
 

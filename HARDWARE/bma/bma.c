@@ -233,7 +233,7 @@ bool bma_resetStepCounter()
     return BMA4_OK == bma423_reset_step_counter(&__devFptr);
 }
 
-uint32_t bma_getCounter()
+uint32_t bma_getStepCount()
 {
     uint32_t stepCount;
     if (bma423_step_counter_output(&stepCount, &__devFptr) == BMA4_OK)

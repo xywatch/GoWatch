@@ -4,11 +4,10 @@
 #define CMD1_NAME "Shut Down"
 #define CMD2_NAME "Deep Sleep"
 #define Show_Accelerometer "Show Accelerometer"
-// #define CMD3_NAME "MPU Display"
-// #define CMD4_NAME "History Data"
+#define StepLog "Step Log"
 #define CMD5_NAME "Back"
 
-#define OPTION_COUNT 3
+#define OPTION_COUNT 4
 
 static void mSelect()
 {
@@ -60,14 +59,8 @@ static void itemLoader(byte num)
 
     setMenuOption_P(num++, PSTR(CMD2_NAME), NULL, cmd2);
 
-    // setMenuOption_P(num++, PSTR(CMD3_NAME), NULL, mpu_open);
-
-    // setMenuOption_P(num++, PSTR(CMD4_NAME), NULL, history_display);
-
-    // sprintf_P((char *)buff, PSTR("Log Time  %d min"), log_time);
-    // setMenuOption_P(num++, buff, NULL, LogTimeUpdate);
-
     setMenuOption_P(num++, PSTR(Show_Accelerometer), NULL, showAccelerometer);
+    setMenuOption_P(num++, PSTR(StepLog), NULL, showStepLog);
 
     setMenuOption_P(num++, PSTR(CMD5_NAME), NULL, cmd3);
 }

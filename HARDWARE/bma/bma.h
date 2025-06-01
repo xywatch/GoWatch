@@ -45,7 +45,7 @@ bool bma_isActivity(void);
 bool bma_isAnyNoMotion(void);
 
 bool bma_resetStepCounter(void);
-uint32_t bma_getCounter(void);
+uint32_t bma_getStepCount(void);
 
 float bma_readTemperature(void);
 float bma_readTemperatureF(void);

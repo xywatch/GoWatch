@@ -32,14 +32,16 @@ static void drawDate(void);
 static display_t ticker(void);
 static void drawTickerNum(tickerData_t *);
 static void drawBattery(void);
+static void drawStep(byte);
 
 byte seconds = 0;
 
 uint32_t stepCount;
+static uint32_t lastUpdateTime = 0;  // 记录上次更新时间
 
 void getBatteryAndOthers () {
     // VBAT = getBatteryVoltage();
-    // stepCount = sensor.getCounter();
+    stepCount = bma_getStepCount();
     // syncWeather();
 }
 
@@ -61,6 +63,14 @@ static display_t draw()
     display_t busy;
 
     busy = ticker();
+
+    uint32_t currentTime = millis();
+    // 每1000ms（1秒）更新一次
+    if (currentTime - lastUpdateTime >= 5000) {
+        // Draw battery icon
+        getBatteryAndOthers();
+        lastUpdateTime = currentTime;
+    }
 
     // Draw battery icon
     drawBattery();
@@ -94,7 +104,7 @@ static display_t draw()
         x += 10;
     }
 
-    // drawStep(x);
+    drawStep(x);
 
     return busy;
 }
@@ -430,7 +440,7 @@ static void drawBattery()
 
 static void drawStep(byte x) {
     char ad[5];
-    // uint32_t stepCount = sensor.getCounter();
+    // uint32_t stepCount = bma_getStepCount();
     sprintf((char *)ad, "%d", (int)stepCount);
     // draw_string(ad, NOINVERT, x, FRAME_HEIGHT - 8);
 

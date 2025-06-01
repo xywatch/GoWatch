@@ -74,5 +74,6 @@
 #include "gui_log_console.h"
 
 #include "bma423_watch.h"
+#include "step_log.h"
 
 #endif /* COMMON_H_ */
