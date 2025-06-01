@@ -90,17 +90,21 @@ void pwrmgr_update()
     }
     else
     {
+        // printf("buttonsActive false\r\n");
         // 没有按钮活动，开始息屏动画
         if (systemState == SYS_AWAKE)
         {
+            printf("没有按钮活动，开始息屏动画\r\n");
             systemState = SYS_CRTANIM;
             display_startCRTAnim(CRTANIM_CLOSE);
         }
         // 已息屏, 则等待动画结束进入睡眠模式
         else if (systemState == SYS_CRTANIM)
         {
+            // printf("已息屏, 则等待动画结束进入睡眠模式\r\n");
             // 等动画结束进入sleep mode
             if (!animation_active() && !display_is_ani_active()) {
+                printf("动画结束，进入睡眠模式\r\n");
                 SleepRequested = true;
             }
 
@@ -112,6 +116,7 @@ void pwrmgr_update()
             // 这里应该是 == 按下中键就是 RTCWAKE_SYSTEM
             if (time_wake() == RTCWAKE_SYSTEM) // Woken by button press, USB plugged in or by RTC user alarm
             {
+                printf("按下中键，唤醒系统\r\n");
                 userWake();
             }
         }

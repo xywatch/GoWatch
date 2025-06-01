@@ -4,6 +4,8 @@
 #include "common.h"
 
 Calendar_OBJ calendar;
+
+// 0xD0 >> 1 = 0x68 DS3231 µØÖ·
 #define DS3231_WriteAddress 0xD0
 #define DS3231_ReadAddress 0xD1
 

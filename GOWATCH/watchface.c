@@ -47,7 +47,7 @@ void getBatteryAndOthers () {
 void watchface_normal()
 {
     display_setDrawFunc(draw);
-    // buttons_setFuncs(altitude_open2, menu_select, my_menu_open2);
+    buttons_setFuncs(NULL, menu_select, my_menu_open2);
     showMeThenRun(NULL); // 设置打开过度动画，（不执行函数）
 }
 

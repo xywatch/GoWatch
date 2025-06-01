@@ -346,6 +346,8 @@ struct bma423_stepcounter_settings {
   uint16_t param25;
 };
 
+void bma423_get_feature_config(uint8_t *data, struct bma4_dev *dev);
+
 /*!
  *	@brief This API is the entry point.
  *	Call this API before using all other APIs.

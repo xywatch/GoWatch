@@ -17,11 +17,11 @@ static button_f oldBtn3Func;
 
 byte nextAlarmIndex;
 byte nextAlarmDay; // 下一个闹钟的星期, 0-6, 0:周一, 6:周日
-bool isAlarmTriggered; // 
+bool isAlarmTriggered;
 
 alarm_s eepAlarms[ALARM_COUNT] EEMEM = {
-    {8, 0, 63}, // 22:45:00, 127 = 1111111, 表示星期1,2,3,4,5,6,7, 255=1(开启) 111111(周二)1(周一), 表示所有星期且开启
-    {9, 0, 63}, 
+    {8, 0, 255}, // 22:45:00, 127 = 1111111, 表示星期1,2,3,4,5,6,7, 255=1(开启) 111111(周二)1(周一), 表示所有星期且开启
+    {9, 0, 255}, 
     {7, 45, 63},  // 63 = 111111, 表示星期1,2,3,4,5,6
     {9, 4, 0}, 
     {3, 1, 7} // 7 = 111, 表示星期1,2,3
@@ -77,6 +77,7 @@ bool alarm_getNext(alarm_s *alarm)
 {
     if (nextAlarmIndex == NOALARM)
     {
+        printf("alarm_getNext NOALARM\r\n");
         return false;
     }
 
@@ -190,7 +191,7 @@ void rtc_set_alarm(void)
     // 得到下一个整点报时的时间
     timeDate_s nextZhengdian;
     time_getNextZhengdiao(&nextZhengdian);
-    // Serial.printf("nextZhengdian %02d:%02d, day:%d\n", nextZhengdian.time.hour, nextZhengdian.time.mins, nextZhengdian.date.day);
+    printf("nextZhengdian %02d:%02d, day:%d\r\n", nextZhengdian.time.hour, nextZhengdian.time.mins, nextZhengdian.date.day);
 
     alarm_s alarm;
     if (!alarm_getNext(&alarm))
@@ -199,11 +200,11 @@ void rtc_set_alarm(void)
         // RTC.clearAlarm();
 
         // 没有闹钟, 则直接用下一个整点
-        // Serial.printf("没有闹钟, 则直接用下一个整点\n");
+        printf("没有闹钟, 则直接用下一个整点\r\n");
         rtc_set_pcf8563_alarm(nextZhengdian.time.hour, nextZhengdian.time.mins, nextZhengdian.date.day);
         return;
     }
-    // Serial.printf("nextAlarm %02d:%02d, day:%d\n", alarm.hour, alarm.min, nextAlarmDay);
+    printf("nextAlarm %02d:%02d, day:%d\r\n", alarm.hour, alarm.min, nextAlarmDay);
 
     // 有设置闹钟, 则判断当前闹钟是否比整点早, 如果早, 则用闹钟的, 否则用整点的
     time_s timeNow;
@@ -220,7 +221,7 @@ void rtc_set_alarm(void)
     // now zd alarm
     if (now < nextZhengdianMins && nextZhengdianMins < nextAlarmMins)
     {
-        // Serial.println("now zd alarm");
+        printf("now zd alarm\r\n");
         rtc_set_pcf8563_alarm(nextZhengdian.time.hour, nextZhengdian.time.mins, nextZhengdian.date.day);
         return;
     }
@@ -228,7 +229,7 @@ void rtc_set_alarm(void)
     // alarm now zd
     if (nextAlarmMins < now && now < nextZhengdianMins)
     {
-        // Serial.println("alarm now zd");
+        printf("alarm now zd\r\n");
         rtc_set_pcf8563_alarm(nextZhengdian.time.hour, nextZhengdian.time.mins, nextZhengdian.date.day);
         return;
     }
@@ -236,12 +237,12 @@ void rtc_set_alarm(void)
     // zd alarm now
     if (nextZhengdianMins < nextAlarmMins && nextAlarmMins < now)
     {
-        // Serial.println("zd alarm now");
+        printf("zd alarm now\r\n");
         rtc_set_pcf8563_alarm(nextZhengdian.time.hour, nextZhengdian.time.mins, nextZhengdian.date.day);
         return;
     }
 
-    // Serial.println("use alarm");
+    printf("use alarm\r\n");
     rtc_set_pcf8563_alarm(alarm.hour, alarm.min, (day_t)nextAlarmDay);
 }
 

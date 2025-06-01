@@ -10,35 +10,60 @@ uint16_t _readRegister(uint8_t address, uint8_t reg, uint8_t *data,
                        uint16_t len)
 {
     // Start condition
-    if (I2C_Start() == 0) return 1;
+    if (I2C2_Start() == 0)
+    {
+        I2C2_Stop();
+        printf("0 I2C2_Start() == 0\r\n");
+        return 1;
+    }
 
     // Send slave address (write mode)
-    I2C_SendByte(address << 1);
-    if (I2C_WaitAck() == 0) return 1;
+    I2C2_SendByte(address << 1);
+    if (I2C2_WaitAck() == 0)
+    {
+        I2C2_Stop();
+        printf("1 I2C2_WaitAck() == 0\r\n");
+        return 1;
+    }
 
     // Send register address
-    I2C_SendByte(reg);
-    if (I2C_WaitAck() == 0) return 1;
+    I2C2_SendByte(reg);
+    if (I2C2_WaitAck() == 0)
+    {
+        I2C2_Stop();
+        printf("2 I2C2_WaitAck() == 0\r\n");
+        return 1;
+    }
 
     // Start condition again
-    if (I2C_Start() == 0) return 1;
+    if (I2C2_Start() == 0)
+    {
+        I2C2_Stop();
+        printf("3 I2C2_Start() == 0\r\n");
+        return 1;
+    }
 
     // Send slave address (read mode)
-    I2C_SendByte((address << 1) | 1);
-    if (I2C_WaitAck() == 0) return 1;
+    I2C2_SendByte((address << 1) | 1);
+    if (I2C2_WaitAck() == 0)
+    {
+        I2C2_Stop();
+        printf("4 I2C2_WaitAck() == 0\r\n");
+        return 1;
+    }
 
     // Read data
     for (uint16_t i = 0; i < len; i++)
     {
-        data[i] = I2C_ReceiveByte();
+        data[i] = I2C2_ReceiveByte();
         if (i < len - 1)
-            I2C_Ack();
+            I2C2_Ack();
         else
-            I2C_NoAck();
+            I2C2_NoAck();
     }
 
     // Stop condition
-    I2C_Stop();
+    I2C2_Stop();
     return 0;
 }
 
@@ -46,38 +71,61 @@ uint16_t _writeRegister(uint8_t address, uint8_t reg, uint8_t *data,
                         uint16_t len)
 {
     // Start condition
-    if (I2C_Start() == 0) return 1;
+    if (I2C2_Start() == 0)
+    {
+        I2C2_Stop();
+        printf("4 I2C2_Start() == 0\r\n");
+        return 1;
+    }
 
     // Send slave address (write mode)
-    I2C_SendByte(address << 1);
-    if (I2C_WaitAck() == 0) return 1;
+    I2C2_SendByte(address << 1);
+    if (I2C2_WaitAck() == 0)
+    {
+        I2C2_Stop();
+        printf("5 I2C2_WaitAck() == 0\r\n");
+        return 1;
+    }
 
     // Send register address
-    I2C_SendByte(reg);
-    if (I2C_WaitAck() == 0) return 1;
+    I2C2_SendByte(reg);
+    if (I2C2_WaitAck() == 0)
+    {
+        I2C2_Stop();
+        printf("6 I2C2_WaitAck() == 0\r\n");
+        return 1;
+    }
 
     // Send data
     for (uint16_t i = 0; i < len; i++)
     {
-        I2C_SendByte(data[i]);
-        if (I2C_WaitAck() == 0) return 1;
+        I2C2_SendByte(data[i]);
+        // 有一个数据会失败, 只有一个
+        // write config file没有问题
+        if (I2C2_WaitAck() == 0)
+        {
+            I2C2_Stop();
+            printf("7 I2C2_WaitAck() == 0, %d\r\n", i);
+            return 1;
+        }
+        else
+        {
+            // printf("9 I2C2_WaitAck() == 1, %d\r\n", i);
+        }
     }
 
-    // Stop condition
-    I2C_Stop();
+    I2C2_Stop();
     return 0;
 }
 
 bool bmaConfig()
 {
-    printf("BMA _bmaConfig");
+    printf("BMA423 config\r\n");
     byte address = 0x18; // getBma423Address(); // 接地 0x18; 1引角悬空了导致没有接地变成了0x19
 
     if (bma_begin(_readRegister, _writeRegister, delay_ms, address) == false)
     {
-        // fail to init BMA
-        printf("BMA ERROR");
-        // getBma423Address();
+        printf("BMA ERROR\r\n");
         return false;
     }
 
@@ -131,7 +179,7 @@ bool bmaConfig()
     // Configure the BMA423 accelerometer
     if (!bma_setAccelConfig(&cfg))
     {
-        printf("bma_setAccelConfig error");
+        printf("bma_setAccelConfig error\r\n");
     }
     else
     {
@@ -143,7 +191,6 @@ bool bmaConfig()
         // printf("cfg2.perf_mode: %d\n", cfg2.perf_mode);
         // printf("bma_setAccelConfig OK");
     }
-
     // Enable BMA423 accelerometer
     // Warning : Need to use feature, you must first enable the accelerometer
     bma_enableAccel(true);
@@ -160,7 +207,7 @@ bool bmaConfig()
     // ok = bma_setINTPinConfig(config, BMA4_INTR2_MAP); // 映射到ACC_INT2引脚
     if (!ok)
     {
-        printf("bma_setINTPinConfig error");
+        printf("bma_setINTPinConfig error\r\n");
     }
 
     // 轴映??, 为了配置抬腕
@@ -170,17 +217,6 @@ bool bmaConfig()
     // Z = -z axis
     // x, y swapped, and z inverted
     struct bma423_axes_remap remap_data;
-
-    // watchy
-    // 1角在左上??, bottom layer
-    remap_data.x_axis = 0;
-    remap_data.x_axis_sign = 1;
-    remap_data.y_axis = 1;
-    remap_data.y_axis_sign = 0;
-    remap_data.z_axis = 2;
-    remap_data.z_axis_sign = 1;
-
-    #if HW_VERSION == 1 // v1
 
     // go watch
     // 1角在左上??, top layer
@@ -193,27 +229,16 @@ bool bmaConfig()
     remap_data.z_axis = 2;
     remap_data.z_axis_sign = 0;
 
-    #else // v2
-    // 1角在左下?? bottom layer
-    remap_data.x_axis = 1;
-    remap_data.x_axis_sign = 1;
-    remap_data.y_axis = 0;
-    remap_data.y_axis_sign = 1;
-    remap_data.z_axis = 2;
-    remap_data.z_axis_sign = 1;
-
-    #endif
-
     // Need to raise the wrist function, need to set the correct axis
     if (!bma_setRemapAxes(&remap_data))
     {
-        printf("bma_setRemapAxes error");
+        printf("bma_setRemapAxes error\r\n");
     }
 
     // Enable BMA423 step counter feature
     if (!bma_enableFeature(BMA423_STEP_CNTR, true))
     {
-        printf("bma_enableFeature BMA423_STEP_CNTR error");
+        printf("bma_enableFeature BMA423_STEP_CNTR error\r\n");
     }
     // Enable BMA423 wrist tilt feature 抬腕
     // if (!bma_enableFeature(BMA423_TILT, appConfig.tiltWrist))
@@ -229,9 +254,8 @@ bool bmaConfig()
     // Reset steps
     if (!bma_resetStepCounter())
     {
-        printf("bma_resetStepCounter error");
+        printf("bma_resetStepCounter error\r\n");
     }
-
     enableTiltWrist(true);
     enableDoubleTap(true);
 
@@ -258,26 +282,29 @@ bool bmaConfig()
     // }
 
     // while (!bma_getAccelEnable()) {
-    //     printf("BMA423 data not ready!");
+    //     printf("BMA423 data not ready!\r\n");
     //     delay_ms(200);
     // }
-    // printf("BMA423 data ready!");
 
-    // bma_read_acc();
-
+    printf("bma_getAccelEnable\r\n");
     if (!bma_getAccelEnable())
     {
-        printf("BMA423 data not ready!");
+        printf("BMA423 data not ready!\r\n");
         // return;
     }
     else
     {
-        printf("BMA423 data ready!");
+        printf("BMA423 data ready!\r\n");
     }
+
+    // while(1) {
+    //     bma_read_acc();
+    //     delay_ms(100);
+    // }
 
     // uint8_t data = 0;
     // bma4_read_regs(BMA4_POWER_CTRL_ADDR, &data, 1, bma_getDevFptr());
-    // printf("BMA423 power ctrl: %d\n", data); // 4
+    // printf("BMA423 power ctrl: %d\r\n", data); // 4
 
     // 可以disableAccel 证明可以写入数据
     // bma_disableAccel();
@@ -285,6 +312,8 @@ bool bmaConfig()
     // printf("BMA423 power ctrl: %d\n", data); // 0
 
     // appconfig_init_step_log();
+
+    bma_print_feature_config();
 
     return true;
 }
@@ -308,7 +337,7 @@ void bma_read_acc()
     // 读取前先检查数据是否就??, 一直是false
     if (!bma_getAccelEnable())
     {
-        printf("BMA423 data not ready!");
+        printf("BMA423 data not ready!\r\n");
         // return;
     }
 
@@ -320,13 +349,13 @@ void bma_read_acc()
     }
 
     // 打印原始值和实际g??
-    printf("Raw - X: %d, Y: %d, Z: %d\n", bma_acc.x, bma_acc.y, bma_acc.z);
+    printf("Raw - X: %d, Y: %d, Z: %d\r\n", bma_acc.x, bma_acc.y, bma_acc.z);
 
     // 转换为g?? (2g范围下，32768 = 2g)
     float x_g = bma_acc.x * 2.0 / 32768.0;
     float y_g = bma_acc.y * 2.0 / 32768.0;
     float z_g = bma_acc.z * 2.0 / 32768.0;
-    printf("g - X: %.2f, Y: %.2f, Z: %.2f\n", x_g, y_g, z_g);
+    printf("g - X: %.2f, Y: %.2f, Z: %.2f\r\n", x_g, y_g, z_g);
 }
 
 float bma423_get_temp()

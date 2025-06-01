@@ -84,7 +84,7 @@ void appconfig_save()
 
 void appconfig_reset()
 {
-    appConfig.sleepTimeout = 4; // 4: 20s; 3: 15s; 2: 10s
+    appConfig.sleepTimeout = 2; // 4: 20s; 3: 15s; 2: 10s
     appConfig.invert = false;
 #if COMPILE_ANIMATIONS
     appConfig.animations = true;

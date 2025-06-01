@@ -38,13 +38,15 @@ bool bma_begin(bma4_com_fptr_t readCallBlack,
 
     if (bma423_init(&__devFptr) != BMA4_OK)
     {
-        // DEBUG("BMA423 FAIL\n");
+        printf("BMA423 FAIL\r\n");
         return false;
     }
 
+    // write config 没问题
+    // printf("BMA423 Write Config ....\r\n");
     if (bma423_write_config_file(&__devFptr) != BMA4_OK)
     {
-        // DEBUG("BMA423 Write Config FAIL\n");
+        printf("BMA423 Write Config FAIL\r\n");
         return false;
     }
 
@@ -59,7 +61,7 @@ bool bma_begin(bma4_com_fptr_t readCallBlack,
 
     if (bma4_set_int_pin_config(&config, BMA4_INTR1_MAP, &__devFptr) != BMA4_OK)
     {
-        // DEBUG("BMA423 SET INT FAIL\n");
+        printf("BMA423 SET INT FAIL\r\n");
         return false;
     }
     return true;
@@ -189,11 +191,18 @@ bool bma_getAccel(Accel *acc)
     return true;
 }
 
+// bool bma_getAccelEnable()
+// {
+//     uint8_t en;
+//     bma4_get_accel_enable(&en, &__devFptr);
+//     return (en & BMA4_ACCEL_ENABLE_POS) == BMA4_ACCEL_ENABLE_POS;
+// }
+
 bool bma_getAccelEnable()
 {
     uint8_t en;
     bma4_get_accel_enable(&en, &__devFptr);
-    return (en & BMA4_ACCEL_ENABLE_POS) == BMA4_ACCEL_ENABLE_POS;
+    return en; // (en & BMA4_ACCEL_ENABLE_POS) == BMA4_ACCEL_ENABLE_POS;
 }
 
 bool bma_disableAccel() { return bma_enableAccel(false); }
@@ -341,4 +350,20 @@ const char *bma_getActivity()
 
 struct bma4_dev *bma_getDevFptr() {
     return &__devFptr;
+}
+
+void bma_print_feature_config() {
+    uint8_t feature_config[64] = {0};
+    bma423_get_feature_config(feature_config, &__devFptr);
+    printf("bma_get_feature_config:\r\n");
+    bool isFirst = true; // 用于判断是否为第一个元素，以决定是否添加逗号
+    printf("[");
+    for (int i = 0; i < 64; i++) {
+        if (!isFirst) {
+            printf(", "); // 在元素间添加逗号和空格
+        }
+        printf("%d", feature_config[i]);
+        isFirst = false; // 设置标志为false，表示已输出第一个元素
+    }
+    printf("]\r\n"); // 结束数组表示，并换行
 }

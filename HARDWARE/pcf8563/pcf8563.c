@@ -27,8 +27,8 @@ const unsigned int months_days[]={31,59,90,120,151,181,212,243,273,304,334};	// 
 
 void PCF8563_Init(void)
 {
-    Rtcc_Addr = RTCC_R>>1;
-    // I2C_GPIO_Config(); // 已经初始化过, 这里不再重复初始化
+    Rtcc_Addr = RTCC_R>>1; // 0x51
+    I2C2_GPIO_Config(); // 已经初始化过, 这里不再重复初始化
 }
 
 /* Private internal functions */
@@ -44,57 +44,57 @@ static u8 PCF8563_BcdToDec(u8 val)
 
 void PCF8563_ZeroClock(void)
 {
-    I2C_Start();
-    I2C_SendByte(RTCC_W);
-    I2C_WaitAck();
-    I2C_SendByte(0x0);        // start address
-    I2C_WaitAck();
+    I2C2_Start();
+    I2C2_SendByte(RTCC_W);
+    I2C2_WaitAck();
+    I2C2_SendByte(0x0);        // start address
+    I2C2_WaitAck();
 
-    I2C_SendByte(0x0);     //control/status1
-    I2C_WaitAck();
-    I2C_SendByte(0x0);     //control/status2
-    I2C_WaitAck();
-    I2C_SendByte(0x00);    //set seconds to 0 & VL to 0
-    I2C_WaitAck();
-    I2C_SendByte(0x00);    //set minutes to 0
-    I2C_WaitAck();
-    I2C_SendByte(0x00);    //set hour to 0
-    I2C_WaitAck();
-    I2C_SendByte(0x01);    //set day to 1
-    I2C_WaitAck();
-    I2C_SendByte(0x00);    //set weekday to 0
-    I2C_WaitAck();
-    I2C_SendByte(0x81);    //set month to 1, century to 1900
-    I2C_WaitAck();
-    I2C_SendByte(0x00);    //set year to 0
-    I2C_WaitAck();
-    I2C_SendByte(0x80);    //minute alarm value reset to 00
-    I2C_WaitAck();
-    I2C_SendByte(0x80);    //hour alarm value reset to 00
-    I2C_WaitAck();
-    I2C_SendByte(0x80);    //day alarm value reset to 00
-    I2C_WaitAck();
-    I2C_SendByte(0x80);    //weekday alarm value reset to 00
-    I2C_WaitAck();
-    I2C_SendByte(SQW_32KHZ); //set SQW to default, see: setSquareWave
-    I2C_WaitAck();
-    I2C_SendByte(0x0);     //timer off
-    I2C_WaitAck();
-    I2C_Stop();
+    I2C2_SendByte(0x0);     //control/status1
+    I2C2_WaitAck();
+    I2C2_SendByte(0x0);     //control/status2
+    I2C2_WaitAck();
+    I2C2_SendByte(0x00);    //set seconds to 0 & VL to 0
+    I2C2_WaitAck();
+    I2C2_SendByte(0x00);    //set minutes to 0
+    I2C2_WaitAck();
+    I2C2_SendByte(0x00);    //set hour to 0
+    I2C2_WaitAck();
+    I2C2_SendByte(0x01);    //set day to 1
+    I2C2_WaitAck();
+    I2C2_SendByte(0x00);    //set weekday to 0
+    I2C2_WaitAck();
+    I2C2_SendByte(0x81);    //set month to 1, century to 1900
+    I2C2_WaitAck();
+    I2C2_SendByte(0x00);    //set year to 0
+    I2C2_WaitAck();
+    I2C2_SendByte(0x80);    //minute alarm value reset to 00
+    I2C2_WaitAck();
+    I2C2_SendByte(0x80);    //hour alarm value reset to 00
+    I2C2_WaitAck();
+    I2C2_SendByte(0x80);    //day alarm value reset to 00
+    I2C2_WaitAck();
+    I2C2_SendByte(0x80);    //weekday alarm value reset to 00
+    I2C2_WaitAck();
+    I2C2_SendByte(SQW_32KHZ); //set SQW to default, see: setSquareWave
+    I2C2_WaitAck();
+    I2C2_SendByte(0x0);     //timer off
+    I2C2_WaitAck();
+    I2C2_Stop();
 }
 
 void PCF8563_ClearStatus(void)
 {
-    I2C_Start();
-    I2C_SendByte(RTCC_W);
-    I2C_WaitAck();
-    I2C_SendByte(0x0);
-    I2C_WaitAck();
-    I2C_SendByte(0x0);                 //control/status1
-    I2C_WaitAck();
-    I2C_SendByte(0x0);                 //control/status2
-    I2C_WaitAck();
-    I2C_Stop();
+    I2C2_Start();
+    I2C2_SendByte(RTCC_W);
+    I2C2_WaitAck();
+    I2C2_SendByte(0x0);
+    I2C2_WaitAck();
+    I2C2_SendByte(0x0);                 //control/status1
+    I2C2_WaitAck();
+    I2C2_SendByte(0x0);                 //control/status2
+    I2C2_WaitAck();
+    I2C2_Stop();
 }
 
 u8 PCF8563_ReadStatus2(void)
@@ -115,24 +115,25 @@ void PCF8563_ClearVoltLow(void)
 void PCF8563_GetDateTime(void)
 {
     /* Start at beginning, read entire memory in one go */
-    I2C_Start();
-    I2C_SendByte(RTCC_W);
-    I2C_WaitAck();
-    I2C_SendByte(RTCC_STAT1_ADDR);
-    I2C_WaitAck();
-    I2C_Start();
-    I2C_SendByte(RTCC_R);
-    I2C_WaitAck();
+    I2C2_Start();
+    I2C2_SendByte(RTCC_W);
+    I2C2_WaitAck();
+    I2C2_SendByte(RTCC_STAT1_ADDR);
+    I2C2_WaitAck();
+
+    I2C2_Start();
+    I2C2_SendByte(RTCC_R);
+    I2C2_WaitAck();
 
     /* As per data sheet, have to read everything all in one operation */
     u8 readBuffer[16] = {0};
     for (u8 i=0; i < 15; i++) {
-        readBuffer[i] = I2C_ReceiveByte();
-        I2C_Ack();
+        readBuffer[i] = I2C2_ReceiveByte();
+        I2C2_Ack();
     }
-    readBuffer[15] = I2C_ReceiveByte();
-    I2C_NoAck();
-    I2C_Stop();
+    readBuffer[15] = I2C2_ReceiveByte();
+    I2C2_NoAck();
+    I2C2_Stop();
 
     // status bytes
     status1 = readBuffer[0];
@@ -161,6 +162,8 @@ void PCF8563_GetDateTime(void)
     month = month & 0x1f;
     month = PCF8563_BcdToDec(month);
     year = PCF8563_BcdToDec(readBuffer[8]);
+
+    // printf("PCF8563_GetDateTime: %d-%d-%d\r\n", year, month, day);
 
     // alarm bytes
     alarm_minute = readBuffer[9];
@@ -207,26 +210,26 @@ void PCF8563_SetDateTime(u8 day, u8 weekday, u8 month, u8 century, u8 year,
         month &= ~RTCC_CENTURY_MASK;
 
     /* As per data sheet, have to set everything all in one operation */
-    I2C_Start();
-    I2C_SendByte(RTCC_W);
-    I2C_WaitAck();
-    I2C_SendByte(RTCC_SEC_ADDR);       // send addr low byte, req'd
-    I2C_WaitAck();
-    I2C_SendByte(PCF8563_DecToBcd(sec) &~RTCC_VLSEC_MASK); //set sec, clear VL bit
-    I2C_WaitAck();
-    I2C_SendByte(PCF8563_DecToBcd(minute));    //set minutes
-    I2C_WaitAck();
-    I2C_SendByte(PCF8563_DecToBcd(hour));        //set hour
-    I2C_WaitAck();
-    I2C_SendByte(PCF8563_DecToBcd(day));            //set day
-    I2C_WaitAck();
-    I2C_SendByte(PCF8563_DecToBcd(weekday));    //set weekday
-    I2C_WaitAck();
-    I2C_SendByte(month);                 //set month, century to 1
-    I2C_WaitAck();
-    I2C_SendByte(PCF8563_DecToBcd(year));        //set year to 99
-    I2C_WaitAck();
-    I2C_Stop();
+    I2C2_Start();
+    I2C2_SendByte(RTCC_W);
+    I2C2_WaitAck();
+    I2C2_SendByte(RTCC_SEC_ADDR);       // send addr low byte, req'd
+    I2C2_WaitAck();
+    I2C2_SendByte(PCF8563_DecToBcd(sec) &~RTCC_VLSEC_MASK); //set sec, clear VL bit
+    I2C2_WaitAck();
+    I2C2_SendByte(PCF8563_DecToBcd(minute));    //set minutes
+    I2C2_WaitAck();
+    I2C2_SendByte(PCF8563_DecToBcd(hour));        //set hour
+    I2C2_WaitAck();
+    I2C2_SendByte(PCF8563_DecToBcd(day));            //set day
+    I2C2_WaitAck();
+    I2C2_SendByte(PCF8563_DecToBcd(weekday));    //set weekday
+    I2C2_WaitAck();
+    I2C2_SendByte(month);                 //set month, century to 1
+    I2C2_WaitAck();
+    I2C2_SendByte(PCF8563_DecToBcd(year));        //set year to 99
+    I2C2_WaitAck();
+    I2C2_Stop();
     // Keep values in-sync with device
     PCF8563_GetDateTime();
 }
@@ -330,14 +333,14 @@ void PCF8563_EnableAlarm(void)
     //enable the interrupt
     status2 |= RTCC_ALARM_AIE;
 
-    I2C_Start();
-    I2C_SendByte(RTCC_W);
-    I2C_WaitAck();
-    I2C_SendByte(RTCC_STAT2_ADDR);
-    I2C_WaitAck();
-    I2C_SendByte(status2);
-    I2C_WaitAck();
-    I2C_Stop();
+    I2C2_Start();
+    I2C2_SendByte(RTCC_W);
+    I2C2_WaitAck();
+    I2C2_SendByte(RTCC_STAT2_ADDR);
+    I2C2_WaitAck();
+    I2C2_SendByte(status2);
+    I2C2_WaitAck();
+    I2C2_Stop();
 }
 
 void PCF8563_SetAlarm(u8 min, u8 hour, u8 day, u8 weekday)
@@ -383,20 +386,20 @@ void PCF8563_SetAlarm(u8 min, u8 hour, u8 day, u8 weekday)
     alarm_day = day;
 
     // First set alarm values, then enable
-    I2C_Start();
-    I2C_SendByte(RTCC_W);
-    I2C_WaitAck();
-    I2C_SendByte(RTCC_ALRM_MIN_ADDR);
-    I2C_WaitAck();
-    I2C_SendByte(alarm_minute);
-    I2C_WaitAck();
-    I2C_SendByte(alarm_hour);
-    I2C_WaitAck();
-    I2C_SendByte(alarm_day);
-    I2C_WaitAck();
-    I2C_SendByte(alarm_weekday);
-    I2C_WaitAck();
-    I2C_Stop();
+    I2C2_Start();
+    I2C2_SendByte(RTCC_W);
+    I2C2_WaitAck();
+    I2C2_SendByte(RTCC_ALRM_MIN_ADDR);
+    I2C2_WaitAck();
+    I2C2_SendByte(alarm_minute);
+    I2C2_WaitAck();
+    I2C2_SendByte(alarm_hour);
+    I2C2_WaitAck();
+    I2C2_SendByte(alarm_day);
+    I2C2_WaitAck();
+    I2C2_SendByte(alarm_weekday);
+    I2C2_WaitAck();
+    I2C2_Stop();
 
     PCF8563_EnableAlarm();
 }
@@ -410,14 +413,14 @@ void PCF8563_ClearAlarm(void)
     //turn off the interrupt
     status2 &= ~RTCC_ALARM_AIE;
 
-    I2C_Start();
-    I2C_SendByte(RTCC_W);
-    I2C_WaitAck();
-    I2C_SendByte(RTCC_STAT2_ADDR);
-    I2C_WaitAck();
-    I2C_SendByte(status2);
-    I2C_WaitAck();
-    I2C_Stop();
+    I2C2_Start();
+    I2C2_SendByte(RTCC_W);
+    I2C2_WaitAck();
+    I2C2_SendByte(RTCC_STAT2_ADDR);
+    I2C2_WaitAck();
+    I2C2_SendByte(status2);
+    I2C2_WaitAck();
+    I2C2_Stop();
 }
 
 void PCF8563_ResetAlarm(void)
@@ -427,14 +430,14 @@ void PCF8563_ResetAlarm(void)
     //set TF to 1 masks it from changing, as per data-sheet
     status2 |= RTCC_TIMER_TF;
 
-    I2C_Start();
-    I2C_SendByte(RTCC_W);
-    I2C_WaitAck();
-    I2C_SendByte(RTCC_STAT2_ADDR);
-    I2C_WaitAck();
-    I2C_SendByte(status2);
-    I2C_WaitAck();
-    I2C_Stop();
+    I2C2_Start();
+    I2C2_SendByte(RTCC_W);
+    I2C2_WaitAck();
+    I2C2_SendByte(RTCC_STAT2_ADDR);
+    I2C2_WaitAck();
+    I2C2_SendByte(status2);
+    I2C2_WaitAck();
+    I2C2_Stop();
 }
 
 /* Timer functions */
@@ -464,23 +467,23 @@ void PCF8563_EnableTimer(void)
     status2 |= RTCC_TIMER_TIE;
 
     // Enable interrupt first, then enable timer
-    I2C_Start();
-    I2C_SendByte(RTCC_W);
-    I2C_WaitAck();
-    I2C_SendByte(RTCC_STAT2_ADDR);
-    I2C_WaitAck();
-    I2C_SendByte(status2);
-    I2C_WaitAck();
-    I2C_Stop();
+    I2C2_Start();
+    I2C2_SendByte(RTCC_W);
+    I2C2_WaitAck();
+    I2C2_SendByte(RTCC_STAT2_ADDR);
+    I2C2_WaitAck();
+    I2C2_SendByte(status2);
+    I2C2_WaitAck();
+    I2C2_Stop();
 
-    I2C_Start();
-    I2C_SendByte(RTCC_W);
-    I2C_WaitAck();
-    I2C_SendByte(RTCC_TIMER1_ADDR);
-    I2C_WaitAck();
-    I2C_SendByte(timer_control);  // Timer starts ticking now!
-    I2C_WaitAck();
-    I2C_Stop();
+    I2C2_Start();
+    I2C2_SendByte(RTCC_W);
+    I2C2_WaitAck();
+    I2C2_SendByte(RTCC_TIMER1_ADDR);
+    I2C2_WaitAck();
+    I2C2_SendByte(timer_control);  // Timer starts ticking now!
+    I2C2_WaitAck();
+    I2C2_Stop();
 }
 
 void PCF8563_SetTimer(u8 value, u8 frequency, u8 is_pulsed)
@@ -494,25 +497,25 @@ void PCF8563_SetTimer(u8 value, u8 frequency, u8 is_pulsed)
     // TE set to 1 in enableTimer(), leave 0 for now
     timer_control |= (frequency & RTCC_TIMER_TD10); // use only last 2 bits
 
-    I2C_Start();
-    I2C_SendByte(RTCC_W);
-    I2C_WaitAck();
-    I2C_SendByte(RTCC_TIMER1_ADDR);
-    I2C_WaitAck();
-    I2C_SendByte(timer_control);
-    I2C_WaitAck();
-    I2C_SendByte(timer_value);
-    I2C_WaitAck();
-    I2C_Stop();
+    I2C2_Start();
+    I2C2_SendByte(RTCC_W);
+    I2C2_WaitAck();
+    I2C2_SendByte(RTCC_TIMER1_ADDR);
+    I2C2_WaitAck();
+    I2C2_SendByte(timer_control);
+    I2C2_WaitAck();
+    I2C2_SendByte(timer_value);
+    I2C2_WaitAck();
+    I2C2_Stop();
 
-    I2C_Start();
-    I2C_SendByte(RTCC_W);
-    I2C_WaitAck();
-    I2C_SendByte(RTCC_STAT2_ADDR);
-    I2C_WaitAck();
-    I2C_SendByte(status2);
-    I2C_WaitAck();
-    I2C_Stop();
+    I2C2_Start();
+    I2C2_SendByte(RTCC_W);
+    I2C2_WaitAck();
+    I2C2_SendByte(RTCC_STAT2_ADDR);
+    I2C2_WaitAck();
+    I2C2_SendByte(status2);
+    I2C2_WaitAck();
+    I2C2_Stop();
 
     PCF8563_EnableTimer();
 }
@@ -530,24 +533,24 @@ void PCF8563_ClearTimer(void)
     timer_control = 0;
 
     // Stop timer first
-    I2C_Start();
-    I2C_SendByte(RTCC_W);
-    I2C_WaitAck();
-    I2C_SendByte(RTCC_TIMER1_ADDR);
-    I2C_WaitAck();
-    I2C_SendByte(timer_control);
-    I2C_WaitAck();
-    I2C_Stop();
+    I2C2_Start();
+    I2C2_SendByte(RTCC_W);
+    I2C2_WaitAck();
+    I2C2_SendByte(RTCC_TIMER1_ADDR);
+    I2C2_WaitAck();
+    I2C2_SendByte(timer_control);
+    I2C2_WaitAck();
+    I2C2_Stop();
 
     // clear flag and interrupt
-    I2C_Start();
-    I2C_SendByte(RTCC_W);
-    I2C_WaitAck();
-    I2C_SendByte(RTCC_STAT2_ADDR);
-    I2C_WaitAck();
-    I2C_SendByte(status2);
-    I2C_WaitAck();
-    I2C_Stop();
+    I2C2_Start();
+    I2C2_SendByte(RTCC_W);
+    I2C2_WaitAck();
+    I2C2_SendByte(RTCC_STAT2_ADDR);
+    I2C2_WaitAck();
+    I2C2_SendByte(status2);
+    I2C2_WaitAck();
+    I2C2_Stop();
 }
 
 void PCF8563_ResetTimer(void)
@@ -558,27 +561,27 @@ void PCF8563_ResetTimer(void)
     //set AF to 1 masks it from changing, as per data-sheet
     status2 |= RTCC_ALARM_AF;
 
-    I2C_Start();
-    I2C_SendByte(RTCC_W);
-    I2C_WaitAck();
-    I2C_SendByte(RTCC_STAT2_ADDR);
-    I2C_WaitAck();
-    I2C_SendByte(status2);
-    I2C_WaitAck();
-    I2C_Stop();
+    I2C2_Start();
+    I2C2_SendByte(RTCC_W);
+    I2C2_WaitAck();
+    I2C2_SendByte(RTCC_STAT2_ADDR);
+    I2C2_WaitAck();
+    I2C2_SendByte(status2);
+    I2C2_WaitAck();
+    I2C2_Stop();
 }
 
 /* Square wave functions */
 void PCF8563_SetSquareWave(u8 frequency)
 {
-    I2C_Start();
-    I2C_SendByte(RTCC_W);
-    I2C_WaitAck();
-    I2C_SendByte(RTCC_SQW_ADDR);
-    I2C_WaitAck();
-    I2C_SendByte(frequency);
-    I2C_WaitAck();
-    I2C_Stop();
+    I2C2_Start();
+    I2C2_SendByte(RTCC_W);
+    I2C2_WaitAck();
+    I2C2_SendByte(RTCC_SQW_ADDR);
+    I2C2_WaitAck();
+    I2C2_SendByte(frequency);
+    I2C2_WaitAck();
+    I2C2_Stop();
 }
 
 void PCF8563_ClearSquareWave(void)

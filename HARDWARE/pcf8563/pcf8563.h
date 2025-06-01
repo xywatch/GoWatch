@@ -44,8 +44,12 @@
 
 /* the read and write values for pcf8563 rtcc */
 /* these are adjusted for stm32 */
-#define RTCC_R      0xa3
-#define RTCC_W      0xa2
+// PCF8563 的 I2C 地址（7-bit）
+// 写地址：0xA2（1010001 + 0 写位）
+// 读地址：0xA3（1010001 + 1 读位）
+#define PCF8563_ADDR 0x51
+#define RTCC_R      0xa3 // 读取地址 = 0x51 << 1 | 1
+#define RTCC_W      0xa2 // 写入地址 = 0x51 << 1 | 0
 
 #define RTCC_SEC        1
 #define RTCC_MIN        2

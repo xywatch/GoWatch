@@ -46,7 +46,7 @@ void c_setup()
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2); // 设置系统中断优先级分组2
 
     uart_init(115200);
-    // printf("goxxx1");
+    printf("go1\r\n");
 
     OLED_Init(); // 初始化OLED接口
     Adc_Init();  // ADC初始化
@@ -61,11 +61,21 @@ void c_setup()
     appconfig_init();
 
     I2C_GPIO_Config(); // I2C初始化
+
+    // I2C_ScanDevices();
+    // I2C2_ScanDevices();
+
     RTC_Init();
+    // RTC_Config("2025:03:12:12:00:00");
+    printf("RTC Inited\r\n");
     console_log(50, "RTC Init OK");
     
-    alarm_init(); // 无法储存闹钟，每次重启以后需要自定义
-    
+    alarm_init();
+    printf("alarm inited\r\n");
+
+    bmaConfig();
+    printf("bmaConfig done\r\n");
+
     // led_init();              // 初始化LED
     buzzer_init();
     buttons_init();
@@ -84,9 +94,8 @@ extern bool DeepSleepFlag;
 extern bool SleepRequested;
 void c_loop()
 {
-    // mpu6050 int后虽然没有moveCheck成功, 但其实已经唤醒了, 此时DeepSleepFlag=1
-    // mpu6050 唤醒后, 也会触发休眠请求, 所以不要在mpu6050唤醒后处理休眠请求
     if (SleepRequested) {
+        printf("SleepRequested\r\n");
         SleepRequested = false;
         nvic_sleep(1);
     }

@@ -55,5 +55,6 @@ int Single_Write(unsigned char SlaveAddress, unsigned char REG_Address, unsigned
 unsigned char Single_Read(unsigned char SlaveAddress, unsigned char REG_Address);
 
 int MPU_I2C_WaitAck(void);
+void I2C_ScanDevices(void);
 
 #endif

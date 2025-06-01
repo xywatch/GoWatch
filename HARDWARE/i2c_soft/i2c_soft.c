@@ -331,3 +331,24 @@ unsigned char Single_Read(unsigned char SlaveAddress, unsigned char REG_Address)
     // return TRUE;
     return REG_data;
 }
+
+
+/**
+ * @brief 扫描 I2C 总线上的设备地址
+ * @param 无
+ * @return 无
+ */
+void I2C_ScanDevices(void) {
+    printf("Starting I2C device scan...\r\n");
+
+    for (uint8_t addr = 0x08; addr <= 0x77; addr++) {
+        // 尝试发送设备地址（写模式）
+        I2C_Start();
+        I2C_SendByte(addr << 1);  // 转为8-bit写地址
+        if (I2C_WaitAck() == 1) {
+            printf("addr found: 0x%02X \r\n", addr); // 发现设备，打印地址
+        }
+        I2C_Stop();
+    }
+    printf("Scan complete.\r\n");
+}

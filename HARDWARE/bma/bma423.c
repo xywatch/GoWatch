@@ -743,6 +743,12 @@ uint16_t bma423_write_config_file(struct bma4_dev *dev) {
   return rslt;
 }
 
+// life
+// uint8_t addr, uint8_t *data, uint8_t len,
+void bma423_get_feature_config(uint8_t *data, struct bma4_dev *dev) {
+  bma4_read_regs(BMA4_FEATURE_CONFIG_ADDR, data, BMA423_FEATURE_SIZE, dev);
+}
+
 /*!
  *	@brief This API is used to get the configuration id of the sensor.
  */

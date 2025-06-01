@@ -42,11 +42,13 @@
 #include "gamelife.h"
 #include "stopwatch.h"
 #include "torch.h"
+#include "my_menu.h"
 #include "watchface.h"
 #include "tunemaker.h"
 #include "calendar.h"
 
 #include "i2c_soft.h"
+#include "i2c_soft2.h" // 仅仅是为了测试
 #include "adc.h"
 #include "nvic.h"
 #include "oled_driver.h"
@@ -69,7 +71,8 @@
 #include "tunes.h"
 #include "resources.h"
 
-#include "wait_data_clock.h"
 #include "gui_log_console.h"
+
+#include "bma423_watch.h"
 
 #endif /* COMMON_H_ */

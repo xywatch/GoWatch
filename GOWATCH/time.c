@@ -37,7 +37,7 @@ void time_shutdown()
 
 rtcwake_t time_wake()
 {
-    if (CONFIRM_BTN_KEY == 1) // 按下
+    if (CONFIRM_BTN_KEY == 0) // 按下
     {
         return RTCWAKE_SYSTEM;
     }
@@ -210,11 +210,12 @@ void time_update()
     lastUpdateTime = currentTime;
 
     RTC_Read_Datetime(&timeDate);
+    printf("%d-%d-%d %d:%d:%d\r\n", timeDate.date.year, timeDate.date.month, timeDate.date.date, timeDate.time.hour, timeDate.time.mins, timeDate.time.secs);
 
     // RTC读出来的是24小时时间, 转为设置的12或24小时时间
     byte hour = timeDate.time.hour; // 避免转成12小时制, 下面resetStepCounter需要判断
     timeDate.time.ampm = CHAR_24;
-		time_timeMode(&timeDate.time, appConfig.timeMode);
+	time_timeMode(&timeDate.time, appConfig.timeMode);
 
     // alarm_updateNextAlarm();
 
@@ -240,6 +241,7 @@ void time_update()
     if (timeDate.date.year == 0 || timeDate.date.date == 0)
     {
         RTC_Config("2025:03:12:12:00:00");
+        printf("RTC reConfig\r\n");
     }
 }
 

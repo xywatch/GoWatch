@@ -1,14 +1,4 @@
-/*
-   Project: N|Watch
-   Author: Zak Kemble, contact@zakkemble.co.uk
-   Copyright: (C) 2013 by Zak Kemble
-   License: GNU GPL v3 (see License.txt)
-   Web: http://blog.zakkemble.co.uk/diy-digital-wristwatch/
-*/
-#include "buttons.h"
 #include "common.h"
-#include "sys.h"
-#include "led.h"
 
 #define BTN_IS_PRESSED 4
 #define BTN_NOT_PRESSED 4
@@ -106,18 +96,18 @@ void buttons_shutdown()
     //  pinMode(BTN_3_P,	OUTPUT);
 }
 
+// 按下后接地
 static void processButtons()
 {
     // Get button pressed states
     BOOL isPressed[BTN_COUNT];
-    isPressed[BTN_1] = UP_BTN_KEY; // right一个按下即可
-    isPressed[BTN_2] = CONFIRM_BTN_KEY;
-    isPressed[BTN_3] = DOWN_BTN_KEY; // left
+    isPressed[BTN_1] = !UP_BTN_KEY; // right一个按下即可
+    isPressed[BTN_2] = !CONFIRM_BTN_KEY;
+    isPressed[BTN_3] = !DOWN_BTN_KEY; // left
 
     // Process each button
-
     LOOPR(BTN_COUNT, i)
-    processButton(&buttons[i], !isPressed[i]);
+    processButton(&buttons[i], isPressed[i]);
 }
 
 static void processButton(s_button *button, BOOL isPressed)

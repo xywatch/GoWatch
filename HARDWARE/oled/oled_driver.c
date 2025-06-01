@@ -2,6 +2,7 @@
 #include "sys.h"
 #include "delay.h"
 
+// PB15 SCL, PB14 SDA
 void SW_IIC_Configuration(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;

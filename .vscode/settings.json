@@ -17,7 +17,13 @@
     "altitude_display.h": "c",
     "my_menu.h": "c",
     "bma423.h": "c",
-    "bma.h": "c"
+    "bma.h": "c",
+    "i2c_soft2.h": "c",
+    "gui_log_console.h": "c",
+    "bma423_watch.h": "c",
+    "torch.h": "c",
+    "watchface.h": "c",
+    "oled_driver.h": "c"
   },
   "files.encoding": "gbk"
 }
