@@ -5,7 +5,7 @@
 void RTC_Init(void)
 {
     PCF8563_Init();
-    PCF8563_InitClock();
+    // PCF8563_InitClock();
 }
 
 void RTC_Config(const char* datetime)

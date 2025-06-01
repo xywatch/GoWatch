@@ -13,9 +13,9 @@ void nvic_sleep(u8 source) {
     DeepSleepFlag = 1;
     OLED_OFF();
     menuData.isOpen = false;  // 关闭菜单
-    printf("to stop mode %d\n", source);
+    printf("to stop mode %d\r\n", source);
     PWR_EnterSTOPMode(PWR_Regulator_LowPower, PWR_STOPEntry_WFI); // 进入停机模式 进入低功耗模式, 使用 WFI (Wait For Interrupt) 指令进入 STOP 模式
-    printf("exit stop mode %d\n", source); // 按键中断后会执行 唤醒后会继续执行 c_loop() 函数中的代码，而不是重新执行 main() 函数。
+    printf("exit stop mode %d\r\n", source); // 按键中断后会执行 唤醒后会继续执行 c_loop() 函数中的代码，而不是重新执行 main() 函数。
 }
 
 void nvic_wake_up(u8 source) {
@@ -32,7 +32,7 @@ void nvic_wake_up(u8 source) {
         exitMeThenRun(display_load);
     }
     userWake(); // 唤醒, 不然以为按钮没动又会进入STOP模式
-    printf("wake up %d\n", source);
+    printf("wake up %d\r\n", source);
 }
 
 // PB1 上 右
@@ -134,12 +134,14 @@ void RTC_Alarm_Handler(void)
     RTC_ClearAlarm(); // 清除闹钟, 中断, 也会清除一个闹钟
     alarm_need_updateAlarm_in_nextLoop(); // 在下一个alarm_update()后再更新alarm
 
+    printf("RTC_Alarm_Handler\n");
     if (DeepSleepFlag) {
         printf("Waking up from deep sleep\n");
         nvic_wake_up(9);
     }
+
     userWake();
-    alarm_update();
+    // alarm_update();
 }
 
 // EXTI4 中断处理函数

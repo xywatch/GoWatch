@@ -66,10 +66,12 @@ void c_setup()
     // I2C2_ScanDevices();
 
     RTC_Init();
-    // RTC_Config("2025:03:12:12:00:00");
+    RTC_Config("2025:03:12:11:59:00");
+    time_update();
     printf("RTC Inited\r\n");
     console_log(50, "RTC Init OK");
     
+    RTC_INT_INIT();
     alarm_init();
     printf("alarm inited\r\n");
 
