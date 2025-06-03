@@ -365,7 +365,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_HD,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\HARDWARE\led;..\SYSTEM\nvic;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\USER;..\STM32F10x_FWLib\inc;..\CORE;..\HARDWARE\adc;..\HARDWARE\i2c_soft;..\HARDWARE\oled;..\HARDWARE\beep;..\HARDWARE;..\GOWATCH;..\GOWATCH\games;..\GOWATCH\games\gamelife;..\HARDWARE\pcf8563;..\GOWATCH\rtc;..\HARDWARE\bma;..\GOWATCH\bma423</IncludePath>
+              <IncludePath>..\HARDWARE\led;..\SYSTEM\nvic;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\USER;..\STM32F10x_FWLib\inc;..\CORE;..\HARDWARE\adc;..\HARDWARE\i2c_soft;..\HARDWARE\oled;..\HARDWARE\beep;..\HARDWARE;..\GOWATCH;..\GOWATCH\games;..\GOWATCH\games\gamelife;..\HARDWARE\pcf8563;..\GOWATCH\rtc;..\HARDWARE\bma;..\GOWATCH\bma423;..\HARDWARE\i2c_soft2</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -548,6 +548,11 @@
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\pcf8563\pcf8563.c</FilePath>
             </File>
+            <File>
+              <FileName>i2c_soft2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\i2c_soft2\i2c_soft2.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -727,6 +732,11 @@
               <FileName>bma423_watch.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\GOWATCH\bma423\bma423_watch.c</FilePath>
+            </File>
+            <File>
+              <FileName>step_log.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\GOWATCH\step_log.c</FilePath>
             </File>
           </Files>
         </Group>
