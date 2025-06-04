@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>GOWATCH-TARGET</TargetName>
+      <TargetName>GOWATCH</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
@@ -46,7 +46,7 @@
             <NotGenerated>0</NotGenerated>
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
-          <OutputDirectory>..\OBJ\</OutputDirectory>
+          <OutputDirectory>.\Objects\</OutputDirectory>
           <OutputName>GOWATCH</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
@@ -365,7 +365,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_HD,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\HARDWARE\led;..\SYSTEM\nvic;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\USER;..\STM32F10x_FWLib\inc;..\CORE;..\HARDWARE\adc;..\HARDWARE\i2c_soft;..\HARDWARE\oled;..\HARDWARE\beep;..\HARDWARE;..\GOWATCH;..\GOWATCH\games;..\GOWATCH\games\gamelife;..\HARDWARE\pcf8563;..\GOWATCH\rtc;..\HARDWARE\bma;..\GOWATCH\bma423;..\HARDWARE\i2c_soft2</IncludePath>
+              <IncludePath>..\HARDWARE\led;..\SYSTEM\nvic;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\USER;..\LIBRARY\inc;..\CORE;..\HARDWARE\adc;..\HARDWARE\i2c_soft;..\HARDWARE\oled;..\HARDWARE\beep;..\HARDWARE;..\APP;..\APP\games;..\APP\games\gamelife;..\HARDWARE\pcf8563;..\APP\rtc;..\HARDWARE\bma;..\APP\bma423;..\HARDWARE\i2c_soft2</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -418,90 +418,75 @@
               <FileType>2</FileType>
               <FilePath>..\CORE\startup_stm32f10x_md.s</FilePath>
             </File>
+            <File>
+              <FileName>system_stm32f10x.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CORE\system_stm32f10x.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>FWLib</GroupName>
+          <GroupName>LIBRARY</GroupName>
           <Files>
             <File>
               <FileName>stm32f10x_gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F10x_FWLib\src\stm32f10x_gpio.c</FilePath>
+              <FilePath>..\LIBRARY\src\stm32f10x_gpio.c</FilePath>
             </File>
             <File>
               <FileName>stm32f10x_rcc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F10x_FWLib\src\stm32f10x_rcc.c</FilePath>
+              <FilePath>..\LIBRARY\src\stm32f10x_rcc.c</FilePath>
             </File>
             <File>
               <FileName>stm32f10x_usart.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F10x_FWLib\src\stm32f10x_usart.c</FilePath>
+              <FilePath>..\LIBRARY\src\stm32f10x_usart.c</FilePath>
             </File>
             <File>
               <FileName>misc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F10x_FWLib\src\misc.c</FilePath>
+              <FilePath>..\LIBRARY\src\misc.c</FilePath>
             </File>
             <File>
               <FileName>stm32f10x_tim.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F10x_FWLib\src\stm32f10x_tim.c</FilePath>
+              <FilePath>..\LIBRARY\src\stm32f10x_tim.c</FilePath>
             </File>
             <File>
               <FileName>stm32f10x_spi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F10x_FWLib\src\stm32f10x_spi.c</FilePath>
+              <FilePath>..\LIBRARY\src\stm32f10x_spi.c</FilePath>
             </File>
             <File>
               <FileName>stm32f10x_adc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F10x_FWLib\src\stm32f10x_adc.c</FilePath>
+              <FilePath>..\LIBRARY\src\stm32f10x_adc.c</FilePath>
             </File>
             <File>
               <FileName>stm32f10x_dma.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F10x_FWLib\src\stm32f10x_dma.c</FilePath>
+              <FilePath>..\LIBRARY\src\stm32f10x_dma.c</FilePath>
             </File>
             <File>
               <FileName>stm32f10x_pwr.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F10x_FWLib\src\stm32f10x_pwr.c</FilePath>
+              <FilePath>..\LIBRARY\src\stm32f10x_pwr.c</FilePath>
             </File>
             <File>
               <FileName>stm32f10x_exti.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F10x_FWLib\src\stm32f10x_exti.c</FilePath>
+              <FilePath>..\LIBRARY\src\stm32f10x_exti.c</FilePath>
             </File>
             <File>
               <FileName>stm32f10x_rtc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F10x_FWLib\src\stm32f10x_rtc.c</FilePath>
+              <FilePath>..\LIBRARY\src\stm32f10x_rtc.c</FilePath>
             </File>
             <File>
               <FileName>stm32f10x_bkp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\STM32F10x_FWLib\src\stm32f10x_bkp.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>USER</GroupName>
-          <Files>
-            <File>
-              <FileName>main.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\main.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f10x_it.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\stm32f10x_it.c</FilePath>
-            </File>
-            <File>
-              <FileName>system_stm32f10x.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\system_stm32f10x.c</FilePath>
+              <FilePath>..\LIBRARY\src\stm32f10x_bkp.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -581,162 +566,167 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>GOWATCH</GroupName>
+          <GroupName>APP</GroupName>
           <Files>
+            <File>
+              <FileName>main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\main.c</FilePath>
+            </File>
             <File>
               <FileName>alarm.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\alarm.c</FilePath>
+              <FilePath>..\APP\alarm.c</FilePath>
             </File>
             <File>
               <FileName>alarms.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\alarms.c</FilePath>
+              <FilePath>..\APP\alarms.c</FilePath>
             </File>
             <File>
               <FileName>animation.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\animation.c</FilePath>
+              <FilePath>..\APP\animation.c</FilePath>
             </File>
             <File>
               <FileName>appconfig.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\appconfig.c</FilePath>
+              <FilePath>..\APP\appconfig.c</FilePath>
             </File>
             <File>
               <FileName>buttons.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\buttons.c</FilePath>
+              <FilePath>..\APP\buttons.c</FilePath>
             </File>
             <File>
               <FileName>display.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\display.c</FilePath>
+              <FilePath>..\APP\display.c</FilePath>
             </File>
             <File>
               <FileName>draw.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\draw.c</FilePath>
+              <FilePath>..\APP\draw.c</FilePath>
             </File>
             <File>
               <FileName>global.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\global.c</FilePath>
+              <FilePath>..\APP\global.c</FilePath>
             </File>
             <File>
               <FileName>m_display.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\m_display.c</FilePath>
+              <FilePath>..\APP\m_display.c</FilePath>
             </File>
             <File>
               <FileName>m_main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\m_main.c</FilePath>
+              <FilePath>..\APP\m_main.c</FilePath>
             </File>
             <File>
               <FileName>menu.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\menu.c</FilePath>
+              <FilePath>..\APP\menu.c</FilePath>
             </File>
             <File>
               <FileName>millis.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\millis.c</FilePath>
+              <FilePath>..\APP\millis.c</FilePath>
             </File>
             <File>
               <FileName>resources.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\resources.c</FilePath>
+              <FilePath>..\APP\resources.c</FilePath>
             </File>
             <File>
               <FileName>settings.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\settings.c</FilePath>
+              <FilePath>..\APP\settings.c</FilePath>
             </File>
             <File>
               <FileName>sleep.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\sleep.c</FilePath>
+              <FilePath>..\APP\sleep.c</FilePath>
             </File>
             <File>
               <FileName>sound.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\sound.c</FilePath>
+              <FilePath>..\APP\sound.c</FilePath>
             </File>
             <File>
               <FileName>stopwatch.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\stopwatch.c</FilePath>
+              <FilePath>..\APP\stopwatch.c</FilePath>
             </File>
             <File>
               <FileName>time.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\time.c</FilePath>
+              <FilePath>..\APP\time.c</FilePath>
             </File>
             <File>
               <FileName>timedate.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\timedate.c</FilePath>
+              <FilePath>..\APP\timedate.c</FilePath>
             </File>
             <File>
               <FileName>torch.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\torch.c</FilePath>
+              <FilePath>..\APP\torch.c</FilePath>
             </File>
             <File>
               <FileName>tune.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\tune.c</FilePath>
+              <FilePath>..\APP\tune.c</FilePath>
             </File>
             <File>
               <FileName>tunemaker.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\tunemaker.c</FilePath>
+              <FilePath>..\APP\tunemaker.c</FilePath>
             </File>
             <File>
               <FileName>tunes.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\tunes.c</FilePath>
+              <FilePath>..\APP\tunes.c</FilePath>
             </File>
             <File>
               <FileName>pwrmgr.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\pwrmgr.c</FilePath>
+              <FilePath>..\APP\pwrmgr.c</FilePath>
             </File>
             <File>
               <FileName>calendar.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\calendar.c</FilePath>
+              <FilePath>..\APP\calendar.c</FilePath>
             </File>
             <File>
               <FileName>gui_log_console.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\gui_log_console.c</FilePath>
+              <FilePath>..\APP\gui_log_console.c</FilePath>
             </File>
             <File>
               <FileName>my_menu.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\my_menu.c</FilePath>
+              <FilePath>..\APP\my_menu.c</FilePath>
             </File>
             <File>
               <FileName>rtc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\rtc\rtc.c</FilePath>
+              <FilePath>..\APP\rtc\rtc.c</FilePath>
             </File>
             <File>
               <FileName>watchface.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\watchface.c</FilePath>
+              <FilePath>..\APP\watchface.c</FilePath>
             </File>
             <File>
               <FileName>bma423_watch.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\bma423\bma423_watch.c</FilePath>
+              <FilePath>..\APP\bma423\bma423_watch.c</FilePath>
             </File>
             <File>
               <FileName>step_log.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\step_log.c</FilePath>
+              <FilePath>..\APP\step_log.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -746,42 +736,42 @@
             <File>
               <FileName>games.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\games\games.c</FilePath>
+              <FilePath>..\APP\games\games.c</FilePath>
             </File>
             <File>
               <FileName>game1.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\games\game1.c</FilePath>
+              <FilePath>..\APP\games\game1.c</FilePath>
             </File>
             <File>
               <FileName>game2.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\games\game2.c</FilePath>
+              <FilePath>..\APP\games\game2.c</FilePath>
             </File>
             <File>
               <FileName>game3.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\games\game3.c</FilePath>
+              <FilePath>..\APP\games\game3.c</FilePath>
             </File>
             <File>
               <FileName>game_snake.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\games\game_snake.c</FilePath>
+              <FilePath>..\APP\games\game_snake.c</FilePath>
             </File>
             <File>
               <FileName>gamecontrol.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\games\gamelife\gamecontrol.c</FilePath>
+              <FilePath>..\APP\games\gamelife\gamecontrol.c</FilePath>
             </File>
             <File>
               <FileName>gamelife.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\games\gamelife\gamelife.c</FilePath>
+              <FilePath>..\APP\games\gamelife\gamelife.c</FilePath>
             </File>
             <File>
               <FileName>gametitle.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\GOWATCH\games\gamelife\gametitle.c</FilePath>
+              <FilePath>..\APP\games\gamelife\gametitle.c</FilePath>
             </File>
           </Files>
         </Group>
