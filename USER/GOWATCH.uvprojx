@@ -365,7 +365,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_HD,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\HARDWARE\led;..\SYSTEM\nvic;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\USER;..\STM32F10x_FWLib\inc;..\CORE;..\HARDWARE\adc;..\HARDWARE\ds3231;..\HARDWARE\i2c_soft;..\HARDWARE\bme280;..\HARDWARE\oled;..\HARDWARE\beep;..\HARDWARE;..\HARDWARE\mpu;..\HARDWARE\mpu\empl;..\GOWATCH;..\GOWATCH\games;..\GOWATCH\games\gamelife</IncludePath>
+              <IncludePath>..\HARDWARE\led;..\SYSTEM\nvic;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\USER;..\STM32F10x_FWLib\inc;..\CORE;..\HARDWARE\adc;..\HARDWARE\ds3231;..\HARDWARE\i2c_soft;..\HARDWARE\bme280;..\HARDWARE\oled;..\HARDWARE\beep;..\HARDWARE;..\HARDWARE\mpu;..\HARDWARE\mpu\empl;..\GOWATCH;..\GOWATCH\games;..\GOWATCH\games\gamelife;..\HARDWARE\flash</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -483,6 +483,11 @@
               <FileType>1</FileType>
               <FilePath>..\STM32F10x_FWLib\src\stm32f10x_bkp.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f10x_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\STM32F10x_FWLib\src\stm32f10x_flash.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -542,6 +547,11 @@
               <FileName>oled_driver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\oled\oled_driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>stmflash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\flash\stmflash.c</FilePath>
             </File>
           </Files>
         </Group>
