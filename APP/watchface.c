@@ -42,7 +42,6 @@ static uint32_t lastUpdateTime = 0;  // 记录上次更新时间
 void getBatteryAndOthers () {
     // VBAT = getBatteryVoltage();
     stepCount = bma_getStepCount();
-    // printf("stepCount: %d\n", stepCount);
     // syncWeather();
 }
 

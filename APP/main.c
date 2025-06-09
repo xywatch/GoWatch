@@ -52,32 +52,26 @@ void c_setup()
     Adc_Init();  // ADC初始化
     KEY_INT_INIT(); // 按键中断
     millis_init();
-
     delay_ms(50);
     showSpace();
 
     milliseconds = 0;
-
     appconfig_init();
 
     I2C_GPIO_Config(); // I2C初始化
-
     RTC_Init();
+    printf("RTC_Init done\r\n");
     // RTC_Config("2025:03:12:11:59:00");
     // time_update();
-    printf("RTC Inited\r\n");
     console_log(50, "RTC Init OK");
     
     RTC_INT_INIT();
     alarm_init();
-    
     console_log(50, "alarm Init OK");
-    printf("alarm inited\r\n");
-
+    console_log(50, "BMA423 Init...");
     bmaConfig();
     BMA_INT_INIT();
     console_log(50, "BMA423 Init OK");
-    printf("bmaConfig done\r\n");
 
     led_init();              // 初始化LED
     buzzer_init();
@@ -111,8 +105,6 @@ void c_loop()
         // battery_update();
         buttons_update();
     }
-
-    // mpu_updata();
 
     buzzer_update();
 
