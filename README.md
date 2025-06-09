@@ -1,8 +1,9 @@
-# GoWatch
-GoWatch - An Open Source Smartwatch based on Stm32c8t6
+# GoWatch v1
+An Open Source Smartwatch based on STM32f103CBT6
 
 ## Main hardware
-* stm32c8t6
-* ds3231
+* STM32f103CBT6
+* DS3231
 * mpu6050
 * bme280
+* OLED 0.96
