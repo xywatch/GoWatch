@@ -1,12 +1,14 @@
 #include "common.h"
 
+// 配置电源控制引脚，确保在 STOP 模式下保持高电平
 void power_pin_init(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
-    RCC_APB2PeriphClockCmd(POWER_ON_PORT == GPIOA ? RCC_APB2Periph_GPIOA : RCC_APB2Periph_GPIOB, ENABLE);
+    RCC_AHBPeriphClockCmd(POWER_ON_PORT == GPIOA ? RCC_AHBPeriph_GPIOA : RCC_AHBPeriph_GPIOB, ENABLE);
     GPIO_InitStructure.GPIO_Pin = POWER_ON_PIN;        //	 PA1 POWER 控制端口
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; // 推挽输出
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz; // 速度
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT; // 推挽输出
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_40MHz; // 速度最大, 防止 stop 后输出低电平
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
     GPIO_Init(POWER_ON_PORT, &GPIO_InitStructure);
     GPIO_SetBits(POWER_ON_PORT, POWER_ON_PIN); // 设为高电平, 开机
 }

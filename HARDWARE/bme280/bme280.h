@@ -1,7 +1,6 @@
 #ifndef _BME280_H_
 #define _BME280_H_
 
-#include "stm32f10x.h"
 #include "i2c_soft.h"
 // #include "spi.h"
 #include "sys.h"

@@ -2,39 +2,29 @@
 #define __I2C_SOFT_H
 #include "sys.h"
 
-/*
-#define SCL_PIN GPIO_Pin_8 // PA
-#define SDA_PIN GPIO_Pin_9 //
-#define SCL_PORT GPIOB
-#define SDA_PORT GPIOB
-#define SCL_RCC_CLOCK RCC_APB2Periph_GPIOB
-#define SDA_RCC_CLOCK RCC_APB2Periph_GPIOB
-
-#define SCL_H GPIOB->BSRR = GPIO_Pin_8 // SCL=PB(8)
-#define SCL_L GPIOB->BRR = GPIO_Pin_8  // SDA=PB(9)
-
-#define SDA_H GPIOB->BSRR = GPIO_Pin_9
-#define SDA_L GPIOB->BRR = GPIO_Pin_9
-
-#define SCL_read GPIOB->IDR &GPIO_Pin_8
-#define SDA_read GPIOB->IDR &GPIO_Pin_9
-*/
-
 #define SCL_PIN GPIO_Pin_7 // PA7
 #define SDA_PIN GPIO_Pin_0 // PB0
 #define SCL_PORT GPIOA
 #define SDA_PORT GPIOB
-#define SCL_RCC_CLOCK RCC_APB2Periph_GPIOA
-#define SDA_RCC_CLOCK RCC_APB2Periph_GPIOB
+#define SCL_RCC_CLOCK RCC_AHBPeriph_GPIOA
+#define SDA_RCC_CLOCK RCC_AHBPeriph_GPIOB
 
-#define SCL_H GPIOA->BSRR = GPIO_Pin_7
-#define SCL_L GPIOA->BRR = GPIO_Pin_7
+// #define SCL_H GPIOA->BSRR = GPIO_Pin_7
+// #define SCL_L GPIOA->BRR = GPIO_Pin_7
 
-#define SDA_H GPIOB->BSRR = GPIO_Pin_0
-#define SDA_L GPIOB->BRR = GPIO_Pin_0
+// #define SDA_H GPIOB->BSRR = GPIO_Pin_0
+// #define SDA_L GPIOB->BRR = GPIO_Pin_0
 
-#define SCL_read GPIOA->IDR & GPIO_Pin_7
-#define SDA_read GPIOB->IDR & GPIO_Pin_0
+// #define SCL_read GPIOA->IDR & GPIO_Pin_7
+// #define SDA_read GPIOB->IDR & GPIO_Pin_0
+
+// I2C 引脚操作宏定义
+#define SCL_H      GPIO_SetBits(SCL_PORT, SCL_PIN)
+#define SCL_L      GPIO_ResetBits(SCL_PORT, SCL_PIN)
+#define SDA_H      GPIO_SetBits(SDA_PORT, SDA_PIN)
+#define SDA_L      GPIO_ResetBits(SDA_PORT, SDA_PIN)
+#define SCL_read   GPIO_ReadInputDataBit(SCL_PORT, SCL_PIN)
+#define SDA_read   GPIO_ReadInputDataBit(SDA_PORT, SDA_PIN)
 
 // #define I2C_PageSize  8  //24C02每页8字节
 void I2C_GPIO_Config(void);

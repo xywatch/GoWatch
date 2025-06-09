@@ -62,8 +62,7 @@ void buzzer_buzz(uint16_t, uint16_t, vol_t, tonePrio_t, buzzFinish_f);
 // void buzzer_buzzb(byte, tone_t, vol_t);
 bool buzzer_buzzing(void);
 void buzzer_update(void);
-
-// LED端口定义
-// #define BEEP PAout(0)	// 蜂鸣器控制IO 使能引脚
-
+void buzzer_beep(u16 time);
+void buzzer_init2(void);
+void buzzer_beep(u16 time);
 #endif

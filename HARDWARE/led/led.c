@@ -1,23 +1,31 @@
 #include "led.h"
-#include "common.h"
+
+// LED control
 
 void led_init()
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
 
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOC, ENABLE); // 使能PA,PD端口时钟
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
-	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE); // 关闭jtag，使能SWD，可以用SWD模式调试
+	// Enable GPIO clocks
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOB | RCC_AHBPeriph_GPIOA, ENABLE);
 
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;		  // LED0-->PB.12 端口配置
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;  // 推挽输出
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; // IO口速度为50MHz
-	GPIO_Init(GPIOB, &GPIO_InitStructure);			  // 根据设定参数初始化GPIOB.12
-	GPIO_ResetBits(GPIOB, GPIO_Pin_12);				  // PB.12 输出低
+	// Configure PB12 (LED0)
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
+	GPIO_ResetBits(GPIOB, GPIO_Pin_12);  // Set initial state to OFF
 
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;		 // PA6
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP; // 设置成上拉输入
-	GPIO_Init(GPIOA, &GPIO_InitStructure);			 // 初始化GPIOA6
+	// Configure PA6 (LED1)
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+	GPIO_ResetBits(GPIOA, GPIO_Pin_6);  // Set initial state to OFF
 }
 
 u8 is_turnOn1 = 0;
@@ -53,7 +61,7 @@ void turnOffAllLed () {
 	turnOffLed2();
 }
 
-// 两个LED轮流显示
+// 脕陆赂枚LED脗脰脕梅脧脭脢戮
 void flashAllLed () {
 	if (is_turnOn1) {
 		turnOffLed1();

@@ -1,27 +1,4 @@
 #include "beep.h"
-//////////////////////////////////////////////////////////////////////////////////
-// 本程序只供学习使用，未经作者许可，不得用于其它任何用途
-// ALIENTEK STM32F407开发板
-// 蜂鸣器驱动代码
-// 正点原子@ALIENTEK
-// 技术论坛:www.openedv.com
-// 创建日期:2014/5/3
-// 版本：V1.0
-// 版权所有，盗版必究。
-// Copyright(C) 广州市星翼电子科技有限公司 2014-2024
-// All rights reserved
-//////////////////////////////////////////////////////////////////////////////////
-/*
- * Project: N|Watch
- * Author: Zak Kemble, contact@zakkemble.co.uk
- * Copyright: (C) 2013 by Zak Kemble
- * License: GNU GPL v3 (see License.txt)
- * Web: http://blog.zakkemble.co.uk/diy-digital-wristwatch/
- */
-
-// Buzzer
-// Timer1 is used for buzzing
-
 #include "common.h"
 
 static uint buzzLen;
@@ -33,59 +10,82 @@ static void stop(void);
 
 // time2 -> 部分重映射到了 PA15
 // time2 == PA15, PA15连接到了BEEP
-// 而精英版BEEP是PB8
 
-// TIM13 PWM部分初始化
-// PWM输出初始化
-// arr：自动重装值
-// psc：时钟预分频数
+// TIM2 PWM initialization for buzzer
 void TIM_PWM_Init_Init(u32 arr, u32 psc)
 {
-    //       //此部分需手动修改IO口设置
     GPIO_InitTypeDef GPIO_InitStructure;
     TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
     TIM_OCInitTypeDef TIM_OCInitStructure;
 
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);                        //
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO, ENABLE); // 使能GPIO外设时钟使能
+    // Enable clocks
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
 
-    GPIO_PinRemapConfig(GPIO_Remap_SWJ_Disable, ENABLE);  // disable JTAG
-    GPIO_PinRemapConfig(GPIO_PartialRemap1_TIM2, ENABLE); // TIM2 Remap CH1->PA15
-
-    // 设置该引脚为复用输出功能,输出TIM2 CH1的PWM脉冲波形
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;      // TIM_CH1
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP; // 复用推挽输出
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    // Configure PA15 for TIM2_CH1
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_400KHz;
     GPIO_Init(GPIOA, &GPIO_InitStructure);
-    GPIO_ResetBits(GPIOA, GPIO_Pin_15); // 蜂鸣器对应引脚GPIOF8拉低，
 
-    TIM_TimeBaseStructure.TIM_Period = arr;                     // 设置在下一个更新事件装入活动的自动重装载寄存器周期的值	 80K
-    TIM_TimeBaseStructure.TIM_Prescaler = psc;                  // 设置用来作为TIMx时钟频率除数的预分频值  不分频
-    TIM_TimeBaseStructure.TIM_ClockDivision = 0;                // 设置时钟分割:TDTS = Tck_tim
-    TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up; // TIM向上计数模式
-    TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);             // 根据TIM_TimeBaseInitStruct中指定的参数初始化TIMx的时间基数单位
+    // 配置PA15为TIM2_CH1
+    GPIO_PinAFConfig(GPIOA, GPIO_PinSource15, GPIO_AF_TIM2);
 
-    TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM2;             // 选择定时器模式:TIM脉冲宽度调制模式2
-    TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable; // 比较输出使能
-    TIM_OCInitStructure.TIM_Pulse = 25;                           // 设置待装入捕获比较寄存器的脉冲值
-    TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;     // 输出极性:TIM输出比较极性高
-    TIM_OC1Init(TIM2, &TIM_OCInitStructure);                      // 根据TIM_OCInitStruct中指定的参数初始化外设TIMx
+    // Configure TIM2
+    TIM_TimeBaseStructure.TIM_Period = arr;
+    TIM_TimeBaseStructure.TIM_Prescaler = psc;
+    TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
+    TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+    TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
 
-    TIM_CtrlPWMOutputs(TIM2, ENABLE); // MOE 主输出使能
+    // Configure PWM
+    TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
+    TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
+    TIM_OCInitStructure.TIM_Pulse = arr / 4;  // 25%占空比，减少发热
+    TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
+    TIM_OC1Init(TIM2, &TIM_OCInitStructure);
 
-    // TIM_OC1PreloadConfig(TIM1, TIM_OCPreload_Enable);  //CH1预装载使能
+    // 使能TIM2的OC1输出
+    TIM_OC1PreloadConfig(TIM2, TIM_OCPreload_Enable);
+    TIM_ARRPreloadConfig(TIM2, ENABLE);
 
-    // TIM_ARRPreloadConfig(TIM1, ENABLE); //使能TIMx在ARR上的预装载寄存器，禁用预装载寄存器，修改ARR的值（TIM_Period）会直接操作影子寄存器，新的ARR值将立即生效：
-
-    TIM_Cmd(TIM2, DISABLE); // 使能TIM2
+    TIM_Cmd(TIM2, DISABLE);
 }
 
 // 蜂鸣器初始化
-// 初始化PF8为输出口
-// BEEP IO初始化
 void buzzer_init()
 {
-    TIM_PWM_Init_Init(50, 1439);
+    // 对于32MHz系统时钟：
+    // 分频到2KHz (32MHz/16000)
+    // 2KHz/4 = 500Hz PWM频率
+    // 这个频率应该接近蜂鸣器的谐振频率
+    // TIM_PWM_Init_Init(4, 16000);
+    buzzer_init2();
+}
+
+// 设置不同的音色
+void buzzer_set_timbre(u8 timbre)
+{
+    switch(timbre) {
+        case 0:  // 纯音
+            TIM_PWM_Init_Init(10000, 256);  // 12.5Hz
+            break;
+        case 1:  // 柔和音
+            TIM_PWM_Init_Init(8000, 256);   // 15.6Hz
+            break;
+        case 2:  // 明亮音
+            TIM_PWM_Init_Init(12000, 256);  // 10.4Hz
+            break;
+        case 3:  // 低沉音
+            TIM_PWM_Init_Init(6000, 256);   // 20.8Hz
+            break;
+        default:
+            TIM_PWM_Init_Init(10000, 256);
+            break;
+    }
 }
 
 // Non-blocking buzz
@@ -252,10 +252,10 @@ void buzzer_update()
 static void stop()
 {
     //	CLEAR_BITS(TCCR1A, COM1A1, COM1A0);
-    //	power_timer1_disable();
+    //	power_timer1_disable();`
     TIM_SetCompare1(TIM2, 5000);
     TIM_Cmd(TIM2, DISABLE); // 停止TIM3
-    TIM_CtrlPWMOutputs(TIM2, DISABLE);
+    // TIM_CtrlPWMOutputs(TIM2, DISABLE);
     GPIO_ResetBits(GPIOA, GPIO_Pin_15); // 蜂鸣器对应引脚GPIOF8拉低
     // BEEP=0; //PB.5 输出低
     buzzLen = 0;
@@ -263,11 +263,74 @@ static void stop()
     //	pwrmgr_setState(PWR_ACTIVE_BUZZER, PWR_STATE_NONE);
 }
 
-// Sometimes the buzzer kind of 'pops' from a bad waveform output (the first HIGH pulse is too long)
-// Here we wait until a timer overflow and then turn on the timer output
-// It still sometimes pops, but much less so than turning on the timer output in buzzer_buzz()
-// ISR(TIMER1_OVF_vect)
-//{
-//	SET_BITS(TCCR1A, COM1A1, COM1A0);
-//	TIMSK1 = 0;
-//}
+// 简单方案（用于对比）
+void buzzer_init2()
+{
+    GPIO_InitTypeDef GPIO_InitStructure;
+    // 使能GPIOA时钟
+    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+    
+    // 配置PA15为推挽输出
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_400KHz;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
+    // 初始状态设为低电平
+    GPIO_ResetBits(GPIOA, GPIO_Pin_15);
+}
+
+// 蜂鸣器开关控制
+void buzzer_on()
+{
+    GPIO_SetBits(GPIOA, GPIO_Pin_15);
+}
+
+void buzzer_off()
+{
+    GPIO_ResetBits(GPIOA, GPIO_Pin_15);
+}
+
+// 蜂鸣器状态切换
+void buzzer_toggle()
+{
+    GPIO_WriteBit(GPIOA, GPIO_Pin_15, (BitAction)!GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_15));
+}
+
+// 蜂鸣器鸣叫指定时间
+void buzzer_beep(u16 time)
+{
+    buzzer_on();
+    delay_ms(time);
+    buzzer_off();
+}
+
+// 蜂鸣器鸣叫指定次数
+void buzzer_beep_times(u8 times, u16 on_time, u16 off_time)
+{
+    while(times--)
+    {
+        buzzer_on();
+        delay_ms(on_time);
+        buzzer_off();
+        delay_ms(off_time);
+    }
+}
+
+/*
+优化 PWM 参数：
+频率保持在 500Hz（蜂鸣器的谐振频率）
+占空比降到 25%（减少发热）
+使用更合理的预分频值
+硬件建议：
+在蜂鸣器两端并联一个 0.1μF 电容
+在蜂鸣器串联一个 100Ω 电阻
+这些可以：
+限制电流
+改善波形
+减少发热
+保留了两个方案：
+PWM 方案（buzzer_init）：音质好，但需要硬件改进
+简单方案（buzzer_init2）：发热小，但音质一般
+*/

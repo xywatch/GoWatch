@@ -62,22 +62,23 @@ void buttons_update()
 //  Sets button pins to INPUT with PULLUP
 void buttons_startup()
 {
-
     GPIO_InitTypeDef GPIO_InitStructure;
 
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO, ENABLE); // 打开GPIO口时钟，先打开复用才能修改复用功能
-    GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);                                           // 要先开时钟，再重映射；这句表示关闭jtag，使能swd。
+    // Enable GPIO clocks
+    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA | RCC_AHBPeriph_GPIOB, ENABLE);
 
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOA, ENABLE); // SW1, SW3, SW2
-
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;                                    // PB1
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;                                // 内部上拉输入, 上拉, 按了之后变成GND
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;                            // 速度50MHz
+    // Configure PB1 (Button 1)
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_4; // PA4, PA5
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;          // 内部上拉输入
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;      // 速度50MHz
+    // Configure PA4 and PA5 (Buttons 2 and 3)
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4 | GPIO_Pin_5;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
     GPIO_Init(GPIOA, &GPIO_InitStructure);
 }
 
@@ -154,6 +155,7 @@ static void processButton(s_button *button, BOOL isPressed)
                 // 按键声音, 如果是按下休眠, 再响会导致声音很怪
                 if (!DeepSleepFlag) {
                     tune_play(button->tune, VOL_UI, PRIO_UI);
+                    buzzer_beep(100);
                 }
             }
         }

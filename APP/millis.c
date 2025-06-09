@@ -5,33 +5,43 @@ millis_t milliseconds;
 
 // Initialise library
 // 1s = 1000ms 每一ms中断一次
-// 50 * 1440 / 72M = 1000/M = 1ms
+// For STM32L151C8 (32MHz system clock):
+// 1ms = 32,000,000 / (320 * 100) = 1ms
+// TIM_Prescaler = 320-1 (分频到100kHz)
+// TIM_Period = 100-1 (100kHz/100 = 1kHz = 1ms)
 void millis_init()
 {
     // Timer settings
     // 1、配置嵌套中断控制器NVIC
-    // NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);//优先级分组
     NVIC_InitTypeDef nvic;
     nvic.NVIC_IRQChannel = TIM3_IRQn;
     nvic.NVIC_IRQChannelCmd = ENABLE;
-    nvic.NVIC_IRQChannelPreemptionPriority = 0;
-    nvic.NVIC_IRQChannelSubPriority = 0;
+    nvic.NVIC_IRQChannelPreemptionPriority = 1;  // 降低优先级
+    nvic.NVIC_IRQChannelSubPriority = 1;         // 降低优先级
     NVIC_Init(&nvic);
 
     // 2、定时器初始化配置
-    TIM_TimeBaseInitTypeDef tim; // 结构体
-    // 优先级函数调用
+    TIM_TimeBaseInitTypeDef tim;
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE); // 开启时钟
-    TIM_DeInit(TIM3);                                    // ？？？？？
-    tim.TIM_ClockDivision = TIM_CKD_DIV1;                // 采样分频
-    tim.TIM_CounterMode = TIM_CounterMode_Up;            // 向上计数
-    tim.TIM_Period = 50 - 1;                             // 之前是50, 应该是49; //自动重装载寄存器的值
-    tim.TIM_Prescaler = 1440 - 1;                        // 时钟预分频
-    // tim.TIM_RepetitionCounter=
-    TIM_TimeBaseInit(TIM3, &tim);         // 初始化结构体
-    TIM_ClearFlag(TIM3, TIM_FLAG_Update); // 清除溢出中断标志
+    TIM_DeInit(TIM3);
+    
+    // 配置定时器基本参数
+    tim.TIM_ClockDivision = TIM_CKD_DIV1;     // 采样分频
+    tim.TIM_CounterMode = TIM_CounterMode_Up; // 向上计数
+    tim.TIM_Period = 100 - 1;                 // 自动重装载寄存器的值 (100-1)
+    tim.TIM_Prescaler = 320 - 1;              // 时钟预分频 (32MHz / 320 = 100kHz)
+    // tim.TIM_RepetitionCounter = 0;            // 重复计数器值
+    TIM_TimeBaseInit(TIM3, &tim);
+    
+    // 清除所有中断标志
+    TIM_ClearFlag(TIM3, TIM_FLAG_Update);
+    TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
+    
+    // 使能更新中断
     TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
-    TIM_Cmd(TIM3, ENABLE); // 开启时钟
+    
+    // 使能定时器
+    TIM_Cmd(TIM3, ENABLE);
 }
 
 // Get current milliseconds
@@ -102,6 +112,7 @@ void TIM3_IRQHandler(void)
             printf("adc start\n");
             // 这里导致卡死
             float rawVoltage = Get_Adc_Average(0, 50) * (3.3f / 4096.0f) * 2.0f;
+            printf("adc end %f\n", rawVoltage);
             voltageSum += rawVoltage;
             adcCount++;
             

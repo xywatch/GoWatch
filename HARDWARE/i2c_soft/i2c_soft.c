@@ -5,33 +5,32 @@ void I2C_GPIO_Config(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
 
-    RCC_APB2PeriphClockCmd(SCL_RCC_CLOCK | SDA_RCC_CLOCK, ENABLE);
+    // Enable GPIO clocks
+    RCC_AHBPeriphClockCmd(SCL_RCC_CLOCK | SDA_RCC_CLOCK, ENABLE);
 
-    // 初始化SCL管脚
+    // Configure SCL pin
     GPIO_InitStructure.GPIO_Pin = SCL_PIN;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
     GPIO_Init(SCL_PORT, &GPIO_InitStructure);
 
-    // 初始化SDA管脚
+    // Configure SDA pin
     GPIO_InitStructure.GPIO_Pin = SDA_PIN;
-    // GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    // GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;  // GPIO_Mode_Out_OD
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
     GPIO_Init(SDA_PORT, &GPIO_InitStructure);
-    /*
-    输出模式 https://blog.csdn.net/baidu_37366055/article/details/80060962
-    -开漏输出(GPIO_Mode_Out_OD)
-    -开漏复用功能(GPIO_Mode_AF_OD)
-    -推挽式输出(GPIO_Mode_Out_PP)
-    -推挽式复用功能(GPIO_Mode_AF_PP)
-    */
 }
 
 void I2C_SDA_IN()
 {
     GPIO_InitTypeDef GPIO_InitStructure;
     GPIO_InitStructure.GPIO_Pin = SDA_PIN;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
     GPIO_Init(SDA_PORT, &GPIO_InitStructure);
 }
 
@@ -39,8 +38,10 @@ void I2C_SDA_OUT()
 {
     GPIO_InitTypeDef GPIO_InitStructure;
     GPIO_InitStructure.GPIO_Pin = SDA_PIN;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
     GPIO_Init(SDA_PORT, &GPIO_InitStructure);
 }
 

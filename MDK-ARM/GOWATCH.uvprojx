@@ -12,16 +12,16 @@
       <ToolsetName>ARM-ADS</ToolsetName>
       <TargetOption>
         <TargetCommonOption>
-          <Device>STM32F103ZE</Device>
+          <Device>STM32L151CBTxA</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F1xx_DFP.1.0.5</PackID>
+          <PackID>Keil.STM32L1xx_DFP.1.4.1</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
-          <Cpu>IROM(0x08000000,0x80000) IRAM(0x20000000,0x10000) CPUTYPE("Cortex-M3") CLOCK(12000000) ELITTLE</Cpu>
+          <Cpu>IROM(0x08000000,0x00020000) IRAM(0x20000000,0x00008000) CPUTYPE("Cortex-M3") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
-          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0STM32F10x_512 -FS08000000 -FL080000 -FP0($$Device:STM32F103ZE$Flash\STM32F10x_512.FLM))</FlashDriverDll>
+          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0STM32L1xx_128 -FS08000000 -FL020000 -FP0($$Device:STM32L151CBTxA$CMSIS/Flash/STM32L1xx_128.FLM))</FlashDriverDll>
           <DeviceId>0</DeviceId>
-          <RegisterFile>$$Device:STM32F103ZE$Device\Include\stm32f10x.h</RegisterFile>
+          <RegisterFile>$$Device:STM32L151CBTxA$Drivers/CMSIS/Device/ST/STM32L1xx/Include/stm32l1xx.h</RegisterFile>
           <MemoryEnv></MemoryEnv>
           <Cmp></Cmp>
           <Asm></Asm>
@@ -31,7 +31,7 @@
           <SLE66CMisc></SLE66CMisc>
           <SLE66AMisc></SLE66AMisc>
           <SLE66LinkerMisc></SLE66LinkerMisc>
-          <SFDFile>$$Device:STM32F103ZE$SVD\STM32F103xx.svd</SFDFile>
+          <SFDFile>$$Device:STM32L151CBTxA$CMSIS/SVD/STM32L151.svd</SFDFile>
           <bCustSvd>0</bCustSvd>
           <UseEnv>0</UseEnv>
           <BinPath></BinPath>
@@ -47,13 +47,13 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Objects\</OutputDirectory>
-          <OutputName>GOWATCH</OutputName>
+          <OutputName>template</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
-          <DebugInformation>1</DebugInformation>
+          <DebugInformation>0</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
-          <ListingPath>.\</ListingPath>
+          <ListingPath>.\Listings\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
           <CreateBatchFile>0</CreateBatchFile>
@@ -106,11 +106,11 @@
         </CommonProperty>
         <DllOption>
           <SimDllName>SARMCM3.DLL</SimDllName>
-          <SimDllArguments> -REMAP</SimDllArguments>
+          <SimDllArguments> -REMAP -MPU</SimDllArguments>
           <SimDlgDll>DCM.DLL</SimDlgDll>
           <SimDlgDllArguments>-pCM3</SimDlgDllArguments>
           <TargetDllName>SARMCM3.DLL</TargetDllName>
-          <TargetDllArguments></TargetDllArguments>
+          <TargetDllArguments> -MPU</TargetDllArguments>
           <TargetDlgDll>TCM.DLL</TargetDlgDll>
           <TargetDlgDllArguments>-pCM3</TargetDlgDllArguments>
         </DllOption>
@@ -143,7 +143,7 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
-            <RestoreTracepoints>0</RestoreTracepoints>
+            <RestoreTracepoints>1</RestoreTracepoints>
             <RestoreSysVw>1</RestoreSysVw>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
@@ -171,11 +171,11 @@
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
             <Capability>1</Capability>
-            <DriverSelection>4096</DriverSelection>
+            <DriverSelection>4103</DriverSelection>
           </Flash1>
-          <bUseTDR>1</bUseTDR>
-          <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3></Flash3>
+          <bUseTDR>0</bUseTDR>
+          <Flash2>STLink\ST-LINKIII-KEIL_SWO.dll</Flash2>
+          <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -224,7 +224,7 @@
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
-            <useUlib>1</useUlib>
+            <useUlib>0</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
             <RoSelD>3</RoSelD>
@@ -280,12 +280,12 @@
               <IRAM>
                 <Type>0</Type>
                 <StartAddress>0x20000000</StartAddress>
-                <Size>0x10000</Size>
+                <Size>0x8000</Size>
               </IRAM>
               <IROM>
                 <Type>1</Type>
                 <StartAddress>0x8000000</StartAddress>
-                <Size>0x80000</Size>
+                <Size>0x20000</Size>
               </IROM>
               <XRAM>
                 <Type>0</Type>
@@ -310,7 +310,7 @@
               <OCR_RVCT4>
                 <Type>1</Type>
                 <StartAddress>0x8000000</StartAddress>
-                <Size>0x80000</Size>
+                <Size>0x20000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
                 <Type>1</Type>
@@ -335,7 +335,7 @@
               <OCR_RVCT9>
                 <Type>0</Type>
                 <StartAddress>0x20000000</StartAddress>
-                <Size>0x10000</Size>
+                <Size>0x8000</Size>
               </OCR_RVCT9>
               <OCR_RVCT10>
                 <Type>0</Type>
@@ -347,25 +347,25 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>3</Optim>
+            <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
-            <OneElfS>0</OneElfS>
+            <OneElfS>1</OneElfS>
             <Strict>0</Strict>
             <EnumInt>0</EnumInt>
             <PlainCh>0</PlainCh>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
-            <wLevel>0</wLevel>
+            <wLevel>2</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
             <uC99>1</uC99>
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>STM32F10X_HD,USE_STDPERIPH_DRIVER</Define>
+              <Define>STM32L1XX_MD, USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\HARDWARE\led;..\SYSTEM\nvic;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\USER;..\LIBRARY\inc;..\CORE;..\HARDWARE\adc;..\HARDWARE\i2c_soft;..\HARDWARE\oled;..\HARDWARE\beep;..\HARDWARE;..\APP;..\APP\games;..\APP\games\gamelife;..\HARDWARE\pcf8563;..\APP\rtc;..\HARDWARE\bma;..\APP\bma423;..\HARDWARE\i2c_soft2</IncludePath>
+              <IncludePath>..\CORE;..\User;..\LIBRARY\inc;..\SYSTEM\sys;..\SYSTEM\nvic;..\SYSTEM\delay;..\SYSTEM\usart;..\SYSTEM\usart2;..\SYSTEM\usart3;..\SYSTEM\rtc;..\SYSTEM\lpm;..\HARDWARE\led;..\HARDWARE\adc;..\HARDWARE\i2c_soft;..\HARDWARE\oled;..\HARDWARE\beep;..\HARDWARE;..\HARDWARE\pcf8563;..\HARDWARE\bma;..\HARDWARE\led;..\APP;..\APP\games;..\APP\games\gamelife;..\APP\rtc;..\APP\bma423</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -414,159 +414,14 @@
               <FilePath>..\CORE\core_cm3.c</FilePath>
             </File>
             <File>
-              <FileName>startup_stm32f10x_md.s</FileName>
+              <FileName>system_stm32l1xx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\CORE\system_stm32l1xx.c</FilePath>
+            </File>
+            <File>
+              <FileName>startup_stm32l1xx_md.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\CORE\startup_stm32f10x_md.s</FilePath>
-            </File>
-            <File>
-              <FileName>system_stm32f10x.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\CORE\system_stm32f10x.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>LIBRARY</GroupName>
-          <Files>
-            <File>
-              <FileName>stm32f10x_gpio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\LIBRARY\src\stm32f10x_gpio.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f10x_rcc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\LIBRARY\src\stm32f10x_rcc.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f10x_usart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\LIBRARY\src\stm32f10x_usart.c</FilePath>
-            </File>
-            <File>
-              <FileName>misc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\LIBRARY\src\misc.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f10x_tim.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\LIBRARY\src\stm32f10x_tim.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f10x_spi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\LIBRARY\src\stm32f10x_spi.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f10x_adc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\LIBRARY\src\stm32f10x_adc.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f10x_dma.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\LIBRARY\src\stm32f10x_dma.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f10x_pwr.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\LIBRARY\src\stm32f10x_pwr.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f10x_exti.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\LIBRARY\src\stm32f10x_exti.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f10x_rtc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\LIBRARY\src\stm32f10x_rtc.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f10x_bkp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\LIBRARY\src\stm32f10x_bkp.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>HARDWARE</GroupName>
-          <Files>
-            <File>
-              <FileName>beep.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\beep\beep.c</FilePath>
-            </File>
-            <File>
-              <FileName>i2c_soft.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\i2c_soft\i2c_soft.c</FilePath>
-            </File>
-            <File>
-              <FileName>adc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\adc\adc.c</FilePath>
-            </File>
-            <File>
-              <FileName>ds3231.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\ds3231\ds3231.c</FilePath>
-            </File>
-            <File>
-              <FileName>bme280.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\bme280\bme280.c</FilePath>
-            </File>
-            <File>
-              <FileName>oled.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\oled\oled.c</FilePath>
-            </File>
-            <File>
-              <FileName>oled_driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\oled\oled_driver.c</FilePath>
-            </File>
-            <File>
-              <FileName>pcf8563.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\pcf8563\pcf8563.c</FilePath>
-            </File>
-            <File>
-              <FileName>i2c_soft2.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\i2c_soft2\i2c_soft2.c</FilePath>
-            </File>
-            <File>
-              <FileName>led.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\led\led.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>SYSTEM</GroupName>
-          <Files>
-            <File>
-              <FileName>delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\SYSTEM\delay\delay.c</FilePath>
-            </File>
-            <File>
-              <FileName>sys.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\SYSTEM\sys\sys.c</FilePath>
-            </File>
-            <File>
-              <FileName>usart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\SYSTEM\usart\usart.c</FilePath>
-            </File>
-            <File>
-              <FileName>nvic.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\SYSTEM\NVIC\nvic.c</FilePath>
+              <FilePath>..\CORE\startup_stm32l1xx_md.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -732,6 +587,146 @@
               <FileName>step_log.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\APP\step_log.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>LIBRARY</GroupName>
+          <Files>
+            <File>
+              <FileName>misc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\LIBRARY\src\misc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32l1xx_dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\LIBRARY\src\stm32l1xx_dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32l1xx_exti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\LIBRARY\src\stm32l1xx_exti.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32l1xx_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\LIBRARY\src\stm32l1xx_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32l1xx_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\LIBRARY\src\stm32l1xx_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32l1xx_iwdg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\LIBRARY\src\stm32l1xx_iwdg.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32l1xx_pwr.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\LIBRARY\src\stm32l1xx_pwr.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32l1xx_rcc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\LIBRARY\src\stm32l1xx_rcc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32l1xx_syscfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\LIBRARY\src\stm32l1xx_syscfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32l1xx_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\LIBRARY\src\stm32l1xx_tim.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32l1xx_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\LIBRARY\src\stm32l1xx_usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32l1xx_adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\LIBRARY\src\stm32l1xx_adc.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>SYSTEM</GroupName>
+          <Files>
+            <File>
+              <FileName>delay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\SYSTEM\delay\delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>sys.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\SYSTEM\sys\sys.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\SYSTEM\usart\usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>nvic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\SYSTEM\NVIC\nvic.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>HARDWARE</GroupName>
+          <Files>
+            <File>
+              <FileName>beep.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\beep\beep.c</FilePath>
+            </File>
+            <File>
+              <FileName>i2c_soft.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\i2c_soft\i2c_soft.c</FilePath>
+            </File>
+            <File>
+              <FileName>adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\adc\adc.c</FilePath>
+            </File>
+            <File>
+              <FileName>ds3231.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\ds3231\ds3231.c</FilePath>
+            </File>
+            <File>
+              <FileName>bme280.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\bme280\bme280.c</FilePath>
+            </File>
+            <File>
+              <FileName>oled.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\oled\oled.c</FilePath>
+            </File>
+            <File>
+              <FileName>oled_driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\oled\oled_driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>pcf8563.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\pcf8563\pcf8563.c</FilePath>
+            </File>
+            <File>
+              <FileName>led.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\led\led.c</FilePath>
             </File>
           </Files>
         </Group>
