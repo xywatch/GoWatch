@@ -365,7 +365,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_HD,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\HARDWARE\led;..\SYSTEM\nvic;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\USER;..\LIBRARY\inc;..\CORE;..\HARDWARE\adc;..\HARDWARE\i2c_soft;..\HARDWARE\oled;..\HARDWARE\beep;..\HARDWARE;..\APP;..\APP\games;..\APP\games\gamelife;..\HARDWARE\pcf8563;..\APP\rtc;..\HARDWARE\bma;..\APP\bma423;..\HARDWARE\i2c_soft2</IncludePath>
+              <IncludePath>..\HARDWARE\led;..\SYSTEM\nvic;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\USER;..\LIBRARY\inc;..\CORE;..\HARDWARE\adc;..\HARDWARE\i2c_soft;..\HARDWARE\oled;..\HARDWARE\beep;..\HARDWARE;..\APP;..\APP\games;..\APP\games\gamelife;..\HARDWARE\pcf8563;..\APP\rtc;..\HARDWARE\bma;..\APP\bma423;..\HARDWARE\flash</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -488,6 +488,11 @@
               <FileType>1</FileType>
               <FilePath>..\LIBRARY\src\stm32f10x_bkp.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f10x_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\LIBRARY\src\stm32f10x_flash.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -534,14 +539,14 @@
               <FilePath>..\HARDWARE\pcf8563\pcf8563.c</FilePath>
             </File>
             <File>
-              <FileName>i2c_soft2.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\i2c_soft2\i2c_soft2.c</FilePath>
-            </File>
-            <File>
               <FileName>led.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\led\led.c</FilePath>
+            </File>
+            <File>
+              <FileName>stmflash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\flash\stmflash.c</FilePath>
             </File>
           </Files>
         </Group>

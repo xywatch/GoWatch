@@ -15,17 +15,10 @@ static button_f oldBtn1Func;
 static button_f oldBtn2Func;
 static button_f oldBtn3Func;
 
-byte nextAlarmIndex;
-byte nextAlarmDay; // 下一个闹钟的星期, 0-6, 0:周一, 6:周日
-bool isAlarmTriggered;
+static byte nextAlarmIndex;
+static byte nextAlarmDay; // 下一个闹钟的星期, 0-6, 0:周一, 6:周日
+bool isAlarmTriggered; // 移除static，使其成为全局变量
 
-alarm_s eepAlarms[ALARM_COUNT] EEMEM = {
-    {12, 1, 255}, // 22:45:00, 127 = 1111111, 表示星期1,2,3,4,5,6,7, 255=1(开启) 111111(周二)1(周一), 表示所有星期且开启
-    {9, 0, 255}, 
-    {7, 45, 63},  // 63 = 111111, 表示星期1,2,3,4,5,6
-    {9, 4, 0}, 
-    {3, 1, 7} // 7 = 111, 表示星期1,2,3
-};
 bool isAlarmInited = false;
 static bool need_updateAlarm_in_nextLoop = false;
 
@@ -43,7 +36,7 @@ bool alarm_is_enabled()
 
     for (i = 0; i < ALARM_COUNT; i++)
     {
-        if (eepAlarms[i].enabled == 1)
+        if (appConfig.alarms[i].enabled == 1)
         {
             return 1;
         }
@@ -65,19 +58,19 @@ void alarm_init()
 
 void alarm_reset()
 {
-    memset(&eepAlarms, 0x00, ALARM_COUNT * sizeof(alarm_s));
+    memset(&appConfig.alarms, 0x00, ALARM_COUNT * sizeof(alarm_s));
 }
 
 void alarm_get(byte num, alarm_s *alarm)
 {
-    memcpy(alarm, &eepAlarms[num], sizeof(alarm_s));
+    memcpy(alarm, &appConfig.alarms[num], sizeof(alarm_s));
 }
 
 bool alarm_getNext(alarm_s *alarm)
 {
     if (nextAlarmIndex == NOALARM)
     {
-        printf("alarm_getNext NOALARM\r\n");
+        // printf("alarm_getNext NOALARM\r\n");
         return false;
     }
 
@@ -92,7 +85,10 @@ byte alarm_getNextDay()
 
 void alarm_save(byte num, alarm_s *alarm)
 {
-    memcpy(&eepAlarms[num], alarm, sizeof(alarm_s));
+    memcpy(&appConfig.alarms[num], alarm, sizeof(alarm_s));
+
+    appconfig_save();
+    
     getNextAlarm();
 }
 
