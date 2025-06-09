@@ -62,23 +62,24 @@ void c_setup()
 
     I2C_GPIO_Config(); // I2C初始化
 
-    // I2C_ScanDevices();
-    // I2C2_ScanDevices();
-
     RTC_Init();
-    RTC_Config("2025:03:12:11:59:00");
-    time_update();
+    // RTC_Config("2025:03:12:11:59:00");
+    // time_update();
     printf("RTC Inited\r\n");
     console_log(50, "RTC Init OK");
     
     RTC_INT_INIT();
     alarm_init();
+    
+    console_log(50, "alarm Init OK");
     printf("alarm inited\r\n");
 
     bmaConfig();
+    BMA_INT_INIT();
+    console_log(50, "BMA423 Init OK");
     printf("bmaConfig done\r\n");
 
-    // led_init();              // 初始化LED
+    led_init();              // 初始化LED
     buzzer_init();
     buttons_init();
     
@@ -114,7 +115,6 @@ void c_loop()
     // mpu_updata();
 
     buzzer_update();
-    // led_update();
 
 #if COMPILE_STOPWATCH
     stopwatch_update();

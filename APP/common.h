@@ -48,7 +48,6 @@
 #include "calendar.h"
 
 #include "i2c_soft.h"
-#include "i2c_soft2.h" // 仅仅是为了测试
 #include "adc.h"
 #include "nvic.h"
 #include "oled_driver.h"

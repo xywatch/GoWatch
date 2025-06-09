@@ -230,6 +230,7 @@ bool bma_setRemapAxes(struct bma423_axes_remap *remap_data)
 
 bool bma_resetStepCounter()
 {
+    printf("bma_resetStepCounter\n");
     return BMA4_OK == bma423_reset_step_counter(&__devFptr);
 }
 
@@ -240,6 +241,7 @@ uint32_t bma_getStepCount()
     {
         return stepCount;
     }
+    printf("bma_getStepCount error\n");
     return 0;
 }
 
@@ -252,6 +254,11 @@ bool bma_setINTPinConfig(struct bma4_int_pin_config config,
 bool bma_getINT()
 {
     return bma423_read_int_status(&__IRQ_MASK, &__devFptr) == BMA4_OK;
+}
+
+uint16_t bma_getInterruptStatus() {
+    bma423_read_int_status(&__IRQ_MASK, &__devFptr);
+    return __IRQ_MASK;
 }
 
 uint8_t bma_getIRQMASK() { return __IRQ_MASK; }

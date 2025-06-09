@@ -16,9 +16,9 @@
 // #define CONFIRM_BTN_KEY GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_7) // ok sw2
 // #define DOWN_BTN_KEY GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_1) // right sw1
 
-#define UP_BTN_KEY GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_4) // left sw3
+#define DOWN_BTN_KEY GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_4) // left sw3
 #define CONFIRM_BTN_KEY GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_5) // ok sw2
-#define DOWN_BTN_KEY GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_1) // right sw1
+#define UP_BTN_KEY GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_1) // right sw1
 
 /*下面方式是通过位带操作方式读取IO*/
 /*

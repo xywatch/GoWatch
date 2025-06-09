@@ -7,4 +7,6 @@ void RTC_INT_INIT(void);
 void RCC_Configuration(void);
 void nvic_sleep(u8 source);
 void nvic_wake_up(u8 source);
+void BMA_INT_INIT(void);
+
 #endif

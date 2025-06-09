@@ -104,7 +104,8 @@ static void processButtons()
     isPressed[BTN_1] = !UP_BTN_KEY; // right一个按下即可
     isPressed[BTN_2] = !CONFIRM_BTN_KEY;
     isPressed[BTN_3] = !DOWN_BTN_KEY; // left
-
+    
+    // printf("UP_BTN_KEY: %d, CONFIRM_BTN_KEY: %d, DOWN_BTN_KEY: %d\n", isPressed[BTN_1], isPressed[BTN_2], isPressed[BTN_3]);
     // Process each button
     LOOPR(BTN_COUNT, i)
     processButton(&buttons[i], isPressed[i]);

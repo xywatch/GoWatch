@@ -207,6 +207,7 @@ void time_update()
     if (lastUpdateTime != 0 && currentTime - lastUpdateTime < 1000) {
         return;
     }
+    flashAllLed();
     lastUpdateTime = currentTime;
 
     RTC_Read_Datetime(&timeDate);

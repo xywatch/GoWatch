@@ -12,6 +12,7 @@ void nvic_sleep(u8 source) {
 
     DeepSleepFlag = 1;
     OLED_OFF();
+    turnOffAllLed();
     menuData.isOpen = false;  // 关闭菜单
     printf("to stop mode %d\r\n", source);
     PWR_EnterSTOPMode(PWR_Regulator_LowPower, PWR_STOPEntry_WFI); // 进入停机模式 进入低功耗模式, 使用 WFI (Wait For Interrupt) 指令进入 STOP 模式
@@ -197,4 +198,78 @@ void RCC_Configuration(void)
     /*开始使能程序中需要使用的外设时钟*/
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_ADC1, ENABLE); // APB2外设时钟使能
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+}
+
+// int <--> PC13
+void BMA_INT_INIT(void) {
+    // 启用 GPIOC 时钟
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+
+    // 配置 PC13 为输入模式，启用内部上拉电阻
+    GPIO_InitTypeDef GPIO_InitStruct;
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_13;
+    GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IPD;
+    GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+    // 启用 SYSCFG 时钟
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+
+    // 将 PC13 映射到 EXTI13
+    GPIO_EXTILineConfig(GPIO_PortSourceGPIOC, GPIO_PinSource13);
+
+    // 配置 EXTI13
+    EXTI_InitTypeDef EXTI_InitStruct;
+    EXTI_InitStruct.EXTI_Line = EXTI_Line13;
+    EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
+    EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising; // 上升沿触发
+    EXTI_InitStruct.EXTI_LineCmd = ENABLE;
+    EXTI_Init(&EXTI_InitStruct);
+
+    // 配置 NVIC
+    NVIC_InitTypeDef NVIC_InitStruct;
+    NVIC_InitStruct.NVIC_IRQChannel = EXTI15_10_IRQn; // EXTI13 的中断通道
+    NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0;
+    NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
+    NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
+    NVIC_Init(&NVIC_InitStruct);
+}
+
+void EXTI15_10_IRQHandler(void) {
+    if (EXTI_GetITStatus(EXTI_Line13) != RESET) {
+        // 清除中断标志
+        EXTI_ClearITPendingBit(EXTI_Line13); // 如果不清空就会一直执行, 卡死
+
+        if (DeepSleepFlag) {
+            printf("Waking up from deep sleep\n");
+            nvic_wake_up(10);
+        }
+        userWake();
+
+        // wakeup后打印才有效
+
+        printf("EXTI_Line13 int\n");
+        
+        // 检查是否是BMA423唤醒
+        uint16_t int_status = bma_getInterruptStatus();
+        if (int_status)
+        {
+          // uint32_t stepCount = sensor.getStepCounter();
+          printf("BMA423 int status: %d\n", int_status);
+          if (bma_isDoubleClick())
+          {
+            printf("is double click\n");
+          }
+          else if (bma_isTilt())
+          {
+            printf("is wrist tilt\n");
+          }
+          else if (bma_isStepCounter())
+          {
+            printf("is step count\n");
+            uint32_t stepCount = bma_getStepCount();
+            printf("stepCount: %d\n", stepCount);
+          }
+        }
+    }
 }

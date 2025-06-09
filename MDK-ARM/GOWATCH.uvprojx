@@ -538,6 +538,11 @@
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\i2c_soft2\i2c_soft2.c</FilePath>
             </File>
+            <File>
+              <FileName>led.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\led\led.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

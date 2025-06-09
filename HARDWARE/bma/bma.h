@@ -66,4 +66,5 @@ bool bma_enableActivityInterrupt(bool);
 
 struct bma4_dev *bma_getDevFptr(void);
 void bma_print_feature_config(void);
+uint16_t bma_getInterruptStatus(void);
 #endif

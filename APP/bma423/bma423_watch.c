@@ -10,60 +10,60 @@ uint16_t _readRegister(uint8_t address, uint8_t reg, uint8_t *data,
                        uint16_t len)
 {
     // Start condition
-    if (I2C2_Start() == 0)
+    if (I2C_Start() == 0)
     {
-        I2C2_Stop();
-        printf("0 I2C2_Start() == 0\r\n");
+        I2C_Stop();
+        printf("0 I2C_Start() == 0\r\n");
         return 1;
     }
 
     // Send slave address (write mode)
-    I2C2_SendByte(address << 1);
-    if (I2C2_WaitAck() == 0)
+    I2C_SendByte(address << 1);
+    if (I2C_WaitAck() == 0)
     {
-        I2C2_Stop();
-        printf("1 I2C2_WaitAck() == 0\r\n");
+        I2C_Stop();
+        printf("1 I2C_WaitAck() == 0\r\n");
         return 1;
     }
 
     // Send register address
-    I2C2_SendByte(reg);
-    if (I2C2_WaitAck() == 0)
+    I2C_SendByte(reg);
+    if (I2C_WaitAck() == 0)
     {
-        I2C2_Stop();
-        printf("2 I2C2_WaitAck() == 0\r\n");
+        I2C_Stop();
+        printf("2 I2C_WaitAck() == 0\r\n");
         return 1;
     }
 
     // Start condition again
-    if (I2C2_Start() == 0)
+    if (I2C_Start() == 0)
     {
-        I2C2_Stop();
-        printf("3 I2C2_Start() == 0\r\n");
+        I2C_Stop();
+        printf("3 I2C_Start() == 0\r\n");
         return 1;
     }
 
     // Send slave address (read mode)
-    I2C2_SendByte((address << 1) | 1);
-    if (I2C2_WaitAck() == 0)
+    I2C_SendByte((address << 1) | 1);
+    if (I2C_WaitAck() == 0)
     {
-        I2C2_Stop();
-        printf("4 I2C2_WaitAck() == 0\r\n");
+        I2C_Stop();
+        printf("4 I2C_WaitAck() == 0\r\n");
         return 1;
     }
 
     // Read data
     for (uint16_t i = 0; i < len; i++)
     {
-        data[i] = I2C2_ReceiveByte();
+        data[i] = I2C_ReceiveByte();
         if (i < len - 1)
-            I2C2_Ack();
+            I2C_Ack();
         else
-            I2C2_NoAck();
+            I2C_NoAck();
     }
 
     // Stop condition
-    I2C2_Stop();
+    I2C_Stop();
     return 0;
 }
 
@@ -71,57 +71,58 @@ uint16_t _writeRegister(uint8_t address, uint8_t reg, uint8_t *data,
                         uint16_t len)
 {
     // Start condition
-    if (I2C2_Start() == 0)
+    if (I2C_Start() == 0)
     {
-        I2C2_Stop();
-        printf("4 I2C2_Start() == 0\r\n");
+        I2C_Stop();
+        printf("4 I2C_Start() == 0\r\n");
         return 1;
     }
 
     // Send slave address (write mode)
-    I2C2_SendByte(address << 1);
-    if (I2C2_WaitAck() == 0)
+    I2C_SendByte(address << 1);
+    if (I2C_WaitAck() == 0)
     {
-        I2C2_Stop();
-        printf("5 I2C2_WaitAck() == 0\r\n");
+        I2C_Stop();
+        printf("5 I2C_WaitAck() == 0\r\n");
         return 1;
     }
 
     // Send register address
-    I2C2_SendByte(reg);
-    if (I2C2_WaitAck() == 0)
+    I2C_SendByte(reg);
+    if (I2C_WaitAck() == 0)
     {
-        I2C2_Stop();
-        printf("6 I2C2_WaitAck() == 0\r\n");
+        I2C_Stop();
+        printf("6 I2C_WaitAck() == 0\r\n");
         return 1;
     }
 
     // Send data
     for (uint16_t i = 0; i < len; i++)
     {
-        I2C2_SendByte(data[i]);
+        I2C_SendByte(data[i]);
         // 有一个数据会失败, 只有一个
         // write config file没有问题
-        if (I2C2_WaitAck() == 0)
+        if (I2C_WaitAck() == 0)
         {
-            I2C2_Stop();
-            printf("7 I2C2_WaitAck() == 0, %d\r\n", i);
+            I2C_Stop();
+            printf("7 I2C_WaitAck() == 0, %d\r\n", i);
             return 1;
         }
         else
         {
-            // printf("9 I2C2_WaitAck() == 1, %d\r\n", i);
+            // printf("9 I2C_WaitAck() == 1, %d\r\n", i);
         }
     }
 
-    I2C2_Stop();
+    I2C_Stop();
     return 0;
 }
 
 bool bmaConfig()
 {
     printf("BMA423 config\r\n");
-    byte address = 0x18; // getBma423Address(); // 接地 0x18; 1引角悬空了导致没有接地变成了0x19
+    I2C_ScanDevices();
+    byte address = 0x18; // 接地 0x18; 1引角悬空了导致没有接地变成了0x19
 
     if (bma_begin(_readRegister, _writeRegister, delay_ms, address) == false)
     {
@@ -197,8 +198,8 @@ bool bmaConfig()
 
     struct bma4_int_pin_config config;
     config.edge_ctrl = BMA4_LEVEL_TRIGGER;
-    config.lvl = BMA4_ACTIVE_HIGH;
-    // config.lvl = BMA4_ACTIVE_LOW;
+    config.lvl = BMA4_ACTIVE_HIGH; // 高电平触发
+    // config.lvl = BMA4_ACTIVE_LOW; // 低电平触发
     config.od = BMA4_PUSH_PULL;
     config.output_en = BMA4_OUTPUT_ENABLE;
     config.input_en = BMA4_INPUT_DISABLE;
@@ -219,13 +220,12 @@ bool bmaConfig()
     struct bma423_axes_remap remap_data;
 
     // go watch
-    // 1角在左上??, top layer
-    // X = -y axis Y = +x axis Z = +z axis
+    // 1角在右下, top layer 
     // x, y swapped, and y inverted
     remap_data.x_axis = 1;
-    remap_data.x_axis_sign = 1;
+    remap_data.x_axis_sign = 0;
     remap_data.y_axis = 0;
-    remap_data.y_axis_sign = 0;
+    remap_data.y_axis_sign = 1;
     remap_data.z_axis = 2;
     remap_data.z_axis_sign = 0;
 
