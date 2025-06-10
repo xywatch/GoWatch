@@ -5,9 +5,10 @@
 #define CMD2_NAME "Deep Sleep"
 #define Show_Accelerometer "Show Accelerometer"
 #define StepLog "Step Log"
+#define About "About"
 #define CMD5_NAME "Back"
 
-#define OPTION_COUNT 4
+#define OPTION_COUNT 5
 
 static void mSelect()
 {
@@ -61,7 +62,7 @@ static void itemLoader(byte num)
 
     setMenuOption_P(num++, PSTR(Show_Accelerometer), NULL, showAccelerometer);
     setMenuOption_P(num++, PSTR(StepLog), NULL, showStepLog);
-
+    setMenuOption_P(num++, PSTR(About), NULL, showAbout);
     setMenuOption_P(num++, PSTR(CMD5_NAME), NULL, cmd3);
 }
 

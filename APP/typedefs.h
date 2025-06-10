@@ -165,6 +165,8 @@ typedef struct
 	bool display180;
 	bool CTRL_LEDs;
 	bool showFPS;
+	bool tiltWrist;
+	bool doubleTap;
 	timemode_t timeMode;
 	union
 	{

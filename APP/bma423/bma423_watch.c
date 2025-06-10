@@ -256,8 +256,9 @@ bool bmaConfig()
     {
         printf("bma_resetStepCounter error\r\n");
     }
-    enableTiltWrist(true);
-    enableDoubleTap(true);
+
+    enableTiltWrist(appConfig.tiltWrist);
+    enableDoubleTap(appConfig.doubleTap);
 
     // ÷–∂œ≈‰÷√
 
@@ -422,14 +423,13 @@ static display_t draw()
         draw_string((char *)buf, false, 0, y += 9);
 
         y += 12;
-        #if HW_VERSION == 1 // v1
         switch (bma_direction)
         {
         case DIRECTION_DISP_DOWN:
-            draw_string_center("FACE DOWN", false, 0, 127, y);
+            draw_string_center("FACE UP", false, 0, 127, y);
             break;
         case DIRECTION_DISP_UP:
-            draw_string_center("FACE UP", false, 0, 127, y);
+            draw_string_center("FACE DOWN", false, 0, 127, y);
             break;
         case DIRECTION_BOTTOM_EDGE:
             draw_string_center("BOTTOM EDGE", false, 0, 127, y);
@@ -447,32 +447,6 @@ static display_t draw()
             draw_string("ERROR!!!", false, 0, y);
             break;
         }
-        #else // v2 
-        switch (bma_direction)
-        {
-        case DIRECTION_DISP_DOWN:
-            draw_string_center("FACE UP", false, 0, 127, y);
-            break;
-        case DIRECTION_DISP_UP:
-            draw_string_center("FACE DOWN", false, 0, 127, y);
-            break;
-        case DIRECTION_BOTTOM_EDGE:
-            draw_string_center("TOP EDGE", false, 0, 127, y);
-            break;
-        case DIRECTION_TOP_EDGE:
-            draw_string_center("BOTTOM EDGE", false, 0, 127, y);
-            break;
-        case DIRECTION_RIGHT_EDGE:
-            draw_string_center("RIGHT EDGE", false, 0, 127, y);
-            break;
-        case DIRECTION_LEFT_EDGE:
-            draw_string_center("LEFT EDGE", false, 0, 127, y);
-            break;
-        default:
-            draw_string("ERROR!!!", false, 0, y);
-            break;
-        }
-        #endif
     }
 
     return DISPLAY_BUSY;

@@ -235,6 +235,19 @@ bool buttons_isActive()
     return false;
 }
 
+millis_t buttons_lastPressedTime()
+{
+    millis_t lastPressedTime = 0;
+    LOOPR(BTN_COUNT, i)
+    {
+        if(lastPressedTime < buttons[i].pressedTime) {
+            lastPressedTime = buttons[i].pressedTime;
+        }
+    }
+
+    return lastPressedTime;
+}
+
 // Set button status to pressed, processed etc but don't run their functions
 void buttons_wake()
 {

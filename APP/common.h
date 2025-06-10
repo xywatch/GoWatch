@@ -17,7 +17,6 @@
 #include "config.h"
 #include "util.h"
 #include "typedefs.h"
-#include "debug.h"
 
 #include "led.h"
 #include "delay.h"
@@ -43,6 +42,7 @@
 #include "stopwatch.h"
 #include "torch.h"
 #include "my_menu.h"
+#include "about.h"
 #include "watchface.h"
 #include "tunemaker.h"
 #include "calendar.h"

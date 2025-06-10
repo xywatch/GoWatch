@@ -738,6 +738,11 @@
               <FileType>1</FileType>
               <FilePath>..\APP\step_log.c</FilePath>
             </File>
+            <File>
+              <FileName>about.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\about.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

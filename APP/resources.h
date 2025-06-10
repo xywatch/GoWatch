@@ -48,6 +48,8 @@ extern const byte menu_volume[][128];
 extern const byte menu_rotate[];
 extern const byte menu_display[];
 extern const byte menu_sleeptimeout[];
+extern const byte menu_double_tap[];
+extern const byte menu_tilt_wrist[];
 
 extern const byte usbIcon[];
 extern const byte chargeIcon[];
