@@ -34,13 +34,7 @@ void buttons_init()
     buttons[BTN_2].tune = tuneBtn2;
     buttons[BTN_3].tune = tuneBtn3;
 
-    // Set up interrupts
-    // #ifdef __AVR_ATmega32U4__
-    //  SET_BITS(PCMSK0, PCINT4, PCINT6, PCINT7);
-    // #else
-    //  SET_BITS(PCMSK1, PCINT9, PCINT10, PCINT11);
-    // #endif
-    //  BTN_INT_ON();
+    buttons_wake(); // 避免开机直接进入关闭了, v2, v1没有这个问题， 奇怪了
 }
 
 void buttons_update()
