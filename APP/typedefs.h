@@ -147,9 +147,12 @@ typedef struct
 	};
 } alarm_s;
 
+#define ALARM_COUNT 5
+
 // Could use bitfields for the bools to save a few bytes of RAM and EEPROM, but uses an extra ~82 bytes of flash
 typedef struct
 {
+	byte flashCheck;
 	// byte sleepMode;
 	// byte sleepBrightness;
 	byte sleepTimeout;
@@ -174,6 +177,8 @@ typedef struct
 			byte brightness;
 		};
 	};
+
+	alarm_s alarms[ALARM_COUNT];
 } appconfig_s;
 
 typedef display_t (*draw_f)(void);
