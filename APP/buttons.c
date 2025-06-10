@@ -14,7 +14,7 @@ typedef struct
 } s_button;
 
 static s_button buttons[BTN_COUNT];
-static millis_t lastPressedTime;
+// static millis_t lastPressedTime;
 byte lastCounter;
 
 static void processButtons(void);

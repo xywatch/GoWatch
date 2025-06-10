@@ -36,7 +36,6 @@ void showSpace()
     }
 }
 
-extern short pitch_a, roll_a, yaw_a;
 void c_setup()
 {
     power_pin_init();
