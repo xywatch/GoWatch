@@ -8,17 +8,19 @@
 
 #include "common.h"
 
-// #include "stmflash.h"
-
 #define NOALARM UCHAR_MAX
 
-static byte nextAlarm;
-static byte nextAlarmDay; // 下一个闹钟的星期, 0-6, 0:周一, 6:周日
-bool isAlarmTriggered; // 移除static，使其成为全局变量
 static draw_f oldDrawFunc;
 static button_f oldBtn1Func;
 static button_f oldBtn2Func;
 static button_f oldBtn3Func;
+
+static byte nextAlarmIndex;
+static byte nextAlarmDay; // 下一个闹钟的星期, 0-6, 0:周一, 6:周日
+bool isAlarmTriggered; // 移除static，使其成为全局变量
+
+bool isAlarmInited = false;
+static bool need_updateAlarm_in_nextLoop = false;
 
 static bool isAlarmTimeReached(void);
 static void getNextAlarm(void);
@@ -26,7 +28,9 @@ static uint toMinutes(byte, byte, byte);
 static bool stopAlarm(void);
 static display_t draw(void);
 
-bool AlarmEnalbe()
+extern bool keep_on;
+
+bool alarm_is_enabled()
 {
     u8 i;
 
@@ -41,9 +45,15 @@ bool AlarmEnalbe()
     return 0;
 }
 
+// 初始化闹钟, 只执行一次, 在setup中调用
+// 即使唤醒后, 也不会重新初始化
+// 因为可能是因为RTC唤醒, 如果再执行这里, 闹钟就会变成下一个闹钟
 void alarm_init()
 {
-    getNextAlarm();
+    if (!isAlarmInited) {
+        isAlarmInited = true;
+        getNextAlarm();
+    }
 }
 
 void alarm_reset()
@@ -58,12 +68,13 @@ void alarm_get(byte num, alarm_s *alarm)
 
 bool alarm_getNext(alarm_s *alarm)
 {
-    if (nextAlarm == NOALARM)
+    if (nextAlarmIndex == NOALARM)
     {
+        // printf("alarm_getNext NOALARM\r\n");
         return false;
     }
 
-    alarm_get(nextAlarm, alarm);
+    alarm_get(nextAlarmIndex, alarm);
     return true;
 }
 
@@ -90,12 +101,17 @@ void alarm_update()
     bool wasTriggered = isAlarmTriggered; // 之前为false
     bool alarmNow = isAlarmTimeReached(); // 调用这个方法后, isAlarmTriggered 会变为true
 
+    // Serial.printf("alarm_update isAlarmTriggered: %d, alarmNow: %d\n", isAlarmTriggered, alarmNow);
+
     if (isAlarmTriggered) // 0秒闹钟触发
     {
         if (alarmNow) // 到达闹钟时间 1分钟内
         {
             if (!wasTriggered && isAlarmTriggered) // 闹钟第一次触发
             {
+                keep_on = true;
+                need_updateAlarm_in_nextLoop = false; // 下一次loop时不要getNextAlarm， 应该在stop时再getNextAlarm
+                // Serial.printf("alarm_update isAlarmTriggered: %d, alarmNow: %d\n", isAlarmTriggered, alarmNow);
                 oldDrawFunc = display_setDrawFunc(draw);
                 oldBtn1Func = buttons_setFunc(BTN_1, NULL);
                 oldBtn2Func = buttons_setFunc(BTN_2, stopAlarm);
@@ -108,6 +124,20 @@ void alarm_update()
             stopAlarm();
         }
     }
+
+    // 重新获取下一个alarm
+    // 这里更新了alarm导致一下就stopAlarm了
+    if (need_updateAlarm_in_nextLoop) {
+        need_updateAlarm_in_nextLoop = false;
+        getNextAlarm();
+    }
+}
+
+// RTC中断时调用, 在下一个loop等alarm_update后再更新
+// 因为RTC中断可能是由于整点报时, 所以这个中断后需要更新alarm
+// 但也有可能真的是alarm, 所以需要等alarm_update后再更新
+void alarm_need_updateAlarm_in_nextLoop () {
+    need_updateAlarm_in_nextLoop = true;
 }
 
 void alarm_updateNextAlarm()
@@ -118,7 +148,6 @@ void alarm_updateNextAlarm()
 // 判断是否到达闹钟时间
 static bool isAlarmTimeReached()
 {
-
     alarm_s nextAlarm;
 
     // Make sure we're in 24 hour mode
@@ -203,7 +232,7 @@ static void getNextAlarm()
     }
 
     // Set next alarm
-    nextAlarm = next;
+    nextAlarmIndex = next;
 
     DS3231_Set_alarm1(); // 存入ds3231闹钟1中
 }
@@ -225,15 +254,14 @@ static bool stopAlarm()
     //	pwrmgr_setState(PWR_ACTIVE_ALARM, PWR_STATE_NONE);
     tune_stop(PRIO_ALARM);
     isAlarmTriggered = false;
+
+    keep_on = false;
     return true;
 }
 
 static display_t draw()
 {
-    if ((millis8_t)millis() < 128)
-    {
-        draw_bitmap(16, 16, menu_alarm, 32, 32, NOINVERT, 0);
-    }
+    draw_bitmap(16, 16, menu_alarm, 32, 32, NOINVERT, 0);
 
     // Draw time
     draw_string(time_timeStr(), NOINVERT, 79, 20);

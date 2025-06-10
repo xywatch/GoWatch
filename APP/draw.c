@@ -27,7 +27,7 @@ u8	oledBuffer[FRAME_BUFFER_SIZE]; // 128*8
 
 inline static void setBuffByte(byte *, byte, byte, byte); //, byte);
 // #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
-inline byte pgm_read_byte(const byte *abc)
+inline static byte pgm_read_byte(const byte *abc)
 {
     return *abc;
 }

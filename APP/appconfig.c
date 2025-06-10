@@ -78,24 +78,24 @@ void appconfig_reset()
     // alarms
     // 22:45:00, 127 = 1111111, 表示星期1,2,3,4,5,6,7, 255=1(开启) 111111(周二)1(周一), 表示所有星期且开启
     // 63 = 111111, 表示星期1,2,3,4,5,6   7 = 111, 表示星期1,2,3
-    appConfig.alarms[0].hour = 10;
-    appConfig.alarms[0].min = 42;
-    appConfig.alarms[0].days = 255;
+    appConfig.alarms[0].hour = 9;
+    appConfig.alarms[0].min = 0;
+    appConfig.alarms[0].days = 127;
 
     appConfig.alarms[1].hour = 10;
-    appConfig.alarms[1].min = 43;
-    appConfig.alarms[1].days = 255;
+    appConfig.alarms[1].min = 0;
+    appConfig.alarms[1].days = 127;
 
     appConfig.alarms[2].hour = 7;
-    appConfig.alarms[2].min = 45;
+    appConfig.alarms[2].min = 0;
     appConfig.alarms[2].days = 63;
 
     appConfig.alarms[3].hour = 9;
-    appConfig.alarms[3].min = 4;
+    appConfig.alarms[3].min = 0;
     appConfig.alarms[3].days = 0;
 
     appConfig.alarms[4].hour = 3;
-    appConfig.alarms[4].min = 1;
+    appConfig.alarms[4].min = 0;
     appConfig.alarms[4].days = 7;
 
     appconfig_save();

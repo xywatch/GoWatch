@@ -79,7 +79,7 @@ static display_t draw()
     //		//draw_bitmap(x, usbImagePos, usbIcon, 16, 8, NOINVERT, 0);
     //		x += 20;
     //	}
-    if (AlarmEnalbe())
+    if (alarm_is_enabled())
     {
         draw_bitmap(x, FRAME_HEIGHT - 8, smallFontAlarm, 8, 8, NOINVERT, 0);
 

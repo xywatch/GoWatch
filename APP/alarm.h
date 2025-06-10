@@ -21,7 +21,7 @@ byte alarm_getNextDay(void);
 void alarm_save(byte, alarm_s *);
 void alarm_update(void);
 void alarm_updateNextAlarm(void);
-bool AlarmEnalbe(void);
+bool alarm_is_enabled(void);
 
 extern bool isAlarmTriggered;
 
