@@ -63,6 +63,10 @@ void appconfig_reset()
     appConfig.display180 = false;
     appConfig.CTRL_LEDs = false;
     appConfig.showFPS = false;
+    
+    appConfig.tiltWrist = true;
+    appConfig.doubleTap = true;
+
     appConfig.timeMode = TIMEMODE_24HR;
 
     appConfig.volUI = 1;

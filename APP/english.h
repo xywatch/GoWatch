@@ -100,7 +100,8 @@
 
 #define STR_SLEEPMENU "< SLEEP >"
 #define STR_TIMEOUT "Timeout"
-#define STR_MOVECHECK "MoveCheck"
+#define STR_TILTWRIST "TiltWrist"
+#define STR_DOUBLETAP "DoubleTap"
 // #define STR_CLOCKMODE	"Clock mode"
 
 #define STR_SETTINGSMENU "< SETTINGS >"

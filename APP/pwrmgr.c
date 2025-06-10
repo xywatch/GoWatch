@@ -65,6 +65,14 @@ void pwrmgr_update()
 
     bool buttonsActive = buttons_isActive() || keep_on;
 
+    // 如果不息屏幕, 但一直没有动作, 不可能一直亮着
+    // 没有操作, 2分钟后就息屏幕, 避免误操作一直亮屏幕
+    if (keep_on) {
+        if(millis() - buttons_lastPressedTime() > 2 * 60 * 1000) {
+            buttonsActive = false;
+        }
+    }
+
     // 按钮活动，保持屏幕开启
     if (buttonsActive)
     {
