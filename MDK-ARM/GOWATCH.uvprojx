@@ -365,7 +365,7 @@
               <MiscControls></MiscControls>
               <Define>STM32L1XX_MD, USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\CORE;..\User;..\LIBRARY\inc;..\SYSTEM\sys;..\SYSTEM\nvic;..\SYSTEM\delay;..\SYSTEM\usart;..\SYSTEM\usart2;..\SYSTEM\usart3;..\SYSTEM\rtc;..\SYSTEM\lpm;..\HARDWARE\led;..\HARDWARE\adc;..\HARDWARE\i2c_soft;..\HARDWARE\oled;..\HARDWARE\beep;..\HARDWARE;..\HARDWARE\pcf8563;..\HARDWARE\bma;..\HARDWARE\led;..\APP;..\APP\games;..\APP\games\gamelife;..\APP\rtc;..\APP\bma423</IncludePath>
+              <IncludePath>..\CORE;..\User;..\LIBRARY\inc;..\SYSTEM\sys;..\SYSTEM\nvic;..\SYSTEM\delay;..\SYSTEM\usart;..\SYSTEM\usart2;..\SYSTEM\usart3;..\SYSTEM\rtc;..\SYSTEM\lpm;..\HARDWARE\led;..\HARDWARE\adc;..\HARDWARE\i2c_soft;..\HARDWARE\oled;..\HARDWARE\beep;..\HARDWARE;..\HARDWARE\pcf8563;..\HARDWARE\bma;..\HARDWARE\led;..\APP;..\APP\games;..\APP\games\gamelife;..\APP\rtc;..\APP\bma423;..\HARDWARE\flash</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -727,6 +727,11 @@
               <FileName>led.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\led\led.c</FilePath>
+            </File>
+            <File>
+              <FileName>stmflash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\flash\stmflash.c</FilePath>
             </File>
           </Files>
         </Group>
