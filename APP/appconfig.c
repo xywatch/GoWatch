@@ -1,7 +1,7 @@
 #include "common.h"
 #include "stmflash.h"
 
-#define EEPROM_CHECK_NUM 0x68 // Any 8 bit number that isn't 0 or 255
+#define EEPROM_CHECK_NUM 0x69 // Any 8 bit number that isn't 0 or 255
 
 /*
 Flash×Ü´óÐ¡£º128KB (0x20000)
@@ -63,7 +63,7 @@ void appconfig_reset()
     appConfig.display180 = false;
     appConfig.CTRL_LEDs = false;
     appConfig.showFPS = false;
-    
+
     appConfig.tiltWrist = true;
     appConfig.doubleTap = true;
 

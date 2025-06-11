@@ -38,10 +38,12 @@ byte seconds = 0;
 
 uint32_t stepCount;
 static uint32_t lastUpdateTime = 0;  // 记录上次更新时间
+float temp = 0;
 
 void getBatteryAndOthers () {
     // VBAT = getBatteryVoltage();
     stepCount = bma_getStepCount();
+    temp = bma423_get_temp();
     // syncWeather();
 }
 
@@ -55,10 +57,6 @@ void watchface_normal()
 
 static display_t draw()
 {
-    // console_log(50, "drawDate !");
-    // Draw date
-    drawDate();
-
     // Draw time animated
     display_t busy;
 
@@ -71,6 +69,10 @@ static display_t draw()
         getBatteryAndOthers();
         lastUpdateTime = currentTime;
     }
+
+    // console_log(50, "drawDate !");
+    // Draw date
+    drawDate();
 
     // Draw battery icon
     drawBattery();
@@ -121,26 +123,22 @@ static void drawDate()
 
     // Draw date
     char buff[BUFFSIZE_DATE_FORMAT];
-    sprintf_P(buff, PSTR(DATE_FORMAT), day, timeDate.date.date, month, timeDate.date.year);
-    draw_string(buff, false, 12, 0);
-}
+    // sprintf_P(buff, PSTR(DATE_FORMAT), day, timeDate.date.date, month, timeDate.date.year);
+    sprintf(buff, "%02d-%02d-%02d %s", timeDate.date.year, timeDate.date.month + 1, timeDate.date.date, day);
 
-#if COMPILE_ANIMATIONS
-// static bool animateIcon(bool active, byte* pos)
-//{
-//	byte y = *pos;
-//	if(active || (!active && y < FRAME_HEIGHT))
-//	{
-//		if(active && y > FRAME_HEIGHT - 8)
-//			y -= 1;
-//		else if(!active && y < FRAME_HEIGHT)
-//			y += 1;
-//		*pos = y;
-//		return true;
-//	}
-//	return false;
-// }
-#endif
+    u8 x = 0;
+    // 显示温度
+    if (temp > 0)
+    {
+        draw_string(buff, false, x, 0);
+        char buff2[8];
+        sprintf((char *)buff2, "%0.1fC", temp);
+        draw_string(buff2, NOINVERT, FRAME_WIDTH - 35, 0);
+    }
+    else {
+        draw_string_center(buff, false, x, 127, 0);
+    }
+}
 
 static display_t ticker()
 {
@@ -157,7 +155,6 @@ static display_t ticker()
     }
     */
 
-#if COMPILE_ANIMATIONS
     static byte hour2;
     static byte mins;
     static byte secs;
@@ -243,7 +240,6 @@ static display_t ticker()
         }
     }
     else
-#endif
     {
         yPos = 0;
         yPos_secs = 0;
