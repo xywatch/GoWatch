@@ -365,7 +365,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_HD,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\HARDWARE\led;..\SYSTEM\nvic;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\USER;..\LIBRARY\inc;..\CORE;..\HARDWARE\adc;..\HARDWARE\ds3231;..\HARDWARE\i2c_soft;..\HARDWARE\bme280;..\HARDWARE\oled;..\HARDWARE\beep;..\HARDWARE;..\HARDWARE\mpu;..\HARDWARE\mpu\empl;..\APP;..\APP\games;..\APP\games\gamelife;..\HARDWARE\flash</IncludePath>
+              <IncludePath>..\HARDWARE\led;..\SYSTEM\nvic;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\USER;..\LIBRARY\inc;..\CORE;..\HARDWARE\adc;..\HARDWARE\ds3231;..\HARDWARE\i2c_soft;..\HARDWARE\bme280;..\HARDWARE\oled;..\HARDWARE\beep;..\HARDWARE;..\HARDWARE\mpu;..\HARDWARE\mpu\empl;..\APP;..\APP\games;..\APP\games\gamelife;..\HARDWARE\flash;..\HARDWARE\led</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -538,6 +538,11 @@
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\flash\stmflash.c</FilePath>
             </File>
+            <File>
+              <FileName>led.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\led\led.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -664,9 +669,9 @@
               <FilePath>..\APP\millis.c</FilePath>
             </File>
             <File>
-              <FileName>normal.c</FileName>
+              <FileName>watchface.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\APP\normal.c</FilePath>
+              <FilePath>..\APP\watchface.c</FilePath>
             </File>
             <File>
               <FileName>resources.c</FileName>
@@ -722,11 +727,6 @@
               <FileName>tunes.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\APP\tunes.c</FilePath>
-            </File>
-            <File>
-              <FileName>ui.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\ui.c</FilePath>
             </File>
             <File>
               <FileName>pwrmgr.c</FileName>

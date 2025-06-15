@@ -792,8 +792,9 @@ int mpu_init(void)
             st.chip_cfg.accel_half = 0;
         else {
             log_e("Unsupported software product rev %d.\n", rev);
+            st.chip_cfg.accel_half = 0;
             // return rev; // 250
-            return -4;
+            // return -4; // 新的mpu6050在这里 Unsupported software product rev 6.
         }
     } else {
         if (i2c_read(st.hw->addr, st.reg->prod_id, 1, data))
@@ -3033,8 +3034,10 @@ u8 mpu_dmp_init(void)
 		if(res)return 36; 
 		res=dmp_set_fifo_rate(DEFAULT_MPU_HZ);	//设置DMP输出速率(最大不超过200Hz)
 		if(res)return 37;   
-		res=run_self_test();		//自检
-		if(res)return 38;    
+		res=run_self_test();		//自检, 新的mpu自检有问题
+		if(res) {
+            return 38;
+        }
 		res=mpu_set_dmp_state(1);	//使能DMP
 		if(res)return 39;     
 	} else return -ok;

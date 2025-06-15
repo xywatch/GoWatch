@@ -1,7 +1,7 @@
 #include "common.h"
 #include "stmflash.h"
 
-#define EEPROM_CHECK_NUM 0x68 // Any 8 bit number that isn't 0 or 255
+#define EEPROM_CHECK_NUM 0x69 // Any 8 bit number that isn't 0 or 255
 
 // 主存储器的起始地址就是 0X08000000, stm32f103c8t6 flash大小64K，地址范围 0x08000000 - 0x0800FFFF 
 // 1 STM32F103C8T6和STM32F103CBT6 引脚相同，唯一的区别是前者为64kflash（0x8000000~0x800FFFF） 
@@ -70,6 +70,7 @@ void appconfig_reset()
     appConfig.CTRL_LEDs = false;
     appConfig.showFPS = false;
     appConfig.timeMode = TIMEMODE_24HR;
+    appConfig.moveCheckFlag = true;
 
     appConfig.volUI = 1;
     appConfig.volAlarm = 2;
@@ -78,9 +79,9 @@ void appconfig_reset()
     // alarms
     // 22:45:00, 127 = 1111111, 表示星期1,2,3,4,5,6,7, 255=1(开启) 111111(周二)1(周一), 表示所有星期且开启
     // 63 = 111111, 表示星期1,2,3,4,5,6   7 = 111, 表示星期1,2,3
-    appConfig.alarms[0].hour = 9;
-    appConfig.alarms[0].min = 0;
-    appConfig.alarms[0].days = 127;
+    appConfig.alarms[0].hour = 10;
+    appConfig.alarms[0].min = 40;
+    appConfig.alarms[0].days = 255;
 
     appConfig.alarms[1].hour = 10;
     appConfig.alarms[1].min = 0;

@@ -1,65 +1,11 @@
-/*
- * Project: Lightweight millisecond tracking library
- * Author: Zak Kemble, contact@zakkemble.co.uk
- * Copyright: (C) 2013 by Zak Kemble
- * License: GNU GPL v3 (see License.txt)
- * Web: http://blog.zakkemble.co.uk/millisecond-tracking-library-for-avr/
- */
-
-#ifndef ARDUINO
-
 #include "common.h"
 #include "sys.h"
 #include "led.h"
 #include "adc.h"
 #include "bme280.h"
-// #include "misc.h"
 
 extern float BatteryVol; // 改成u16会导致无法正常显示
 millis_t milliseconds;
-
-// static inline bool millis_interrupt_off(void)
-//{
-//	TIM_Cmd(TIM2,DISABLE);//开启时钟
-//	return true;
-// }
-
-// static inline bool millis_interrupt_on(void)
-//{
-//	TIM_Cmd(TIM2,ENABLE);//开启时钟
-//	return false;
-// }
-
-////// NEED TO DO A RESTORE THING! if paused then millis() is called it will unpause
-// #define MILLIS_ATOMIC() for(bool cs = millis_interrupt_off(); cs; cs = millis_interrupt_on())
-
-// ((200)*( 72)) / 72M = 200us
-// 若时钟信号为72M，TIM_Prescaler=72，TIM_Period=1000，则定时1ms
-// TIM2_init(200, 72); // 200us为了蜂鸣器，最后还是1ms时标
-/*
-// ((200)*( 72)) / 72 = 200us
-// 若时钟信号为72M，TIM_Prescaler=72，TIM_Period=1000，则定时1ms
-// TIM2_init(200, 72); // 200us为了蜂鸣器，最后还是1ms时标
-void TIM2_init(unsigned short pre, unsigned short psc)
-{
-    // TIM使能时钟
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
-
-    // TIM配置
-    TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStruct;
-    TIM_TimeBaseInitStruct.TIM_CounterMode = TIM_CounterMode_Up; //向上计数
-    TIM_TimeBaseInitStruct.TIM_Period = pre - 1;	// 预装载值
-    TIM_TimeBaseInitStruct.TIM_Prescaler = psc - 1; // 分频72
-    TIM_TimeBaseInitStruct.TIM_ClockDivision = TIM_CKD_DIV1; //设置时钟分割:TDTS = Tck_tim 就是少加了这个!!!!
-    TIM_TimeBaseInit(TIM2, &TIM_TimeBaseInitStruct);// 初始化定时器
-
-    TIM_Cmd(TIM2, ENABLE);	//使能定时器
-
-    //NVIC
-    TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
-}
-
-*/
 
 // Initialise library
 // 1s = 1000ms 每一ms中断一次
@@ -168,17 +114,11 @@ void TIM3_IRQHandler(void)
         milliseconds++;
         // update = true;
 
-#ifdef RTC_SRC
-        update = true;
-#else
-
         if (milliseconds % 200 == 0)
         {
             update = true;
             //++timeDate.time.secs;   //每0.2秒钟更新一次时间;
         }
-
-#endif
 
         if (milliseconds % (bme_time * 1000) == 0)
         {
@@ -229,12 +169,11 @@ void TIM3_IRQHandler(void)
             // 有时会卡死, imu_run 在 mpu_task.c中, 卡死ds3231时钟
             if (imu_run)
             {
-                mpu_dmp_get_data(&pitch, &roll, &yaw);
+                u8 ret = mpu_dmp_get_data(&pitch, &roll, &yaw);
+                printf("ret: %d, pitch: %.2f, roll: %.2f, yaw: %.2f\n", ret, pitch, roll, yaw);
             }
         }
     }
 
     TIM_ClearITPendingBit(TIM3, TIM_FLAG_Update); // 手动清除中断标志位
 }
-
-#endif

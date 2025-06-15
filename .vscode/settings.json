@@ -9,7 +9,13 @@
     "delay.h": "c",
     "i2c_soft.h": "c",
     "config.h": "c",
-    "nvic.h": "c"
+    "nvic.h": "c",
+    "appconfig.h": "c",
+    "inv_mpu_dmp_motion_driver.h": "c",
+    "oled.h": "c",
+    "typedefs.h": "c",
+    "oled_driver.h": "c",
+    "animation.h": "c"
   },
   "files.encoding": "gbk"
 }

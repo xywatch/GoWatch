@@ -28,3 +28,6 @@ AD/v1.1/drive/drive-stm32.zip
 /MDK-ARM/Objects
 MDK-ARM/GOWATCH.map
 *.zip
+/.vscode
+.vscode/settings.json
+MDK-ARM/GOWATCH.uvguix.lt

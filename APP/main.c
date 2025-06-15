@@ -1,19 +1,4 @@
-#include "led.h"
-#include "delay.h"
-#include "sys.h"
-#include "usart.h"
-#include "led.h"
-#include "oled.h"
 #include "common.h"
-#include "i2c_soft.h"
-#include "adc.h"
-#include "ds3231.h"
-#include "rtc.h"
-#include "nvic.h"
-#include "bme280.h"
-#include "oled_driver.h"
-
-// extern unsigned char wifi_time_cnt;
 
 void power_pin_init(void)
 {
@@ -74,16 +59,18 @@ void c_setup()
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2); // 设置系统中断优先级分组2
 
     uart_init(115200);
-    printf("goxxx1");
+    printf("go1\n");
 
     OLED_Init(); // 初始化OLED接口
     Adc_Init();  // ADC初始化
     KEY_INT_INIT(); // 按键中断
     millis_init();
-    printf("goxxx2");
+    printf("go2\n");
 
     delay_ms(50);
     showSpace();
+    
+    appconfig_init();
 
     console_log(50, "Init MPU...");
     // console_log(50, "SS %d", SystemCoreClock);
@@ -125,18 +112,18 @@ void c_setup()
     {
         console_log(50, "Init MPU Error");
     }
-    MPU_INT_Init();
-
+    if (appConfig.moveCheckFlag) {
+        MPU_INT_Init();
+    }
+    
     milliseconds = 0;
 
-    // 先初始化中断引脚
-    DS3231_INT_INIT();  // 初始化DS3231中断引脚
-    delay_ms(10);       // 等待引脚配置稳定
-    
     // 然后初始化 DS3231
     DS3231_Init();      // DS3231初始化
     delay_ms(10);       // 等待初始化完成
 
+    // 初始化中断引脚
+    RTC_INT_INIT();
     console_log(50, "DS3231 Init OK");
 
     // time_init();
@@ -155,16 +142,14 @@ void c_setup()
         DS3231_Set_Time();
     }
 
-    appconfig_init();
-    // led_init();              // 初始化LED
+    led_init();
     buzzer_init();
     buttons_init();
 
     Bme280_Init();
     console_log(50, "BME Init OK");
 
-    // global_init();
-    alarm_init(); // 无法储存闹钟，每次重启以后需要自定义
+    alarm_init();
 
     pwrmgr_init();
     console_log(50, "START !");
@@ -189,9 +174,12 @@ void c_loop()
         // 1. 先恢复时钟
         RCC_Configuration();
         delay_ms(10);  // 等待时钟稳定
+
+        printf("MPU6050_WakeUpRequested\n");
         
         // 2. 再检查运动
         if (MPU_movecheck()) {
+            printf("mpu6050 movecheck\n");
             nvic_wake_up(50);
             SleepRequested = false; // 避免在mpu6050唤醒后处理休眠请求
         }
@@ -199,7 +187,7 @@ void c_loop()
             printf("mpu6050 not move\n");
             // 如果mpu6050没有移动, 则会立即执行下面的进入STOP模式
         }
-        
+
         MPU6050_WakeUpRequested = false;
     }
 
@@ -217,19 +205,14 @@ void c_loop()
     // 这里会一直返回true, 除非sleep也就不会执行loop()了
     if (pwrmgr_userActive())
     {
-        // battery_update();
         buttons_update();
     }
 
-    // mpu_updata();
-
     buzzer_update();
-    // led_update();
 
 #if COMPILE_STOPWATCH
     stopwatch_update();
 #endif
-    //  global_update();
 
     if (pwrmgr_userActive())
     {

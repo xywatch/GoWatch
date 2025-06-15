@@ -81,8 +81,6 @@ nvic.c 按键中断也要配置
 
 config.h
 
-#define RTC_SRC   ///在无外部时钟时间 请注销这里          这里有BUG ，需要配合修改millis.c里面的z中断计时软件
-
 # DS3231, MPU6050 SCL2, SDA2
 SCL2 PB8
 SDA2 PB9

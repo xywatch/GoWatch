@@ -139,6 +139,7 @@ u8 MPU_Pitch_Detect(void);
 u8 MPU_Pitch_Detect2(void);
 u8 MPU_Roll_Detect2(float middle);
 void MPU_INT_Init(void);
-void MPU_GPIO_Config(void);
+void MPU_INT_Init_Config(void);
 u8 MPU_movecheck(void);
+void MPU_INT_Disable (void);
 #endif

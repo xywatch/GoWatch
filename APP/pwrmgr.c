@@ -48,44 +48,7 @@ void pwrmgr_init()
 }
 
 bool keep_on = 0;
-short pitch_a, roll_a, yaw_a;
-/*************************检测滚转******************************************/
-// 看是不是绕y旋转
-/*
-    |
-    |
- -------y
-    |
-    |
-    x
-*/
-// 抬腕
-void movecheck(void)
-{
-    if (MPU_Get_Gyroscope(&pitch_a, &roll_a, &yaw_a) == 0)
-    {
-        // pitch_a = roll_a; // 因为PCB画错了
-        if (pitch_a > 2300 || pitch_a < -2300)
-        {
-            delay_ms(300);
 
-            while (MPU_Get_Gyroscope(&pitch_a, &roll_a, &yaw_a))
-            {
-            };
-
-            // pitch_a = roll_a; // 因为PCB画错了
-            if (pitch_a > 2300 || pitch_a < -2300)
-            {
-                userWake();
-            }
-        }
-    }
-
-    // if(threshold>45||threshold<45)
-    //	userWake();
-}
-
-extern bool MoveCheckFlag; // 这个参数是在sleep设置里控制的, 默认是打开的
 bool SleepRequested; // 是否请求休眠, 在息屏结束会认为就可以休眠了, 然后在main.c里会执行休眠
 
 // c_loop()里循环执行
@@ -103,13 +66,21 @@ void pwrmgr_update()
 
     bool buttonsActive = buttons_isActive() || keep_on;
 
+    // 如果不息屏幕, 但一直没有动作, 不可能一直亮着
+    // 没有操作, 2分钟后就息屏幕, 避免误操作一直亮屏幕
+    if (keep_on) {
+        if(millis() - buttons_lastPressedTime() > 2 * 60 * 1000) {
+            buttonsActive = false;
+        }
+    }
+
     // 按钮活动，保持屏幕开启
     if (buttonsActive)
     {
         SleepRequested = false;
         // 如果之前是息屏动画，现在有按钮活动，则取消息屏动画, 即打开屏幕
         if (systemState == SYS_CRTANIM && buttonsActive)
-        { 
+        {
             // 取消息屏动画
             display_startCRTAnim(CRTANIM_OPEN);
             systemState = SYS_AWAKE;
@@ -128,17 +99,21 @@ void pwrmgr_update()
     }
     else
     {
+        // printf("buttonsActive false\r\n");
         // 没有按钮活动，开始息屏动画
         if (systemState == SYS_AWAKE)
         {
+            printf("没有按钮活动，开始息屏动画\r\n");
             systemState = SYS_CRTANIM;
             display_startCRTAnim(CRTANIM_CLOSE);
         }
         // 已息屏, 则等待动画结束进入睡眠模式
         else if (systemState == SYS_CRTANIM)
         {
+            // printf("已息屏, 则等待动画结束进入睡眠模式\r\n");
             // 等动画结束进入sleep mode
             if (!animation_active() && !display_is_ani_active()) {
+                printf("动画结束，进入睡眠模式\r\n");
                 SleepRequested = true;
             }
 
@@ -150,15 +125,8 @@ void pwrmgr_update()
             // 这里应该是 == 按下中键就是 RTCWAKE_SYSTEM
             if (time_wake() == RTCWAKE_SYSTEM) // Woken by button press, USB plugged in or by RTC user alarm
             {
+                printf("按下中键，唤醒系统\r\n");
                 userWake();
-            }
-
-            // 如果MoveCheckFlag为真，则执行movecheck()
-            // 这个函数是用来检测用户是否在移动设备的，如果检测到用户在移动设备，则唤醒设备
-            // 但是因为已STOP, 所以不会执行
-            if (MoveCheckFlag)
-            {
-                movecheck();
             }
         }
     }

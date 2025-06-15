@@ -63,19 +63,23 @@ static void setTimeout()
     }
 
     appConfig.sleepTimeout = timeout;
+    appconfig_save();
 }
 
-bool MoveCheckFlag = 1;
 static void setMoveCheck()
 {
-    if (MoveCheckFlag)
+    if (appConfig.moveCheckFlag)
     {
-        MoveCheckFlag = 0;
+        appConfig.moveCheckFlag = 0;
+        MPU_INT_Disable();
     }
     else
     {
-        MoveCheckFlag = 1;
+        appConfig.moveCheckFlag = 1;
+        MPU_INT_Init();
     }
+    appconfig_save();
+    // printf("setMoveCheck %d, %d\n", appConfig.moveCheckFlag, appConfig.volUI);
 }
 
 static void setMenuOptions()
@@ -95,7 +99,7 @@ static display_t mDraw()
 
     if (menuData.selected == 1)
     {
-        if (MoveCheckFlag == 1)
+        if (appConfig.moveCheckFlag == 1)
         {
             draw_string("On", NOINVERT, 58, 40);
         }

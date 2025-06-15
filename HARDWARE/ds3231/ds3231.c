@@ -212,12 +212,27 @@ void DS3231_Set_alarm1(void)
     
     if (!alarm_getNext(&alarm))
     {
-        printf("DS3231 alarm is not set\n");
+        printf("DS3231 alarm is not set, clear alarm\n");
+        // 清空闹钟, 这里清空有问题
+        // DS3231_WR_Byte(Alarm1_Address_Second, 0x80);  // A1M1=1，忽略秒匹配
+        // DS3231_WR_Byte(Alarm1_Address_Minute, 0x80);  // A1M2=1，忽略分钟匹配
+        // DS3231_WR_Byte(Alarm1_Address_Hour, 0x80);    // A1M3=1，忽略小时匹配
+        // DS3231_WR_Byte(Alarm1_Address_Week, 0x80);    // A1M4=1, 忽略日期/星期匹配
+
         // 清空闹钟
-        DS3231_WR_Byte(Alarm1_Address_Second, 0x80);  // A1M1=1，忽略秒匹配
-        DS3231_WR_Byte(Alarm1_Address_Minute, 0x80);  // A1M2=1，忽略分钟匹配
-        DS3231_WR_Byte(Alarm1_Address_Hour, 0x80);    // A1M3=1，忽略小时匹配
-        DS3231_WR_Byte(Alarm1_Address_Week, 0x80);    // A1M4=1, 忽略日期/星期匹配
+        DS3231_WR_Byte(Alarm1_Address_Second, 0x00);  // 秒设为0，A1M1=0
+        DS3231_WR_Byte(Alarm1_Address_Minute, 0x00);  // 分钟设为0，A1M2=0
+        DS3231_WR_Byte(Alarm1_Address_Hour, 0x00);    // 小时设为0，A1M3=0
+        DS3231_WR_Byte(Alarm1_Address_Week, 0x00);    // 星期设为0，A1M4=0
+        
+        // 清除闹钟中断标志位
+        // uint8_t status = DS3231_RD_Byte(Address_control_status);
+        // DS3231_WR_Byte(Address_control_status, status & ~0x01);  // 清除A1F标志位
+
+        // // 禁用闹钟中断
+        // uint8_t ctrl = DS3231_RD_Byte(Address_control);
+        // DS3231_WR_Byte(Address_control, ctrl & ~0x01);  // 清除A1IE位
+
         return;
     }
 
@@ -337,8 +352,8 @@ void DS3231_Alarm_Handler(void)
     uint8_t ctrl = DS3231_RD_Byte(Address_control);
     
     printf("DS3231 interrupt triggered!\n");
-    // printf("Status Register (0x0F): 0x%02X\n", status); // 0x01表示闹钟1触发
-    // printf("Control Register (0x0E): 0x%02X\n", ctrl); // 0x05表示闹钟1中断使能
+    printf("Status Register (0x0F): 0x%02X\n", status); // 0x01表示闹钟1触发
+    printf("Control Register (0x0E): 0x%02X\n", ctrl); // 0x05表示闹钟1中断使能
     
     // Check if Alarm 1 triggered (A1F bit)
     if(status & 0x01)

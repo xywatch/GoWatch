@@ -605,6 +605,7 @@ void MPU_INT_Init(void)
 
     MPU_Write_Byte(MPU_INTBP_CFG_REG, 0X1C);  // INT引脚低电平平时
     MPU_Write_Byte(MPU_INT_EN_REG, 0x40);   // 中断使能寄存器
+
     // MPU_Write_Byte(MPU_INT_EN_REG, 0x80 | 0x40);  // 同时使能运动和静止检测中断
 
     // MPU_Write_Byte(MPU_INTBP_CFG_REG, 0X80);	// INT引脚0X80低电平触发
@@ -622,32 +623,32 @@ void MPU_INT_Init(void)
     MPU_Write_Byte(MPU_RA_INT_PIN_CFG,0X1C);      //INT引脚低电平平时
     MPU_Write_Byte(MPU_RA_INT_ENABLE,0x40);       //中断使能寄存器
     */
-   MPU_GPIO_Config();
+   MPU_INT_Init_Config();
 }
 
-// int <--> PB11
-// 配置 PB11 为输入模式，并启用内部上拉电阻。
-// 将 PB11 映射到 EXTI11，配置为上升沿触发。
-void MPU_GPIO_Config(void) {
+// int <--> PC13
+// 配置 PC13 为输入模式，并启用内部上拉电阻。
+// 将 PC13 映射到 EXTI13，配置为上升沿触发。
+void MPU_INT_Init_Config(void) {
     // 启用 GPIOB 时钟
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
 
     // 配置 PB11 为输入模式，启用内部上拉电阻
     GPIO_InitTypeDef GPIO_InitStruct;
-    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_11;
+    GPIO_InitStruct.GPIO_Pin = GPIO_Pin_13;
     GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IPU; // 输入上拉模式
     GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(GPIOB, &GPIO_InitStruct);
+    GPIO_Init(GPIOC, &GPIO_InitStruct);
 
     // 启用 SYSCFG 时钟
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 
     // 将 PB11 映射到 EXTI11
-    GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource11);
+    GPIO_EXTILineConfig(GPIO_PortSourceGPIOC, GPIO_PinSource13);
 
     // 配置 EXTI11
     EXTI_InitTypeDef EXTI_InitStruct;
-    EXTI_InitStruct.EXTI_Line = EXTI_Line11;
+    EXTI_InitStruct.EXTI_Line = EXTI_Line13;
     EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
     EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising; // 上升沿触发
     EXTI_InitStruct.EXTI_LineCmd = ENABLE;
@@ -662,11 +663,15 @@ void MPU_GPIO_Config(void) {
     NVIC_Init(&NVIC_InitStruct);
 }
 
+void MPU_INT_Disable (void) {
+    MPU_Write_Byte(MPU_INT_EN_REG, 0x00);   // 禁用中断
+}
+
 bool MPU6050_WakeUpRequested; // 是否请求唤醒, 在mpu6050唤醒后会设置为true
 void EXTI15_10_IRQHandler(void) {
-    if (EXTI_GetITStatus(EXTI_Line11) != RESET) {
+    if (EXTI_GetITStatus(EXTI_Line13) != RESET) {
         // 清除中断标志
-        EXTI_ClearITPendingBit(EXTI_Line11); // 如果不清空就会一直执行, 卡死
+        EXTI_ClearITPendingBit(EXTI_Line13); // 如果不清空就会一直执行, 卡死
 
         printf("mpu int\n");
 

@@ -145,6 +145,8 @@ void buzzer_buzz(uint16_t len, uint16_t tone, vol_t volType, tonePrio_t _prio, b
         break;
     }
 
+    // printf("vol %d, %d\n", vol, appConfig.volUI);
+
     // Pulse width goes down as freq goes up
     // This keeps power consumption the same for all frequencies, but volume goes down as freq goes up
 

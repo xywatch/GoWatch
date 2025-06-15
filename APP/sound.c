@@ -62,27 +62,25 @@ static void itemLoader(byte num)
 
 static void setVolumeUI()
 {
-    //   volUI = setVolume(volUI);
-
     appConfig.volUI = setVolume(appConfig.volUI);
     // 画出来了但是又被擦掉了，一直在画图
+    // printf("setVolumeUI %d, %d\n", appConfig.volUI, appConfig.volAlarm);
     //	char name[3];
     //	sprintf(name,"%d",appConfig.volUI);
     //	draw_string((char*)name, false, 64, FRAME_HEIGHT - 8);
+    appconfig_save();
 }
 
 static void setVolumeAlarm()
 {
-    //	volAlarm = setVolume(volAlarm);
-
     appConfig.volAlarm = setVolume(appConfig.volAlarm);
+    appconfig_save();
 }
 
 static void setVolumeHour()
 {
-    //	volHour = setVolume(volHour);
-
     appConfig.volHour = setVolume(appConfig.volHour);
+    appconfig_save();
 }
 
 static byte setVolume(byte vol)

@@ -166,6 +166,9 @@ typedef struct
 	bool CTRL_LEDs;
 	bool showFPS;
 	timemode_t timeMode;
+	bool moveCheckFlag;
+
+	bool __padding; // 不知道为什么, 改了moveCheckFlag会影响union里的值, 这里加一个占位就不会影响
 	union
 	{
 		ulong volumes;

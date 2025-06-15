@@ -13,6 +13,7 @@ void nvic_sleep(u8 source) {
 
     DeepSleepFlag = 1;
     OLED_OFF();
+    turnOffAllLed();
     menuData.isOpen = false;  // 关闭菜单
     printf("to stop mode %d\n", source);
     PWR_EnterSTOPMode(PWR_Regulator_LowPower, PWR_STOPEntry_WFI); // 进入停机模式 进入低功耗模式
@@ -28,12 +29,15 @@ void nvic_wake_up(u8 source) {
     // RCC_Configuration(); // 只有 RCC_Configuration()后, print才有效
     RCC_Configuration(); // 只有 RCC_Configuration()后, print才有效
     DeepSleepFlag = 0;
-    OLED_ON();
+    OLED_ON(); // 有时这里没作用, 是因为 RCC_Configuration 还没生效?
     if (source != 9) { // alarm中断唤醒时, 不执行动画, 因为alarm唤醒后要立即显示闹钟界面
         exitMeThenRun(display_load);
     }
-    userWake(); // 唤醒, 不然以为按钮没动又会进入STOP模式
     printf("wake up %d\n", source);
+    userWake(); // 唤醒, 不然以为按钮没动又会进入STOP模式
+
+    delay_ms(10);  // 等待时钟稳定
+    OLED_ON(); // 再来一次
 }
 
 // deep sleep后如何唤醒?
@@ -52,9 +56,9 @@ void cmd2(void)
 // PA7 中
 // PA3 下 左
 // v8:
-// KEY0: PB1 上 右
-// KEY1: PA5 中
-// KEY2: PA4 下 左
+// UP_BTN_KEY: PB1 上 右
+// CONFIRM_BTN_KEY: PA5 中
+// DOWN_BTN_KEY: PA4 下 左
 
 // 按键中断初始化 PA5
 void KEY_INT_INIT(void) 
@@ -81,7 +85,7 @@ void KEY_INT_INIT(void)
     NVIC_Init(&NVIC_InitStruct);
 }
 
-// 中键key要长按才能restart, 因为下降沿触发, 如果弹出了, KEY1读出来就是高电平了
+// 中键key要长按才能restart, 因为下降沿触发, 如果弹出了, CONFIRM_BTN_KEY读出来就是高电平了
 // 外部中断9~5处理程序
 // IO引脚 PA7
 void EXTI9_5_IRQHandler(void)
@@ -89,16 +93,17 @@ void EXTI9_5_IRQHandler(void)
     EXTI_ClearITPendingBit(EXTI_Line5); // 清除 LINE 上的中断标志位
     if (EXTI_GetITStatus(EXTI_Line5) != RESET) // PA5
     {
-        printf("EXTI9_5_IRQHandler KEY1=%d, DeepSleepFlag=%d\n", KEY1, DeepSleepFlag);
-        if (KEY1 == 0 && DeepSleepFlag == 1)
+        printf("EXTI9_5_IRQHandler CONFIRM_BTN_KEY=%d, DeepSleepFlag=%d\n", CONFIRM_BTN_KEY, DeepSleepFlag);
+        if (CONFIRM_BTN_KEY == 0 && DeepSleepFlag == 1)
         {
-            // delay_ms(80); // 为什么要delay? 因为下降沿触发, 如果弹出了, KEY1读出来就是高电平了
+            // delay_ms(80); // 为什么要delay? 因为下降沿触发, 如果弹出了, CONFIRM_BTN_KEY读出来就是高电平了
             // 但是因为stop后, 时钟会变慢, delay不准, 去掉delay后也不用长按了, 屏幕也亮了(不然偶尔会不亮)
             // 判断某个线上的中断是否发生, 
-            if (KEY1 == 0)
+            if (CONFIRM_BTN_KEY == 0)
             {
                 nvic_wake_up(3);
                 printf("wake up by key int\n");
+                
             }
         }
         else
@@ -201,7 +206,7 @@ void EXTI1_IRQHandler(void)
 //}
 
 // 初始化DS3231中断 PB4
-void DS3231_INT_INIT(void)
+void RTC_INT_INIT(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
     EXTI_InitTypeDef EXTI_InitStruct;

@@ -8,7 +8,6 @@
 
 #include "common.h"
 #include "ds3231.h"
-#include "rtc.h"
 
 #define SECONDS_IN_MIN 60
 #define SECONDS_IN_HOUR (60 * SECONDS_IN_MIN)
@@ -22,8 +21,7 @@ static const byte monthDayCount[] PROGMEM = {31, 28, 31, 30, 31, 30, 31, 31, 30,
 timeDate_s timeDate;
 // static timestamp_t timestamp;
 bool update;
-
-static void getRtcTime(void);
+static uint32_t lastUpdateTime = 0;  // 记录上次更新时间
 
 void time_init()
 {
@@ -32,87 +30,37 @@ void time_init()
 
 void time_sleep()
 {
-    ////	TCCR2B = _BV(CS22)|_BV(CS20);
-    ////	while(ASSR & (_BV(OCR2BUB)|_BV(TCR2AUB)|_BV(TCR2BUB)));
-
-    // #if RTC_SRC != RTC_SRC_INTERNAL
-    //	// Turn off square wave
-    //	rtc_sqw(RTC_SQW_OFF);
-
-    //	alarm_s alarm;
-
-    //	// Set next alarm
-    //	if(alarm_getNext(&alarm))
-    //	{
-    //		alarm.days = alarm_getNextDay() + 1;
-    //		rtc_setUserAlarmWake(&alarm);
-    //	}
-    //	else // No next alarm
-    //		rtc_setUserAlarmWake(NULL);
-
-    //	// Set up hour beeps
-    //	if(appConfig.volHour)
-    //	{
-    //		alarm.min = 0;
-    //		alarm.hour = 0;
-    //		alarm.days = 0;
-    //		rtc_setSystemAlarmWake(&alarm);
-    //	}
-    //	else // Hour beep volume set to minimum, so don't bother with the system alarm
-    //		rtc_setSystemAlarmWake(NULL);
-    // #endif
-
-    update = false;
 }
 
 void time_shutdown()
 {
-    // #if RTC_SRC != RTC_SRC_INTERNAL
-    //	rtc_sqw(RTC_SQW_OFF);
-    //	rtc_setUserAlarmWake(NULL);
-    //	rtc_setSystemAlarmWake(NULL);
-    // #endif
-
-    update = false;
 }
 
 rtcwake_t time_wake()
 {
-    // #if RTC_SRC != RTC_SRC_INTERNAL
-    // getRtcTime();
-
-    // Turn on square wave
-    //	rtc_sqw(RTC_SQW_ON);
-
-    //	update = false;
-
-    // Check alarms
-    if (KEY1 == 1)
+    if (CONFIRM_BTN_KEY == 0) // 按下
     {
         return RTCWAKE_SYSTEM;
     }
     else
     {
-
         return RTCWAKE_NONE;
     }
 }
 
 void time_set(timeDate_s *newTimeDate)
 {
-
+    // 复制时间数据
     memcpy(&timeDate, newTimeDate, sizeof(timeDate_s));
 
+    // 设置秒为0
     timeDate.time.secs = 0;
-    time_timeMode(&timeDate.time, appConfig.timeMode);
 
-#ifdef RTC_SRC
-    RTC_SetDatetime(timeDate.date.year + 2000, timeDate.date.month + 1, timeDate.date.date, timeDate.time.hour, timeDate.time.mins, timeDate.time.secs);
-    getRtcTime();
-#else
+    // 转换24小时模式保存到RTC
+    time_timeMode(&timeDate.time, TIMEMODE_24HR);
+
     DS3231_Set_Date();
     DS3231_Set_Time();
-#endif
 
     alarm_updateNextAlarm();
 }
@@ -141,9 +89,10 @@ day_t time_calcWeekDay(byte yy, month_t m, byte d)
     // 蔡勒公式使用的是1-14月
     // 调整月份和年份
     // 如果是1月或2月，按上一年的13月和14月计算
-    m += 1;
-    if (m < 3) {
-        m = (month_t)(m + 12);
+    u8 m2 = (u8)m;
+    m2 += 1;
+    if (m2 < 3) {
+        m2 = (month_t)(m2 + 12);
         yy--;
     }
     
@@ -152,7 +101,7 @@ day_t time_calcWeekDay(byte yy, month_t m, byte d)
     int j = y / 100;    // 年份前两位
     
     // 蔡勒公式
-    int h = (d + ((13 * (m + 1)) / 5) + k + (k / 4) + (j / 4) - (2 * j)) % 7;
+    int h = (d + ((13 * (m2 + 1)) / 5) + k + (k / 4) + (j / 4) - (2 * j)) % 7;
     
     // 确保结果为正数
     h = (h + 7) % 7;
@@ -184,16 +133,32 @@ char *time_timeStr()
     return buff;
 }
 
+// 转为时间mode, 12或24小时
+/*
+12小时制：将一天分为两个12小时周期，即上午（AM）和下午（PM）。
+    AM（Ante Meridiem）：午夜12:00到中午11:59。
+    PM（Post Meridiem）：中午12:00到午夜11:59。
+
+12小时制的规则：
+    一天被分为两个12小时周期：AM（午夜到中午）和PM（中午到午夜）。
+    小时数从12开始，接着是1到11，没有0。
+    AM周期：12:00 AM（午夜）→ 1:00 AM → … → 11:59 AM（上午）。
+    PM周期：12:00 PM（中午）→ 1:00 PM → … → 11:59 PM（午夜前）。
+
+24小时制：直接以0-24表示全天时间，无需区分AM/PM。例如，13:00即下午1点。
+*/
 void time_timeMode(time_s *time, timemode_t mode)
 {
     byte hour = time->hour;
 
+    // 转为12小时制
     if (mode == TIMEMODE_12HR)
     {
-        if (time->ampm != CHAR_24)
-        { // Already 12hr
+        if (time->ampm != CHAR_24) // Already 12hr
+        {
             return;
         }
+        // 之前是24小时, 现在转为12小时, 则13点变成下午1点
         else if (hour >= 12)
         {
             if (hour > 12)
@@ -205,6 +170,7 @@ void time_timeMode(time_s *time, timemode_t mode)
         }
         else
         {
+            // 0点变成12点AM (12小时制没有0点)
             if (hour == 0)
             {
                 hour = 12;
@@ -213,14 +179,15 @@ void time_timeMode(time_s *time, timemode_t mode)
             time->ampm = CHAR_AM;
         }
     }
+    // 转为24小时制
     else
-    { // 24 hour
-        if (time->ampm == CHAR_AM && hour == 12)
-        { // Midnight 12AM = 00:00
+    {
+        if (time->ampm == CHAR_AM && hour == 12) // Midnight 12AM = 00:00
+        {
             hour = 0;
         }
-        else if (time->ampm == CHAR_PM && hour < 12)
-        { // No change for 12PM (midday)
+        else if (time->ampm == CHAR_PM && hour < 12) // No change for 12PM (midday)
+        {
             hour += 12;
         }
 
@@ -230,108 +197,141 @@ void time_timeMode(time_s *time, timemode_t mode)
     time->hour = hour;
 }
 
+// 更新时间
 void time_update()
 {
-    static bool tuneHourFlag;
-
-    if (!update)
-    {
+    uint32_t currentTime = millis();
+    
+    // 每1000ms（1秒）更新一次
+    if (lastUpdateTime != 0 && currentTime - lastUpdateTime < 1000) {
         return;
     }
-
-    update = false;
-
-#ifdef RTC_SRC
-    getRtcTime();
-
-    if (timeDate.time.secs == 0 && timeDate.time.mins == 0)
-    {
-        tune_play(tuneHour, VOL_HOUR, PRIO_HOUR);
-    }
-
-#else
-    // Slightly modified code from AVR134
-    // console_log(50, "DS3231_Get_Time !");
+    flashAllLed();
+    lastUpdateTime = currentTime;
 
     DS3231_Get_Time();
+    printf("%d-%d-%d %d:%d:%d\r\n", timeDate.date.year, timeDate.date.month, timeDate.date.date, timeDate.time.hour, timeDate.time.mins, timeDate.time.secs);
 
-    // console_log(50, "DS3231_Get_Time2 !");
-    // console_log(50, "year=%d", timeDate.date.year);
+    // RTC读出来的是24小时时间, 转为设置的12或24小时时间
+    byte hour = timeDate.time.hour; // 避免转成12小时制, 下面resetStepCounter需要判断
+    timeDate.time.ampm = CHAR_24;
+	time_timeMode(&timeDate.time, appConfig.timeMode);
 
-    if (timeDate.time.mins == 0 && tuneHourFlag == 1)
+    // alarm_updateNextAlarm();
+
+    // Serial.printf("time_update\n");
+    // Serial.printf("%d-%d-%d %d:%d:%d\n", timeDate.date.year, timeDate.date.month, timeDate.date.date, timeDate.time.hour, timeDate.time.mins, timeDate.time.secs);
+
+    // u8 rtcPin = digitalRead(RTC_INT_PIN);
+    // Serial.printf("rtc pin: %d\n", rtcPin);
+
+    if (timeDate.time.mins == 0 && timeDate.time.secs == 0)
     {
         tune_play(tuneHour, VOL_HOUR, PRIO_HOUR);
-        tuneHourFlag = 0;
     }
-
-    if (timeDate.time.mins > 0)
-    {
-        tuneHourFlag = 1;
-    }
-
-    //	if(timeDate.time.secs == 60)
-    //	{
-    //		timeDate.time.secs = 0;
-    //		if(++timeDate.time.mins == 60)
-    //		{
-    //			timeDate.time.mins = 0;
-    //			if(++timeDate.time.hour == 24) // What about 12 hr?
-    //			{
-    //				byte numDays = time_monthDayCount(timeDate.date.month, timeDate.date.year);
-
-    //				timeDate.time.hour = 0;
-    //				if (++timeDate.date.date == numDays + 1)
-    //				{
-    //					timeDate.date.month++;
-    //					timeDate.date.date = 1;
-    //				}
-
-    //				if (timeDate.date.month == 13)
-    //				{
-    //					timeDate.date.month = (month_t)1;
-    //					timeDate.date.year++;
-    //					if(timeDate.date.year == 100)
-    //						timeDate.date.year = 0;
-    //				}
-
-    //				if(++timeDate.date.day == 7)
-    //					timeDate.date.day = (day_t)0;
-    //			}
-
-    //			tune_play(tuneHour, VOL_HOUR, PRIO_HOUR);
-    //		}
-    //	}
-#endif
-
-    // debug_printf("%02hhu:%02hhu:%02hhu\n", timeDate.time.hour, timeDate.time.mins, timeDate.time.secs);
-    // debug_printf("T: %hhuC\n",rtc_temp());
 }
 
-// #if RTC_SRC == RTC_SRC_INTERNAL
-// ISR(TIMER2_OVF_vect)
-// #else
-// #ifdef __AVR_ATmega32U4__
-// ISR(INT3_vect)
-// #else
-// ISR(INT0_vect)
-// #endif
-// #endif
-//{
-//	update = true;
-// }
+// 得到下一个整点报时的时间
+void time_getNextZhengdiao(timeDate_s *timeDate2) {
+    // 得到当前时间
+    DS3231_Get_Time();
 
-// life
-static void getRtcTime()
+    // 这3个值可以不变, 不用管进位
+    timeDate2->date.year = timeDate.date.year;
+    timeDate2->date.month = timeDate.date.month;
+    timeDate2->date.date = timeDate.date.date;
+
+    timeDate2->time.hour = (timeDate.time.hour + 1) % 24; // 0-23
+    timeDate2->time.mins = 0;
+    timeDate2->time.secs = 0;
+
+    // 第二天
+    if (timeDate.time.hour == 23)
+    {
+        timeDate2->date.day = (day_t)((timeDate.date.day + 1) % 7); // 0-6
+    }
+    else
+    {
+        timeDate2->date.day = timeDate.date.day;
+    }
+}
+
+/*
+typedef struct
 {
-    RTC_GetDatetime();
-    timeDate.time.ampm = CHAR_24;
+	day_t day; // 0-6, 星期, 0:周一, 6:周日
+	byte date; // 1-31, 日期
+	month_t month; // 0-11, 月份, 0:一月, 11:十二月
+	byte year; // 0-99, 年份
+} date_s;
 
-    // Convert to correct time mode
-    time_timeMode(&timeDate.time, appConfig.timeMode);
+typedef struct  { 
+  uint8_t Second; 
+  uint8_t Minute; 
+  uint8_t Hour; 
+  uint8_t Wday;   // 星期几 (1 = 星期日, 7 = 星期六)
+  uint8_t Day; // 一个月中的第几天 (1 - 31)
+  uint8_t Month; // 月份 1-12
+  uint8_t Year;   // offset from 1970; 
+} 	tmElements_t, TimeElements, *tmElementsPtr_t;
+*/
 
-    // rtc_get(&timeDate);
-    // timeDate.time.ampm = CHAR_24;
+// tmWday转为day_t
+// tmWday 1-7, 1:星期日, 7:星期六
+// day_t 0-6, 0:周一, 6:周日
+day_t tmWdayToDay(uint8_t tmWday)
+{
+  if (tmWday == 1)
+  {
+    return DAY_SUN;
+  }
+  else if (tmWday == 7)
+  {
+    return DAY_SAT;
+  }
+  else
+  {
+    return (day_t)(tmWday - 2);
+  }
+}
 
-    // Convert to correct time mode
-    // time_timeMode(&timeDate.time, appConfig.timeMode);
+// day_t转为tmWday
+// day_t 0-6, 0:周一, 6:周日, 4:周五
+// tmWday 1-7, 1:星期日, 7:星期六, 6:周五
+uint8_t dayToTmWday(day_t day)
+{
+  if (day == DAY_SUN)
+  {
+    return 1;
+  }
+  else if (day == DAY_SAT)
+  {
+    return 7;
+  }
+  else
+  {
+    return (uint8_t)(day + 2);
+  }
+}
+
+// PCF8563 的星期表示中，0表示周日, 6表示周六
+uint8_t dayToPcf8563Day(day_t day)
+{
+    return dayToTmWday(day)-1;
+}
+
+// timeDate month转为tmMonth
+// timeDate month 0-11, 0:一月, 11:十二月
+// tmMonth 1-12
+uint8_t timeDateMonthToTmMonth(month_t month)
+{
+  return (uint8_t)(month + 1);
+}
+
+// tmMonth转为timeDate month
+// tmMonth 1-12
+// timeDate month 0-11, 0:一月, 11:十二月
+month_t tmMonthToTimeDateMonth(uint8_t tmMonth)
+{
+  return (month_t)(tmMonth - 1);
 }

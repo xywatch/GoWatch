@@ -54,8 +54,6 @@
 #define DEBUG_MSGS 0
 #define UART_BAUD 115200
 
-// #define RTC_SRC // 使用外部时钟时间DS3231时 请注销这里 这里有BUG ，需要配合修改millis.c里面的z中断计时软件
-
 #define POWER_ON_PIN GPIO_Pin_1 // PA1
 #define POWER_ON_PORT GPIOA
 
