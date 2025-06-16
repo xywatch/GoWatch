@@ -72,6 +72,9 @@ void appconfig_reset()
     appConfig.timeMode = TIMEMODE_24HR;
     appConfig.moveCheckFlag = true;
 
+    appConfig.bme_log_time = 5; // 5∑÷÷”“ª¥Œ
+    appConfig.bme_enable = true;
+
     appConfig.volUI = 1;
     appConfig.volAlarm = 2;
     appConfig.volHour = 1;

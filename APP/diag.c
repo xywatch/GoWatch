@@ -16,18 +16,12 @@ static void mSelect(void);
 static void itemLoader(byte);
 static void Change_BmeState(void);
 static void Change_BmeTime(void);
-// static void updateFPS(void);
-// static void setShowFPS(void);
+static void updateFPS(void);
+static void setShowFPS(void);
 static void MeasureTimeUpdate(void);
-
-extern bool bme_enable;
-extern u8 bme_time;
 
 void mDiagOpen()
 {
-    // rtc_tempUpdate();//读取内部温度传感器
-    //	battery_update();
-
     setMenuInfo(OPTION_COUNT, MENU_TYPE_STR, PSTR(STR_DIAGNOSTICSMENU));
     setMenuFuncs(MENUFUNC_NEXT, mSelect, MENUFUNC_PREV, itemLoader);
 
@@ -60,16 +54,20 @@ static void itemLoader(byte num)
     case 2:
         Change_BmeTime();
         return;
+    case 3:
+        updateFPS();
+        return;
     }
 
-    setMenuOption_P(3, PSTR("FW    " FW_VERSION), NULL, NULL);
-    setMenuOption_P(4, PSTR("User   " USER_NAME), NULL, NULL);
+    // setMenuOption_P(3, PSTR("FW    " FW_VERSION), NULL, NULL);
+    // setMenuOption_P(4, PSTR("User   " USER_NAME), NULL, NULL);
     addBackOption();
 }
 
 static void Change_State()
 {
-    bme_enable = !bme_enable;
+    appConfig.bme_enable = !appConfig.bme_enable;
+    appconfig_save();
 }
 
 static void Change_BmeState()
@@ -77,7 +75,7 @@ static void Change_BmeState()
 
     char buff[24];
 
-    if (bme_enable)
+    if (appConfig.bme_enable)
     // sprintf_P(buff, PSTR("EnvirMeasure  ON"));
     {
         sprintf((char *)buff, "EnvirMeasure  ON");
@@ -93,30 +91,32 @@ static void Change_BmeState()
 static void Change_BmeTime()
 {
     char buff[24];
-    sprintf_P((char *)buff, PSTR("MeasureTime   %ds"), bme_time);
+    sprintf_P((char *)buff, PSTR("MeasureLog   %dmin"), appConfig.bme_log_time);
     setMenuOption(2, buff, NULL, MeasureTimeUpdate);
 }
 
 static void MeasureTimeUpdate()
 {
     //	battery_updateNow();
-    bme_time += 5;
+    appConfig.bme_log_time += 5;
 
-    if (bme_time > 50)
+    if (appConfig.bme_log_time > 60)
     {
-        bme_time = 5;
+        appConfig.bme_log_time = 5;
     }
+    appconfig_save();
 }
 
-// static void updateFPS()
-//{
-//	char buff[20];
-//	char c =  appConfig.showFPS ? CHAR_YES : CHAR_NO;
-//	sprintf_P(buff, PSTR(STR_SHOWFPS), c);
-//	setMenuOption(2, buff, NULL, setShowFPS);
-// }
+static void updateFPS()
+{
+	char buff[20];
+	char c =  appConfig.showFPS ? CHAR_YES : CHAR_NO;
+	sprintf_P(buff, PSTR(STR_SHOWFPS), c);
+	setMenuOption(3, buff, NULL, setShowFPS);
+}
 
-// static void setShowFPS()
-//{
-//	appConfig.showFPS = !appConfig.showFPS;
-// }
+static void setShowFPS()
+{
+	appConfig.showFPS = !appConfig.showFPS;
+    appconfig_save();
+}

@@ -165,6 +165,8 @@ typedef struct
 	bool display180;
 	bool CTRL_LEDs;
 	bool showFPS;
+	bool bme_enable;
+	byte bme_log_time; // 分钟为单位
 	timemode_t timeMode;
 	bool moveCheckFlag;
 

@@ -11,7 +11,7 @@
 #define About "About"
 #define CMD5_NAME "Back"
 
-#define OPTION_COUNT 6
+#define OPTION_COUNT 5
 
 static void mSelect()
 {
@@ -41,18 +41,17 @@ void cmd3(void)
     menuData.isOpen = false; // ¹Ø±Õ²Ëµ¥
 }
 
-// log
-extern u8 log_time;
-static void LogTimeUpdate()
-{
-    //	battery_updateNow();
-    log_time += 2;
+// // log
+// static void LogTimeUpdate()
+// {
+//     //	battery_updateNow();
+//     log_time += 2;
 
-    if (log_time > 15)
-    {
-        log_time = 1;
-    }
-}
+//     if (log_time > 15)
+//     {
+//         log_time = 1;
+//     }
+// }
 
 static void itemLoader(byte num)
 {
@@ -67,10 +66,10 @@ static void itemLoader(byte num)
 
     setMenuOption_P(num++, PSTR(CMD4_NAME), NULL, history_display);
 
-    sprintf_P((char *)buff, PSTR("Log Time  %d min"), log_time);
-    setMenuOption_P(num++, buff, NULL, LogTimeUpdate);
+    // sprintf_P((char *)buff, PSTR("Log Time  %d min"), log_time);
+    // setMenuOption_P(num++, buff, NULL, LogTimeUpdate);
 	
-	setMenuOption_P(num++, PSTR(About), NULL, showAbout);
+		setMenuOption_P(num++, PSTR(About), NULL, showAbout);
 
     setMenuOption_P(num++, PSTR(CMD5_NAME), NULL, cmd3);
 }

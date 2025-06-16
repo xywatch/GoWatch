@@ -51,10 +51,6 @@ u8 HistoryCount = 0;
 extern HistoryData historydat[12];
 extern float DS3231_Temp;
 extern int altitude;
-bool bme_flag = 0;
-u8 bme_time = 5;
-u8 log_time = 1;
-extern bool bme_enable;
 
 // 电池电压滤波
 static float batteryFilter(float newValue) {
@@ -100,6 +96,14 @@ static float calibrateVoltage(float rawVoltage) {
     return calibratedVoltage;
 }
 
+void bme_update(void)
+{
+    readTrim();
+    bme280CompensateH();
+    bme280CompensateP();
+    bme280CompensateT();
+}
+
 // 定时器中断函数处理。 //TIM2通用定时器
 void TIM3_IRQHandler(void)
 {
@@ -109,8 +113,7 @@ void TIM3_IRQHandler(void)
     const u8 ADC_AVERAGE_COUNT = 5;  // 每5次采样取平均
 
     if (TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET)
-    { // 判断中断标志是否发生
-        // wifi_wait_data_hander();
+    {
         milliseconds++;
         // update = true;
 
@@ -120,9 +123,10 @@ void TIM3_IRQHandler(void)
             //++timeDate.time.secs;   //每0.2秒钟更新一次时间;
         }
 
-        if (milliseconds % (bme_time * 1000) == 0)
+        if (appConfig.bme_enable && (milliseconds % (5 * 1000) == 0)) // 每5秒更新下bme数据显示在表盘
         {
-            bme_flag = 1;
+            bme_update();
+            count++;
         }
 
         if (milliseconds % 2000 == 0) {  // 缩短采样间隔到2秒
@@ -142,15 +146,11 @@ void TIM3_IRQHandler(void)
                 voltageSum = 0;
                 adcCount = 0;
             }
-
-            if (bme_enable)
-            {
-                count++;
-            }
         }
 
-        if (count > 6 * log_time)
-        { // 每10分钟更新一次数据
+        // 1count = 5秒
+        if (count * 5 / 60 > appConfig.bme_log_time) // 每10分钟更新一次数据
+        {
             count = 0;
             historydat[HistoryCount].hour = timeDate.time.hour;
             historydat[HistoryCount].min = timeDate.time.mins;

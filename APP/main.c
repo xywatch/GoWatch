@@ -11,19 +11,6 @@ void power_pin_init(void)
     GPIO_SetBits(POWER_ON_PORT, POWER_ON_PIN); // 设为高电平, 开机
 }
 
-extern bool bme_flag;
-void bme_update(void)
-{
-    if (bme_flag)
-    {
-        bme_flag = 0;
-        readTrim();
-        bme280CompensateH();
-        bme280CompensateP();
-        bme280CompensateT();
-    }
-}
-
 void showSpace()
 {
     byte width = 52;
@@ -162,8 +149,6 @@ void c_setup()
     display_load(); // 启动表盘
 }
 
-bool bme_enable = 1; // 先暂时不要
-
 extern bool MPU6050_WakeUpRequested;
 extern bool DeepSleepFlag;
 extern bool SleepRequested;
@@ -220,11 +205,6 @@ void c_loop()
 
         // 刷新屏幕
         display_update();
-    }
-
-    if (bme_enable)
-    {
-        bme_update();
     }
 
     pwrmgr_update();
