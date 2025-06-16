@@ -734,11 +734,6 @@
               <FilePath>..\APP\pwrmgr.c</FilePath>
             </File>
             <File>
-              <FileName>rtc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\rtc.c</FilePath>
-            </File>
-            <File>
               <FileName>calendar.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\APP\calendar.c</FilePath>
@@ -757,6 +752,11 @@
               <FileName>altitude_display.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\APP\altitude_display.c</FilePath>
+            </File>
+            <File>
+              <FileName>about.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\about.c</FilePath>
             </File>
           </Files>
         </Group>
