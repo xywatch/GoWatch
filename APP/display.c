@@ -124,16 +124,16 @@ void display_update()
         busy = DISPLAY_BUSY;
     }
 
-    // if (appConfig.showFPS)
-    // {
-    //     // Work out & draw FPS, add 2ms (actually 2.31ms) for time it takes to send to OLED, clear buffer etc
-    //     // This is only approximate
-    //     // millis8_t end = millis() + 1;
-    //     char buff[5];
-    //     sprintf_P(buff, PSTR("%u"), (uint)(1000 / fpsms));
-    //     //	draw_string(buff,false,107,56);
-    //     draw_string(buff, false, 100, 56);
-    // }
+    if (appConfig.showFPS)
+    {
+        // Work out & draw FPS, add 2ms (actually 2.31ms) for time it takes to send to OLED, clear buffer etc
+        // This is only approximate
+        // millis8_t end = millis() + 1;
+        char buff[5];
+        sprintf_P(buff, PSTR("%u"), (uint)(1000 / fpsms));
+        //	draw_string(buff,false,107,56);
+        draw_string(buff, false, 100, 56);
+    }
 
     // End drawing, send to OLED
     draw_end();

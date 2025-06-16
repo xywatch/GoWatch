@@ -7,7 +7,6 @@
  */
 
 #include "common.h"
-#include "ds3231.h"
 
 #define SECONDS_IN_MIN 60
 #define SECONDS_IN_HOUR (60 * SECONDS_IN_MIN)

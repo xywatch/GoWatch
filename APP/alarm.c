@@ -171,6 +171,66 @@ static bool isAlarmTimeReached()
     return false;
 }
 
+void rtc_set_alarm(void)
+{
+    // 只能设置一个闹钟
+    // 要实现整点报时, 需要将下一个整点报时的时间设置到RTC中
+    // 比如现在是12:01, 下一个整点报时是13:00, 则将13:00设置到RTC中
+    // 得到下一个整点报时的时间
+    timeDate_s nextZhengdian;
+    time_getNextZhengdiao(&nextZhengdian);
+    printf("nextZhengdian %02d:%02d, day:%d\r\n", nextZhengdian.time.hour, nextZhengdian.time.mins, nextZhengdian.date.day);
+
+    alarm_s alarm;
+    if (!alarm_getNext(&alarm))
+    {
+        // 没有闹钟, 则直接用下一个整点
+        printf("没有闹钟, 则直接用下一个整点\r\n");
+        DS3231_Set_alarm1(nextZhengdian.time.hour, nextZhengdian.time.mins, nextZhengdian.date.day);
+        return;
+    }
+    printf("nextAlarm %02d:%02d, day:%d\r\n", alarm.hour, alarm.min, nextAlarmDay);
+
+    // 有设置闹钟, 则判断当前闹钟是否比整点早, 如果早, 则用闹钟的, 否则用整点的
+    time_s timeNow;
+    timeNow.hour = timeDate.time.hour;
+    timeNow.ampm = timeDate.time.ampm;
+    time_timeMode(&timeNow, TIMEMODE_24HR);
+
+    // Now in minutes from start of week
+    uint now = toMinutes(timeNow.hour, timeDate.time.mins + 1, timeDate.date.day);
+    uint nextZhengdianMins = toMinutes(nextZhengdian.time.hour, nextZhengdian.time.mins + 1, nextZhengdian.date.day);
+    uint nextAlarmMins = toMinutes(alarm.hour, alarm.min + 1, nextAlarmDay);
+
+    // 整点比下一个闹钟早, 且比当前时间晚
+    // now zd alarm
+    if (now < nextZhengdianMins && nextZhengdianMins < nextAlarmMins)
+    {
+        printf("now zd alarm\r\n");
+        DS3231_Set_alarm1(nextZhengdian.time.hour, nextZhengdian.time.mins, nextZhengdian.date.day);
+        return;
+    }
+
+    // alarm now zd
+    if (nextAlarmMins < now && now < nextZhengdianMins)
+    {
+        printf("alarm now zd\r\n");
+        DS3231_Set_alarm1(nextZhengdian.time.hour, nextZhengdian.time.mins, nextZhengdian.date.day);
+        return;
+    }
+
+    // zd alarm now
+    if (nextZhengdianMins < nextAlarmMins && nextAlarmMins < now)
+    {
+        printf("zd alarm now\r\n");
+        DS3231_Set_alarm1(nextZhengdian.time.hour, nextZhengdian.time.mins, nextZhengdian.date.day);
+        return;
+    }
+
+    printf("use alarm\r\n");
+    DS3231_Set_alarm1(alarm.hour, alarm.min, (day_t)nextAlarmDay);
+}
+
 // This func needs to be ran when an alarm has changed, time has changed or an active alarm has been turned off
 static void getNextAlarm()
 {
@@ -234,7 +294,7 @@ static void getNextAlarm()
     // Set next alarm
     nextAlarmIndex = next;
 
-    DS3231_Set_alarm1(); // 存入ds3231闹钟1中
+    rtc_set_alarm();
 }
 
 static uint toMinutes(byte hours, byte mins, byte dow)

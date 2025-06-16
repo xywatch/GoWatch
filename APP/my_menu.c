@@ -1,19 +1,17 @@
 #include "common.h"
-#include "delay.h"
-#include "oled_driver.h"
-#include "nvic.h"
 #include "bme280.h"
 #include "mpu_task.h"
 #include "altitude_display.h"
 
-#define STR_WIFICMDMENU "< My Menu >"
+#define STR_WIFICMDMENU "< Quickstart >"
 #define CMD1_NAME "Shut Down"
 #define CMD2_NAME "Deep Sleep"
 #define CMD3_NAME "MPU Display"
 #define CMD4_NAME "History Data"
+#define About "About"
 #define CMD5_NAME "Back"
 
-#define OPTION_COUNT 5
+#define OPTION_COUNT 6
 
 static void mSelect()
 {
@@ -71,6 +69,8 @@ static void itemLoader(byte num)
 
     sprintf_P((char *)buff, PSTR("Log Time  %d min"), log_time);
     setMenuOption_P(num++, buff, NULL, LogTimeUpdate);
+	
+	setMenuOption_P(num++, PSTR(About), NULL, showAbout);
 
     setMenuOption_P(num++, PSTR(CMD5_NAME), NULL, cmd3);
 }

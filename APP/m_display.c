@@ -81,6 +81,7 @@ static void setBrightness()
 static void setInvert()
 {
     appConfig.invert = !appConfig.invert;
+	appconfig_save();
 }
 
 static void setRotate()
@@ -97,6 +98,8 @@ static void setRotate()
         WriteCmd(0xA0);
         WriteCmd(0xC0);
     }
+	
+	appconfig_save();
 }
 
 #if COMPILE_ANIMATIONS
@@ -104,6 +107,7 @@ static void setAnimations()
 {
     bool anims = !appConfig.animations;
     appConfig.animations = anims;
+	appconfig_save();
 }
 
 extern byte MY_FPS;

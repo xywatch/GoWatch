@@ -1,6 +1,5 @@
 #include "common.h"
 #include "nvic.h"
-#include "DS3231.h"
 #include "oled_driver.h"
 
 bool DeepSleepFlag = 0;
@@ -39,18 +38,6 @@ void nvic_wake_up(u8 source) {
     delay_ms(10);  // 等待时钟稳定
     OLED_ON(); // 再来一次
 }
-
-// deep sleep后如何唤醒?
-/*
-STOP模式可以通过外部中断或事件唤醒
-void cmd2(void)
-{
-    DeepSleepFlag = 1;
-    OLED_OFF();
-    menuData.isOpen = false;  // 关闭菜单
-    PWR_EnterSTOPMode(PWR_Regulator_LowPower, PWR_STOPEntry_WFI); // 进入停机模式
-}
-*/
 
 // PB1 上 右
 // PA7 中
@@ -103,7 +90,6 @@ void EXTI9_5_IRQHandler(void)
             {
                 nvic_wake_up(3);
                 printf("wake up by key int\n");
-                
             }
         }
         else
@@ -113,99 +99,7 @@ void EXTI9_5_IRQHandler(void)
     }
 }
 
-/*
-// 上键初始化 PB1
-void KEY_INT_INIT(void) 
-{
-    NVIC_InitTypeDef NVIC_InitStruct; // 定义结构体变量
-    EXTI_InitTypeDef EXTI_InitStruct;
-
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE); // 启动GPIO时钟 （需要与复用时钟一同启动）
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);  // 配置端口中断需要启用复用时钟
-
-    GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource1); // 定义 GPIO  中断 PA5
-
-    EXTI_InitStruct.EXTI_Line = EXTI_Line1;              // 定义中断线 PA5
-    EXTI_InitStruct.EXTI_LineCmd = ENABLE;               // 中断使能
-    EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;     // 中断模式为 中断
-    EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Falling; // 下降沿触发
-
-    EXTI_Init(&EXTI_InitStruct);
-
-    NVIC_InitStruct.NVIC_IRQChannel = EXTI1_IRQn;        // 中断线
-    NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;           // 使能中断
-    NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 2; // 抢占优先级 2
-    NVIC_InitStruct.NVIC_IRQChannelSubPriority = 4;        // 子优先级  2
-    NVIC_Init(&NVIC_InitStruct);
-}
-
-// 长按才能restart
-// 外部中断9~5处理程序
-// IO引脚 PB1 KEY2
-void EXTI1_IRQHandler(void)
-{
-    if (EXTI_GetITStatus(EXTI_Line1) != RESET)
-    {
-        printf("EXTI1_IRQHandler KEY1=%d, DeepSleepFlag=%d\n", KEY2, DeepSleepFlag);
-        if (KEY2 == 0 && DeepSleepFlag == 1)
-        {
-            delay_ms(80);
-
-            // 判断某个线上的中断是否发生
-            if (KEY2 == 0)
-            {
-                // 如果不重新RCC_Configuration时钟就会很慢!!亲测!!
-                // 进了STOP模式后，PLL停掉了，所以，如果开始的时钟配置，用的是PLL，那么唤醒后，需要重新配置RCC。
-                RCC_Configuration();
-                DeepSleepFlag = 0;
-                OLED_ON();
-                animation_start(display_load, ANIM_MOVE_OFF);
-                EXTI_ClearITPendingBit(EXTI_Line1); // 清除 LINE 上的中断标志位
-
-                // 只有 RCC_Configuration()后, print才有效
-                printf("restart by key int\n");
-            }
-        }
-        else
-        {
-            EXTI_ClearITPendingBit(EXTI_Line1); // 清除 LINE 上的中断标志位
-        }
-    }
-}
-*/
-
-// void DS3231_INT_INIT (void){	 //按键中断初始化
-//	GPIO_InitTypeDef  GPIO_InitStructure;
-//	EXTI_InitTypeDef  EXTI_InitStruct;
-//	NVIC_InitTypeDef  NVIC_InitStruct;	//定义结构体变量
-//
-//   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA,ENABLE); //启动GPIO时钟 （需要与复用时钟一同启动）
-//	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;//PA2
-//  	GPIO_InitStructure.GPIO_Mode =GPIO_Mode_IPU; 		 //内部上拉输入
-//	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;//速度50MHz
-//  	GPIO_Init(GPIOA, &GPIO_InitStructure);
-//
-//
-//	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO , ENABLE);//配置端口中断需要启用复用时钟
-
-//	GPIO_EXTILineConfig(GPIO_PortSourceGPIOA, GPIO_PinSource2);  //定义 GPIO  中断
-//
-//	EXTI_InitStruct.EXTI_Line=EXTI_Line2;  //定义中断线
-//	EXTI_InitStruct.EXTI_LineCmd=ENABLE;              //中断使能
-//	EXTI_InitStruct.EXTI_Mode=EXTI_Mode_Interrupt;     //中断模式为 中断
-//	EXTI_InitStruct.EXTI_Trigger=EXTI_Trigger_Falling;   //下降沿触发
-//
-//	EXTI_Init(& EXTI_InitStruct);
-//
-//	NVIC_InitStruct.NVIC_IRQChannel=EXTI2_IRQn ;   //中断线
-//	NVIC_InitStruct.NVIC_IRQChannelCmd=ENABLE;  //使能中断
-//	NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority=2;  //抢占优先级 2
-//	NVIC_InitStruct.NVIC_IRQChannelSubPriority=3;     //子优先级  2
-//	NVIC_Init(& NVIC_InitStruct);
-
-//}
-
-// 初始化DS3231中断 PB4
+// 初始化 pcf8563 中断 PB4
 void RTC_INT_INIT(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;

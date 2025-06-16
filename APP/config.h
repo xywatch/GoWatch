@@ -1,34 +1,12 @@
-/*
- * Project: N|Watch
- * Author: Zak Kemble, contact@zakkemble.co.uk
- * Copyright: (C) 2013 by Zak Kemble
- * License: GNU GPL v3 (see License.txt)
- * Web: http://blog.zakkemble.co.uk/diy-digital-wristwatch/
- */
-
-// Fuses for ATmega328/328P
-// Internal RC 8MHz 6 CK/14CK + 4.1ms startup
-// Serial program (SPI) enabled
-// Brown-out at 1.8V
-// High:		0xDF
-// Low:			0xD2
-// Extended:	0xFE
-
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
-// #define CPU_DIV clock_div_1
-
 // Hardware version
-// 1 = PCB 1.0 - 1.1
-// 2 = PCB 1.2
-// 3 = PCB 1.3 - 1.4
-#define HW_VERSION 3
-
+#define HW_VERSION 1
 #define USER_NAME "Life"
 
 // Firmware version
-#define FW_VERSION "  2022/2/16" // maybe use some __DATE__ __TIME__ stuff?
+#define FW_VERSION "1"
 
 // Language
 // 0 = English
@@ -48,11 +26,6 @@
 #define COMPILE_TORCH 1      // 手电筒
 #define COMPILE_TUNEMAKER 1  // 3D滚动
 #define COMPILE_CALENDAR 1   // 日历
-
-// 这个两个开启后可以串口打印调试信息
-#define COMPILE_UART 1
-#define DEBUG_MSGS 0
-#define UART_BAUD 115200
 
 #define POWER_ON_PIN GPIO_Pin_1 // PA1
 #define POWER_ON_PORT GPIOA

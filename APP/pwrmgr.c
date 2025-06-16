@@ -9,7 +9,6 @@
 // Deals with sleeping and waking up/电源管理
 
 #include "common.h"
-#include "delay.h"
 
 #define BATTERY_CUTOFF 2800
 
@@ -80,7 +79,7 @@ void pwrmgr_update()
         SleepRequested = false;
         // 如果之前是息屏动画，现在有按钮活动，则取消息屏动画, 即打开屏幕
         if (systemState == SYS_CRTANIM && buttonsActive)
-        {
+        { 
             // 取消息屏动画
             display_startCRTAnim(CRTANIM_OPEN);
             systemState = SYS_AWAKE;

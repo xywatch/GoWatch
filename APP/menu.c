@@ -38,6 +38,12 @@ static display_t menu_drawIcon(void);
 static void checkScroll(void);
 static void clear(void);
 
+void back_to_watchface(void)
+{
+    exitMeThenRun(display_load);
+    menuData.isOpen = false; // 关闭菜单
+}
+
 // 主菜单选择界面
 bool menu_select()
 {

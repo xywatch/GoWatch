@@ -15,7 +15,8 @@
     "oled.h": "c",
     "typedefs.h": "c",
     "oled_driver.h": "c",
-    "animation.h": "c"
+    "animation.h": "c",
+    "adc.h": "c"
   },
   "files.encoding": "gbk"
 }
