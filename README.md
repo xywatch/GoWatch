@@ -31,5 +31,7 @@ v1使用了MPU6050导致功耗比较大, 200毫安电池只能使用一天. v2/v
 ## 如何烧录
 <img src="./images/dowload.jpg">
 
+注意: 如不使用烧录时, 不要短接5v和3v, 避免正常充电时5v击穿芯片!
+
 ## 如何调试串口
 <img src="./images/serial.jpg">
