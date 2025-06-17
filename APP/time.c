@@ -196,8 +196,6 @@ void time_timeMode(time_s *time, timemode_t mode)
     time->hour = hour;
 }
 
-ulong lastMils = 0;
-
 // 更新时间
 void time_update()
 {

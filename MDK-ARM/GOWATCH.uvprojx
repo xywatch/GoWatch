@@ -514,11 +514,6 @@
               <FilePath>..\HARDWARE\adc\adc.c</FilePath>
             </File>
             <File>
-              <FileName>ds3231.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\ds3231\ds3231.c</FilePath>
-            </File>
-            <File>
               <FileName>bme280.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\bme280\bme280.c</FilePath>

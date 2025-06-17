@@ -68,6 +68,10 @@ static void setBrightness()
         brightness = 1;
     }
 
+    if (brightness == 0) {
+        brightness = 1;
+    }
+
     appConfig.brightness = brightness;
 
     WriteCmd(0x81);            //--set contrast control register
@@ -76,20 +80,15 @@ static void setBrightness()
 
 static void setInvert()
 {
-    bool invert = !appConfig.invert;
-    appConfig.invert = invert;
-
-    //	oled_setInvert(invert);
+    appConfig.invert = !appConfig.invert;
+	appconfig_save();
 }
 
 static void setRotate()
 {
-    bool rotate = !appConfig.display180;
-    appConfig.display180 = rotate;
+    appConfig.display180 = !appConfig.display180;
 
-    //	oled_set180(rotate);
-
-    if (rotate)
+    if (!appConfig.display180)
     {
         WriteCmd(0xA1);
         WriteCmd(0XC8);
@@ -99,17 +98,15 @@ static void setRotate()
         WriteCmd(0xA0);
         WriteCmd(0xC0);
     }
+	
+	appconfig_save();
 }
-
-// static void setLEDs() {
-//   appConfig.CTRL_LEDs = !appConfig.CTRL_LEDs;
-// }
 
 #if COMPILE_ANIMATIONS
 static void setAnimations()
 {
-    bool anims = !appConfig.animations;
-    appConfig.animations = anims;
+    appConfig.animations = !appConfig.animations;
+	appconfig_save();
 }
 
 extern byte MY_FPS;

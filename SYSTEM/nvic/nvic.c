@@ -28,12 +28,15 @@ void nvic_wake_up(u8 source) {
     // RCC_Configuration(); // 只有 RCC_Configuration()后, print才有效
     RCC_Configuration(); // 只有 RCC_Configuration()后, print才有效
     DeepSleepFlag = 0;
-    OLED_ON();
+    OLED_ON(); // 有时这里没作用, 是因为 RCC_Configuration 还没生效?
     if (source != 9) { // alarm中断唤醒时, 不执行动画, 因为alarm唤醒后要立即显示闹钟界面
         exitMeThenRun(display_load);
     }
+    printf("wake up %d\n", source);
     userWake(); // 唤醒, 不然以为按钮没动又会进入STOP模式
-    printf("wake up %d\r\n", source);
+
+    delay_ms(10);  // 等待时钟稳定
+    OLED_ON(); // 再来一次
 }
 
 // PB1 上 右
