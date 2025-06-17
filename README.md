@@ -1,10 +1,10 @@
 # GoWatch
-本项目有3个分支, v1和v2/v3的功能不一样. v2和v3功能一样, 只是MCU芯片不一样, 详细区分如下:
+本项目有3个分支, 大致功能都一样. v1使用mpu6050, v2/v3使用BMA423. 详细区别如下:
 
 | 分支 | MCU芯片 | RTC | 运动传感器 | 气压温度传感器 |
 | ---- | ---- | ---- | ---- | ---- |
 | [v1](https://github.com/xywatch/GoWatch/tree/v1) | STM32F103CBT6 | [DS3231MZ+TRL](https://item.taobao.com/item.htm?id=784371508620)
- | [MPU6050](https://detail.tmall.com/item.htm?id=598555471828&skuId=5780956225523) | [BME280](https://item.taobao.com/item.htm?id=641115619117) |
+| [MPU6050](https://detail.tmall.com/item.htm?id=598555471828&skuId=5780956225523) | [BME280](https://item.taobao.com/item.htm?id=641115619117) |
 | [v2](https://github.com/xywatch/GoWatch/tree/v2) | STM32F103CBT6 | [PCF8563BS](https://item.taobao.com/item.htm?id=756706038432&spm=tbpc.boughtlist.suborder_itemtitle.1.42092e8d5rsiuO) | [BMA423](https://item.taobao.com/item.htm?_u=nfl2f5gc82f&id=585190973333&sku_properties=-1%3A-1&spm=a1z09.2.0.0.54c72e8dzYZERC) | 无 |
 | [v3](https://github.com/xywatch/GoWatch/tree/v3) | STM32L151CBT6 | [PCF8563BS](https://item.taobao.com/item.htm?id=756706038432&spm=tbpc.boughtlist.suborder_itemtitle.1.42092e8d5rsiuO) | [BMA423](https://item.taobao.com/item.htm?_u=nfl2f5gc82f&id=585190973333&sku_properties=-1%3A-1&spm=a1z09.2.0.0.54c72e8dzYZERC) | 无 |
 
