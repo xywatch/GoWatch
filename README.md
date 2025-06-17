@@ -1,6 +1,8 @@
 # GoWatch
 <img src="./images/preview.jpg">
 
+本项目是将ESP32版的[XYWatch](https://github.com/xywatch/xywatch)移植到STM32下, 如果需要网络功能, 推荐使用[XYWatch](https://github.com/xywatch/xywatch)
+
 本项目有3个分支, 大致功能都一样. v1使用mpu6050, v2/v3使用BMA423. 详细区别如下:
 
 | 分支 | MCU芯片 | RTC | 运动传感器 | 气压温度传感器 |
@@ -9,7 +11,7 @@
 | [v2](https://github.com/xywatch/GoWatch/tree/v2) | STM32F103CBT6 | [PCF8563BS](https://item.taobao.com/item.htm?id=756706038432&spm=tbpc.boughtlist.suborder_itemtitle.1.42092e8d5rsiuO) | [BMA423](https://item.taobao.com/item.htm?_u=nfl2f5gc82f&id=585190973333&sku_properties=-1%3A-1&spm=a1z09.2.0.0.54c72e8dzYZERC) | 无 |
 | [v3](https://github.com/xywatch/GoWatch/tree/v3) | STM32L151CBT6 | [PCF8563BS](https://item.taobao.com/item.htm?id=756706038432&spm=tbpc.boughtlist.suborder_itemtitle.1.42092e8d5rsiuO) | [BMA423](https://item.taobao.com/item.htm?_u=nfl2f5gc82f&id=585190973333&sku_properties=-1%3A-1&spm=a1z09.2.0.0.54c72e8dzYZERC) | 无 |
 
-v1使用了MPU6050导致功耗比较大, 200毫安电池只能使用一天. v2/v3可使用3-4天.
+v1使用了MPU6050导致功耗比较大, 200毫安电池只能使用一天. v2/v3可使用3-4天. (问题: STM32L151CBT6 是低功耗芯片, 但实际用下来并没有降低多少)
 
 其它相同的元件:
 
@@ -27,7 +29,7 @@ v1使用了MPU6050导致功耗比较大, 200毫安电池只能使用一天. v2/v
 |表带|表带宽15mm|[淘宝](https://item.taobao.com/item.htm?id=872619805915&spm=tbpc.boughtlist.suborder_itemtitle.1.42092e8d5rsiuO)|
 
 ## 如何烧录
-<img src="./images/dowload.png">
+<img src="./images/dowload.jpg">
 
 ## 如何调试串口
-<img src="./images/serial.png">
+<img src="./images/serial.jpg">
