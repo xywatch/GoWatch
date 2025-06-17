@@ -1,5 +1,5 @@
 # GoWatch
-<img src="./images/preview.png">
+<img src="./images/preview.jpg">
 
 本项目有3个分支, 大致功能都一样. v1使用mpu6050, v2/v3使用BMA423. 详细区别如下:
 
