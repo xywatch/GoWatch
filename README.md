@@ -29,6 +29,10 @@ v1使用了MPU6050导致功耗比较大, 200毫安电池只能使用一天. v2/v
 |表带|表带宽15mm|[淘宝](https://item.taobao.com/item.htm?id=872619805915&spm=tbpc.boughtlist.suborder_itemtitle.1.42092e8d5rsiuO)|
 
 ## 如何烧录
+Keil pack:
+* STM32F1xx_DFP 1.0.5
+* STM32L1xx_DFP 1.4.1
+
 <img src="./images/dowload.jpg">
 
 注意: 如不使用烧录时, 不要短接5v和3v, 避免正常充电时5v击穿芯片!
