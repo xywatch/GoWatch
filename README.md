@@ -1,4 +1,6 @@
 # GoWatch
+<img src="./images/preview.png">
+
 本项目有3个分支, 大致功能都一样. v1使用mpu6050, v2/v3使用BMA423. 详细区别如下:
 
 | 分支 | MCU芯片 | RTC | 运动传感器 | 气压温度传感器 |
