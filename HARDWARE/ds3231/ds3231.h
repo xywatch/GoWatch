@@ -2,6 +2,7 @@
 #define __DS3231_H_
 
 #include "sys.h"
+#include "typedefs.h"
 typedef struct
 {
     u8 hour;
@@ -137,10 +138,10 @@ void DS3231_Set_Time(void); // 设置时间
 void DS3231_Set_Date(void); // 设置日期
 void Date_init(void);
 // void DS3231_Alarm_Config(void); //
-void DS3231_Set_alarm1(void);
+void DS3231_Set_alarm1(byte hour, byte min, day_t day);
 void DS3231_Get_alarm1(void);
 void DS3231_Alarm_Handler(void);  // 添加闹钟中断处理函数声明
-
+void DS3231_Clear_alarm1(void);
 // void enable_alarm1(void);
 // void reset_alarm1(void); // 复位闹钟1
 // void get_alarm1_status(void);

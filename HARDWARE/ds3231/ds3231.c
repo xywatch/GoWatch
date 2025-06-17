@@ -1,18 +1,12 @@
-#include "DS3231.h"
-#include "i2c_soft.h"
-#include "delay.h"
 #include "common.h"
 
 Calendar_OBJ calendar;
-
-// 0xD0 >> 1 = 0x68 DS3231 地址
 #define DS3231_WriteAddress 0xD0
 #define DS3231_ReadAddress 0xD1
 
 u8 test1, test2, test3;
 u8 alarm1_flag;
 u8 alarm_hour, alarm_min, alarm_sec, alarm_week;
-extern alarm_s eepAlarms[ALARM_COUNT];
 extern bool DeepSleepFlag;
 u8 BCD2HEX(u8 val)
 {
@@ -204,23 +198,108 @@ void DS3231_Get_Time(void)
     DS3231_Temp = (float)calendar.temper_H + (float)calendar.temper_L / 100;
 }
 
+void DS3231_Set_alarm1(byte hour, byte min, day_t day)
+{
+		u8 temp_a = 0;
+    printf("Setting alarm for %02d:%02d\n", hour, min);
+
+    // 1. 秒设为0，A1M1=0（需要匹配）
+    DS3231_WR_Byte(Alarm1_Address_Second, 0x00);  // 秒设为0，A1M1=0（需要匹配）
+    // DS3231_WR_Byte(Alarm1_Address_Second, 0x80);  // 不需要匹配，A1M1=1（忽略匹配）不能用这个, 必须要秒设为0, 不然导致闹钟不触发
+    
+    // 2. 设置分钟，A1M2=0（需要匹配）
+    temp_a = B_BCD(min);
+    DS3231_WR_Byte(Alarm1_Address_Minute, temp_a);  // 不需要&0x7F，因为BCD值最大是0x59
+    
+    // 3. 设置小时，A1M3=0（需要匹配），24小时制
+    temp_a = B_BCD(hour);
+    DS3231_WR_Byte(Alarm1_Address_Hour, temp_a);  // 不需要&0x3F，因为BCD值最大是0x23
+    
+    // 4. 设置日期/星期，A1M4=1（忽略匹配）
+    /*
+    DS3231_WR_Byte(Alarm1_Address_Week, 0x80);
+    // 读取并打印所有相关寄存器的值进行调试
+    printf("\nDS3231 Registers after alarm set:\n");
+    printf("Control(0x0E): 0x%02X (should be 0x05)\n", DS3231_RD_Byte(Address_control));
+    printf("Status(0x0F): 0x%02X (should be 0x00)\n", DS3231_RD_Byte(Address_control_status));
+    printf("Alarm1 Second: 0x%02X (should be 0x00)\n", DS3231_RD_Byte(Alarm1_Address_Second));
+    printf("Alarm1 Minute: 0x%02X (should match %02d)\n", DS3231_RD_Byte(Alarm1_Address_Minute), min);
+    printf("Alarm1 Hour: 0x%02X (should match %02d)\n", DS3231_RD_Byte(Alarm1_Address_Hour), hour);
+    printf("Alarm1 Week/Date: 0x%02X\n", DS3231_RD_Byte(Alarm1_Address_Week));
+    */
+
+    // 闹钟1的星期/日期寄存器（0x0A）的格式如下：
+    // bit 7: A1M4 (匹配位)
+    // bit 6: DY/DT (1=按星期匹配，0=按日期匹配)
+    // bit 5-0: 星期(1-7)或日期(1-31)的BCD值
+    // 设置星期，A1M4=0（需要匹配），DY/DT=1（按星期匹配）
+    
+    byte nextAlarmDay = (byte)day;  // 下一个闹钟的星期, 0-6, 0:周一, 6:周日
+    uint8_t ds3231_day = system_week_to_DS3231_week(nextAlarmDay); // (nextAlarmDay == 6) ? 1 : (nextAlarmDay + 2);
+    temp_a = B_BCD(ds3231_day);  // 转换为DS3231的星期格式, 是因为 DS3231 的星期从 1 开始（1=周日，7=周六）
+    DS3231_WR_Byte(Alarm1_Address_Week, (0x40 | temp_a));  // 0x40=按星期匹配，A1M4=0 0b 0100 0000
+
+    // 打印调试信息
+    printf("\nAlarm Configuration Verification:\n");
+    printf("Day conversion: %d -> %d (DS3231 format)\n", nextAlarmDay, ds3231_day);
+    printf("Time: %02d:%02d:00\n", hour, min);
+    printf("Week register: 0x%02X\n", DS3231_RD_Byte(Alarm1_Address_Week));
+    printf("Control: 0x%02X, Status: 0x%02X\n", 
+           DS3231_RD_Byte(Address_control),
+           DS3231_RD_Byte(Address_control_status));
+    // 打印当前week
+    printf("Current week: %d\n", nextAlarmDay); // 0-6, 0:周一, 6:周日
+}
+
+// 没用了, 因为至少有整点的闹钟
+void DS3231_Clear_alarm1(void)
+{
+    // 清空闹钟
+    DS3231_WR_Byte(Alarm1_Address_Second, 0x00);  // 秒设为0，A1M1=0
+    DS3231_WR_Byte(Alarm1_Address_Minute, 0x00);  // 分钟设为0，A1M2=0
+    DS3231_WR_Byte(Alarm1_Address_Hour, 0x00);    // 小时设为0，A1M3=0
+    DS3231_WR_Byte(Alarm1_Address_Week, 0x00);    // 星期设为0，A1M4=0
+    
+    // 清除闹钟中断标志位
+    // uint8_t status = DS3231_RD_Byte(Address_control_status);
+    // DS3231_WR_Byte(Address_control_status, status & ~0x01);  // 清除A1F标志位
+
+    // // 禁用闹钟中断
+    // uint8_t ctrl = DS3231_RD_Byte(Address_control);
+    // DS3231_WR_Byte(Address_control, ctrl & ~0x01);  // 清除A1IE位
+}
 
 /*********************************************************************************************************************************************/
 // 闹钟设定函数，内部已设定为按照时，分，秒匹配闹钟。
 // 可选择是否匹配星期
-void DS3231_Set_alarm1(void)
+void DS3231_Set_alarm1_old(void)
 {
     alarm_s alarm;
     u8 temp_a = 0;
     
     if (!alarm_getNext(&alarm))
     {
-        printf("DS3231 alarm is not set\n");
+        printf("DS3231 alarm is not set, clear alarm\n");
+        // 清空闹钟, 这里清空有问题
+        // DS3231_WR_Byte(Alarm1_Address_Second, 0x80);  // A1M1=1，忽略秒匹配
+        // DS3231_WR_Byte(Alarm1_Address_Minute, 0x80);  // A1M2=1，忽略分钟匹配
+        // DS3231_WR_Byte(Alarm1_Address_Hour, 0x80);    // A1M3=1，忽略小时匹配
+        // DS3231_WR_Byte(Alarm1_Address_Week, 0x80);    // A1M4=1, 忽略日期/星期匹配
+
         // 清空闹钟
-        DS3231_WR_Byte(Alarm1_Address_Second, 0x80);  // A1M1=1，忽略秒匹配
-        DS3231_WR_Byte(Alarm1_Address_Minute, 0x80);  // A1M2=1，忽略分钟匹配
-        DS3231_WR_Byte(Alarm1_Address_Hour, 0x80);    // A1M3=1，忽略小时匹配
-        DS3231_WR_Byte(Alarm1_Address_Week, 0x80);    // A1M4=1, 忽略日期/星期匹配
+        DS3231_WR_Byte(Alarm1_Address_Second, 0x00);  // 秒设为0，A1M1=0
+        DS3231_WR_Byte(Alarm1_Address_Minute, 0x00);  // 分钟设为0，A1M2=0
+        DS3231_WR_Byte(Alarm1_Address_Hour, 0x00);    // 小时设为0，A1M3=0
+        DS3231_WR_Byte(Alarm1_Address_Week, 0x00);    // 星期设为0，A1M4=0
+        
+        // 清除闹钟中断标志位
+        // uint8_t status = DS3231_RD_Byte(Address_control_status);
+        // DS3231_WR_Byte(Address_control_status, status & ~0x01);  // 清除A1F标志位
+
+        // // 禁用闹钟中断
+        // uint8_t ctrl = DS3231_RD_Byte(Address_control);
+        // DS3231_WR_Byte(Address_control, ctrl & ~0x01);  // 清除A1IE位
+
         return;
     }
 
@@ -238,54 +317,6 @@ void DS3231_Set_alarm1(void)
     }
     */
 
-    printf("Setting alarm for %02d:%02d\n", alarm.hour, alarm.min);
-
-    // 1. 秒设为0，A1M1=0（需要匹配）
-    DS3231_WR_Byte(Alarm1_Address_Second, 0x00);  // 秒设为0，A1M1=0（需要匹配）
-    // DS3231_WR_Byte(Alarm1_Address_Second, 0x80);  // 不需要匹配，A1M1=1（忽略匹配）不能用这个, 必须要秒设为0, 不然导致闹钟不触发
-    
-    // 2. 设置分钟，A1M2=0（需要匹配）
-    temp_a = B_BCD(alarm.min);
-    DS3231_WR_Byte(Alarm1_Address_Minute, temp_a);  // 不需要&0x7F，因为BCD值最大是0x59
-    
-    // 3. 设置小时，A1M3=0（需要匹配），24小时制
-    temp_a = B_BCD(alarm.hour);
-    DS3231_WR_Byte(Alarm1_Address_Hour, temp_a);  // 不需要&0x3F，因为BCD值最大是0x23
-    
-    // 4. 设置日期/星期，A1M4=1（忽略匹配）
-    /*
-    DS3231_WR_Byte(Alarm1_Address_Week, 0x80);
-    // 读取并打印所有相关寄存器的值进行调试
-    printf("\nDS3231 Registers after alarm set:\n");
-    printf("Control(0x0E): 0x%02X (should be 0x05)\n", DS3231_RD_Byte(Address_control));
-    printf("Status(0x0F): 0x%02X (should be 0x00)\n", DS3231_RD_Byte(Address_control_status));
-    printf("Alarm1 Second: 0x%02X (should be 0x00)\n", DS3231_RD_Byte(Alarm1_Address_Second));
-    printf("Alarm1 Minute: 0x%02X (should match %02d)\n", DS3231_RD_Byte(Alarm1_Address_Minute), alarm.min);
-    printf("Alarm1 Hour: 0x%02X (should match %02d)\n", DS3231_RD_Byte(Alarm1_Address_Hour), alarm.hour);
-    printf("Alarm1 Week/Date: 0x%02X\n", DS3231_RD_Byte(Alarm1_Address_Week));
-    */
-
-    // 闹钟1的星期/日期寄存器（0x0A）的格式如下：
-    // bit 7: A1M4 (匹配位)
-    // bit 6: DY/DT (1=按星期匹配，0=按日期匹配)
-    // bit 5-0: 星期(1-7)或日期(1-31)的BCD值
-    // 设置星期，A1M4=0（需要匹配），DY/DT=1（按星期匹配）
-    
-    byte nextAlarmDay = alarm_getNextDay();  // 下一个闹钟的星期, 0-6, 0:周一, 6:周日
-    uint8_t ds3231_day = system_week_to_DS3231_week(nextAlarmDay); // (nextAlarmDay == 6) ? 1 : (nextAlarmDay + 2);
-    temp_a = B_BCD(ds3231_day);  // 转换为DS3231的星期格式, 是因为 DS3231 的星期从 1 开始（1=周日，7=周六）
-    DS3231_WR_Byte(Alarm1_Address_Week, (0x40 | temp_a));  // 0x40=按星期匹配，A1M4=0 0b 0100 0000
-
-    // 打印调试信息
-    printf("\nAlarm Configuration Verification:\n");
-    printf("Day conversion: %d -> %d (DS3231 format)\n", nextAlarmDay, ds3231_day);
-    printf("Time: %02d:%02d:00\n", alarm.hour, alarm.min);
-    printf("Week register: 0x%02X\n", DS3231_RD_Byte(Alarm1_Address_Week));
-    printf("Control: 0x%02X, Status: 0x%02X\n", 
-           DS3231_RD_Byte(Address_control),
-           DS3231_RD_Byte(Address_control_status));
-    // 打印当前week
-    printf("Current week: %d\n", timeDate.date.day); // 0-6, 0:周一, 6:周日
 }
 
 void DS3231_Get_alarm1(void) // 获取闹钟1各参数
@@ -340,8 +371,8 @@ void DS3231_Alarm_Handler(void)
     uint8_t ctrl = DS3231_RD_Byte(Address_control);
     
     printf("DS3231 interrupt triggered!\n");
-    // printf("Status Register (0x0F): 0x%02X\n", status); // 0x01表示闹钟1触发
-    // printf("Control Register (0x0E): 0x%02X\n", ctrl); // 0x05表示闹钟1中断使能
+    printf("Status Register (0x0F): 0x%02X\n", status); // 0x01表示闹钟1触发
+    printf("Control Register (0x0E): 0x%02X\n", ctrl); // 0x05表示闹钟1中断使能
     
     // Check if Alarm 1 triggered (A1F bit)
     if(status & 0x01)

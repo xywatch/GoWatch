@@ -112,7 +112,6 @@ void TIM3_IRQHandler(void)
             printf("adc start\n");
             // ÕâÀïµ¼ÖÂ¿¨ËÀ
             float rawVoltage = Get_Adc_Average(0, 50) * (3.3f / 4096.0f) * 2.0f;
-            printf("adc end %f\n", rawVoltage);
             voltageSum += rawVoltage;
             adcCount++;
             

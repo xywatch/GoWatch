@@ -62,8 +62,8 @@ void buzzer_init()
     // 分频到2KHz (32MHz/16000)
     // 2KHz/4 = 500Hz PWM频率
     // 这个频率应该接近蜂鸣器的谐振频率
-    // TIM_PWM_Init_Init(4, 16000);
-    buzzer_init2();
+    TIM_PWM_Init_Init(4, 16000);
+    // buzzer_init2();
 }
 
 // 设置不同的音色
@@ -284,12 +284,12 @@ void buzzer_init2()
 // 蜂鸣器开关控制
 void buzzer_on()
 {
-    GPIO_SetBits(GPIOA, GPIO_Pin_15);
+    // GPIO_SetBits(GPIOA, GPIO_Pin_15);
 }
 
 void buzzer_off()
 {
-    GPIO_ResetBits(GPIOA, GPIO_Pin_15);
+    // GPIO_ResetBits(GPIOA, GPIO_Pin_15);
 }
 
 // 蜂鸣器状态切换
