@@ -91,6 +91,7 @@
 #define STR_ROTATE "Rotate"
 #define STR_ANIMATIONS "Animations"
 #define STR_SETFPS "FPS"
+#define STR_WATCHFACE "Watchface"
 
 #define STR_GAMESMENU "< GAMES >"
 

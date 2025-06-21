@@ -147,17 +147,31 @@ static display_t ticker()
     static bool moving = false;
     static bool moving2[5];
 
-    /*
-    if(milliseconds % 3600 > 1800) {
-        seconds++;
-        seconds = seconds % 60;
-        timeDate.time.secs = seconds;
-    }
-    */
-
     static byte hour2;
     static byte mins;
     static byte secs;
+
+    byte midFontHeight;
+    byte midFontWidth;
+    byte smallFontHeight;
+    byte smallFontWidth;
+    byte timePosX;
+    byte timePosY;
+
+    if (appConfig.watchface == WATCHFACE_NWATCH) {
+        midFontHeight = MIDFONT_HEIGHT;
+        midFontWidth = MIDFONT_WIDTH;
+        smallFontHeight = FONT_SMALL2_HEIGHT;
+        smallFontWidth = FONT_SMALL2_WIDTH;
+        timePosY = 20;
+    }
+    else {
+        midFontHeight = MIDFONT_NUM_HEIGHT;
+        midFontWidth = MIDFONT_NUM_WIDTH;
+        smallFontHeight = SMALLFONT_NUM_HEIGHT;
+        smallFontWidth = SMALLFONT_NUM_WIDTH;
+        timePosY = 17;
+    }
 
     if (appConfig.animations)
     {
@@ -198,16 +212,16 @@ static display_t ticker()
             {
                 yPos += 5;
             }
-            else if (yPos <= MIDFONT_NUM_HEIGHT - 3)
+            else if (yPos <= midFontHeight - 3)
             { // 22 前快后慢
                 yPos += 3;
             }
-            else if (yPos <= MIDFONT_NUM_HEIGHT + TICKER_GAP)
+            else if (yPos <= midFontHeight + TICKER_GAP)
             { // 24 + TICKER_GAP, 如果还用24会卡顿
                 yPos++;
             }
 
-            if (yPos >= MIDFONT_NUM_HEIGHT + TICKER_GAP)
+            if (yPos >= midFontHeight + TICKER_GAP)
             {
                 yPos = 255;
             }
@@ -216,21 +230,21 @@ static display_t ticker()
             {
                 yPos_secs++;
             }
-            else if (yPos_secs <= SMALLFONT_NUM_HEIGHT - 3)
+            else if (yPos_secs <= smallFontHeight - 3)
             {
                 yPos_secs += 3;
             }
-            else if (yPos_secs <= SMALLFONT_NUM_HEIGHT + TICKER_GAP)
+            else if (yPos_secs <= smallFontHeight + TICKER_GAP)
             {
                 yPos_secs++;
             }
 
-            if (yPos_secs >= SMALLFONT_NUM_HEIGHT + TICKER_GAP)
+            if (yPos_secs >= smallFontHeight + TICKER_GAP)
             {
                 yPos_secs = 255;
             }
 
-            if (yPos_secs > SMALLFONT_NUM_HEIGHT + TICKER_GAP && yPos > MIDFONT_NUM_HEIGHT + TICKER_GAP)
+            if (yPos_secs > smallFontHeight + TICKER_GAP && yPos > midFontHeight + TICKER_GAP)
             {
                 yPos = 0;
                 yPos_secs = 0;
@@ -250,68 +264,127 @@ static display_t ticker()
     tickerData_t data;
 
     // Set new font data for hours and minutes
-    data.y = TIME_POS_Y;
-    // data.w = MIDFONT_WIDTH;
-    // data.h = MIDFONT_HEIGHT;
-    data.w = MIDFONT_NUM_WIDTH;
-    data.h = MIDFONT_NUM_HEIGHT;
-    // data.bitmap = (const byte*)&midFont;
-    data.bitmap = (const byte *)&numFont16x32;
+    data.w = midFontWidth;
+    data.h = midFontHeight;
+
+    byte *colon_big;
+    byte *colon_small;
+
+    if (appConfig.watchface == WATCHFACE_WEIXUE) {
+        data.bitmap = (const byte *)&numFont16x32;
+        colon_big = (byte *)numFont16x32[10];
+    }
+    else if (appConfig.watchface == WATCHFACE_MICRO5) {
+        data.bitmap = (const byte *)&numFont16x32_micro5;
+        colon_big = (byte *)numFont16x32_micro5[10];
+    }
+    else if (appConfig.watchface == WATCHFACE_TINY5) {
+        data.bitmap = (const byte *)&numFont16x32_tiny5;
+        colon_big = (byte *)numFont16x32_tiny5[10];
+    }
+    else if (appConfig.watchface == WATCHFACE_JARO) {
+        data.bitmap = (const byte *)&numFont16x32_jaro;
+        colon_big = (byte *)numFont16x32_jaro[10];
+    }
+    else {
+        data.bitmap = (const byte*)&midFont;
+    }
+
+    data.y = timePosY;
     data.offsetY = yPos;
 
     // Hours
-    data.x = TIME_POS_X;
+    data.x = timePosX;
     data.val = div10(timeDate.time.hour);
     data.maxVal = 2;
     data.moving = moving2[0];
     drawTickerNum(&data);
 
-    data.x += 16;
+    if (appConfig.watchface == WATCHFACE_NWATCH) {
+        data.x += 23;
+    } else {
+        data.x += 16;
+    }
     data.val = mod10(timeDate.time.hour);
     data.maxVal = 9;
     data.moving = moving2[1];
     drawTickerNum(&data);
 
-    data.x += 16;
+    if (appConfig.watchface == WATCHFACE_NWATCH) {
+        data.x += 23;
+    } else {
+        data.x += 16;
+    }
 
-    // Draw colon for half a second   画半秒的冒号
-    // if(milliseconds % 3600 > 1800) { // 假装是半秒钟  30ms
-    // draw_bitmap(TIME_POS_X + 46 + 2, TIME_POS_Y, colon, FONT_COLON_WIDTH, FONT_COLON_HEIGHT, NOINVERT, 0);
-    draw_bitmap(data.x, TIME_POS_Y, numFont16x32[10], MIDFONT_NUM_WIDTH, MIDFONT_NUM_HEIGHT, NOINVERT, 0);
-    //}
+    // 时与分的冒号
+    if (appConfig.watchface == WATCHFACE_NWATCH) {
+        draw_bitmap(data.x, timePosY, colon, FONT_COLON_WIDTH, FONT_COLON_HEIGHT, NOINVERT, 0);
+    }
+    else {
+        draw_bitmap(data.x, timePosY, colon_big, midFontWidth, midFontHeight, NOINVERT, 0);
+    }
 
     // Minutes
-    data.x += 16;
+    if (appConfig.watchface == WATCHFACE_NWATCH) {
+        data.x += 10;
+    } else {
+        data.x += 16;
+    }
     data.val = div10(timeDate.time.mins);
     data.maxVal = 5;
     data.moving = moving2[2];
     drawTickerNum(&data);
 
-    data.x += 16;
+    if (appConfig.watchface == WATCHFACE_NWATCH) {
+        data.x += 23;
+    } else {
+        data.x += 16;
+    }
     data.val = mod10(timeDate.time.mins);
     data.maxVal = 9;
     data.moving = moving2[3];
     drawTickerNum(&data);
-    data.x += 16;
 
+    data.x += 16;
     // Seconds
     data.y += 16;
 
-    // if(milliseconds % 3600 > 1800) { // 假装是半秒钟  30ms
-    if (milliseconds % 1000 >= 500)
-    { // 0.5s 1秒分成两断, 后半秒显示, 前半秒隐藏
-        // draw_bitmap(TIME_POS_X + 46 + 2, TIME_POS_Y, colon, FONT_COLON_WIDTH, FONT_COLON_HEIGHT, NOINVERT, 0);
-        draw_bitmap(data.x, data.y, numFont16x16[10], SMALLFONT_NUM_WIDTH, SMALLFONT_NUM_HEIGHT, NOINVERT, 0);
+    data.w = smallFontWidth;
+    data.h = smallFontHeight;
+    if (appConfig.watchface == WATCHFACE_WEIXUE) {
+        data.bitmap = (const byte *)&numFont16x16;
+        colon_small = (byte *)numFont16x16[10];
+    }
+    else if (appConfig.watchface == WATCHFACE_MICRO5) {
+        data.bitmap = (const byte *)&numFont16x16_micro5;
+        colon_small = (byte *)numFont16x16_micro5[10];
+    }
+    else if (appConfig.watchface == WATCHFACE_TINY5) {
+        data.bitmap = (const byte *)&numFont16x16_tiny5;
+        colon_small = (byte *)numFont16x16_tiny5[10];
+    }
+    else if (appConfig.watchface == WATCHFACE_JARO) {
+        data.bitmap = (const byte *)&numFont16x16_jaro;
+        colon_small = (byte *)numFont16x16_jaro[10];
+    }
+    else {
+        data.bitmap = (const byte*)&small2Font;
+    }
+
+    if (millis() % 1000 >= 500) // 0.5s 1秒分成两断, 后半秒显示, 前半秒隐藏
+    {
+        if (appConfig.watchface == WATCHFACE_NWATCH) {
+        }
+        else {
+            draw_bitmap(data.x, data.y, colon_small, smallFontWidth, smallFontHeight, NOINVERT, 0);
+        }
     }
 
     data.x += 16;
-
-    // data.bitmap = (const byte*)&small2Font;
-    data.bitmap = (const byte *)&numFont16x16;
-    // data.w = FONT_SMALL2_WIDTH;
-    // data.h = FONT_SMALL2_HEIGHT;
-    data.w = SMALLFONT_NUM_WIDTH;
-    data.h = SMALLFONT_NUM_HEIGHT;
+    if (appConfig.watchface == WATCHFACE_NWATCH) {
+        data.x = 104;
+        data.y = 28;
+    }
     data.offsetY = yPos_secs;
     data.val = div10(timeDate.time.secs);
     data.maxVal = 5;
@@ -319,6 +392,9 @@ static display_t ticker()
     drawTickerNum(&data);
 
     data.x += 16;
+    if (appConfig.watchface == WATCHFACE_NWATCH) {
+        data.x = 116;
+    }
     data.val = mod10(timeDate.time.secs);
     data.maxVal = 9;
     data.moving = moving;
@@ -329,10 +405,6 @@ static display_t ticker()
     tmp[0] = timeDate.time.ampm;
     tmp[1] = 0x00;
     draw_string(tmp, false, 104, 20);
-
-    //	char buff[12];
-    //	sprintf_P(buff, PSTR("%lu"), time_getTimestamp());
-    //	draw_string(buff, false, 30, 50);
 
     return (moving ? DISPLAY_BUSY : DISPLAY_DONE);
 }

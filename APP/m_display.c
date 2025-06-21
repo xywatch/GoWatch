@@ -10,7 +10,7 @@
 #include "oled.h"
 #include "led.h"
 
-#define OPTION_COUNT 5
+#define OPTION_COUNT 6
 
 static prev_menu_s prevMenuData;
 
@@ -124,6 +124,12 @@ static void setFPS()
     MY_FPS = fps * 2;
 }
 
+static void setWatchface()
+{
+    appConfig.watchface = (appConfig.watchface + 1) % 5;
+    appconfig_save();
+}
+
 static display_t thisDraw()
 {
     if (menuData.selected == 4)
@@ -131,6 +137,13 @@ static display_t thisDraw()
         char buff[4];
         sprintf_P(buff, PSTR("%hhuS"), (unsigned char)MY_FPS);
         draw_string(buff, NOINVERT, 56, 40);
+    }
+
+    if (menuData.selected == 5)
+    {
+        char buff[4];
+        sprintf_P(buff, "%d", appConfig.watchface + 1);
+        draw_string(buff, NOINVERT, 60, 40);
     }
 
     return DISPLAY_DONE;
@@ -156,5 +169,6 @@ static void setMenuOptions()
     setMenuOption_P(3, PSTR(STR_ANIMATIONS), menu_anim[appConfig.animations], setAnimations);
     setMenuOption_P(4, PSTR(STR_SETFPS), menu_setfps, setFPS);
 #endif
+    setMenuOption_P(5, PSTR(STR_WATCHFACE), menu_watchface, setWatchface);
     //  setMenuOption_P(5, PSTR(STR_LEDS), menu_LEDs[appConfig.CTRL_LEDs], setLEDs);
 }
