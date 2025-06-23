@@ -32,12 +32,6 @@ typedef uint8_t BOOL;
 
 typedef uint32_t timestamp_t;
 
-#define WATCHFACE_WEIXUE 0
-#define WATCHFACE_NWATCH 1
-#define WATCHFACE_MICRO5 2
-#define WATCHFACE_TINY5 3
-#define WATCHFACE_JARO 4
-
 typedef enum
 {
 	DISPLAY_DONE, // ÆÁÄ»Ë¢ÐÂÍê³É

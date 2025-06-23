@@ -126,7 +126,7 @@ static void setFPS()
 
 static void setWatchface()
 {
-    appConfig.watchface = (appConfig.watchface + 1) % 5;
+    appConfig.watchface = (appConfig.watchface + 1) % WATCHFACE_COUNT;
     appconfig_save();
 }
 

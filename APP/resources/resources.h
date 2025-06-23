@@ -81,8 +81,8 @@ extern const byte space_image10[];
 #define SMALLFONT_HEIGHT 8
 extern const byte smallFont[][5];
 
-
-// Nwatch表盘
+/*
+// Nwatch表盘 不要了, 字体不一致, 要统一
 #define MIDFONT_WIDTH 19
 #define MIDFONT_HEIGHT 24
 extern const byte midFont[][57];
@@ -94,26 +94,37 @@ extern const byte small2Font[][22];
 #define FONT_COLON_WIDTH 6
 #define FONT_COLON_HEIGHT 24
 extern const byte colon[];
+*/
 
 // 微雪表盘
 // 0-9
 #define SMALLFONT_NUM_WIDTH 16
 #define SMALLFONT_NUM_HEIGHT 16
-extern const byte numFont16x16[][32];
+extern const byte numFont16x16_weixue[11][32];
 
 // 0-9
 #define MIDFONT_NUM_WIDTH 16
 #define MIDFONT_NUM_HEIGHT 32
-extern const byte numFont16x32[][64];
+extern const byte numFont16x32_weixue[11][64];
 
 // Micro 5 宽高和weixue一样
-extern const byte numFont16x16_micro5[][32];
-extern const byte numFont16x32_micro5[][64];
+extern const byte numFont16x16_micro5[11][32];
+extern const byte numFont16x32_micro5[11][64];
 
-extern const byte numFont16x16_tiny5[][32];
-extern const byte numFont16x32_tiny5[][64];
+extern const byte numFont16x16_tiny5[11][32];
+extern const byte numFont16x32_tiny5[11][64];
 
-extern const byte numFont16x16_jaro[][32];
-extern const byte numFont16x32_jaro[][64];
+extern const byte numFont16x16_jaro[11][32];
+extern const byte numFont16x32_jaro[11][64];
+
+extern const byte numFont16x16_revoluzia[11][32];
+extern const byte numFont16x32_revoluzia[11][64];
+
+// 表盘数量
+#define WATCHFACE_COUNT 5
+
+// 多个字体合并
+extern const byte (*numFont16x16s[WATCHFACE_COUNT])[11][32];
+extern const byte (*numFont16x32s[WATCHFACE_COUNT])[11][64];
 
 #endif /* RESOURCES_H_ */

@@ -81,7 +81,7 @@ void appconfig_reset()
     // 63 = 111111, 表示星期1,2,3,4,5,6   7 = 111, 表示星期1,2,3
     appConfig.alarms[0].hour = 9;
     appConfig.alarms[0].min = 0;
-    appConfig.alarms[0].days = 127;
+    appConfig.alarms[0].days = 225;
 
     appConfig.alarms[1].hour = 10;
     appConfig.alarms[1].min = 0;

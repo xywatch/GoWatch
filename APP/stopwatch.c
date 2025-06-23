@@ -112,38 +112,24 @@ static display_t draw()
         num1 = (secs / 3600);    // hours
     }
 
-    /*
-    // ∑÷
-    // draw_bitmap(1, TIME_POS_Y, midFont[div10(num1)], MIDFONT_WIDTH, MIDFONT_HEIGHT, NOINVERT, 0);
-    // draw_bitmap(24, TIME_POS_Y, midFont[mod10(num1)], MIDFONT_WIDTH, MIDFONT_HEIGHT, NOINVERT, 0);
-    // √Î
-    draw_bitmap(60, TIME_POS_Y, midFont[div10(num2)], MIDFONT_WIDTH, MIDFONT_HEIGHT, NOINVERT, 0);
-    draw_bitmap(83, TIME_POS_Y, midFont[mod10(num2)], MIDFONT_WIDTH, MIDFONT_HEIGHT, NOINVERT, 0);
-    // √Î2
-    draw_bitmap(104, 20 - 4 + 12, small2Font[div10(num3)], FONT_SMALL2_WIDTH, FONT_SMALL2_HEIGHT, NOINVERT, 0);
-    draw_bitmap(116, 20 - 4 + 12, small2Font[mod10(num3)], FONT_SMALL2_WIDTH, FONT_SMALL2_HEIGHT, NOINVERT, 0);
-    // :
-    draw_bitmap(TIME_POS_X + 46 + 2, TIME_POS_Y, colon, FONT_COLON_WIDTH, FONT_COLON_HEIGHT, NOINVERT, 0);
-    */
-
     char x = 8;
     // ∑÷
-    draw_bitmap(x, TIME_POS_Y, numFont16x32[div10(num1)], MIDFONT_NUM_WIDTH, MIDFONT_NUM_HEIGHT, NOINVERT, 0);
+    draw_bitmap(x, TIME_POS_Y, (const byte*)((*numFont16x32s[appConfig.watchface])[div10(num1)]), MIDFONT_NUM_WIDTH, MIDFONT_NUM_HEIGHT, NOINVERT, 0);
     x += 16;
-    draw_bitmap(x, TIME_POS_Y, numFont16x32[mod10(num1)], MIDFONT_NUM_WIDTH, MIDFONT_NUM_HEIGHT, NOINVERT, 0);
+    draw_bitmap(x, TIME_POS_Y, (const byte*)((*numFont16x32s[appConfig.watchface])[mod10(num1)]), MIDFONT_NUM_WIDTH, MIDFONT_NUM_HEIGHT, NOINVERT, 0);
     x += 16;
     // :
-    draw_bitmap(x, TIME_POS_Y, numFont16x32[10], MIDFONT_NUM_WIDTH, MIDFONT_NUM_HEIGHT, NOINVERT, 0);
+    draw_bitmap(x, TIME_POS_Y, (const byte*)((*numFont16x32s[appConfig.watchface])[10]), MIDFONT_NUM_WIDTH, MIDFONT_NUM_HEIGHT, NOINVERT, 0);
     x += 16;
     // √Î
-    draw_bitmap(x, TIME_POS_Y, numFont16x32[div10(num2)], MIDFONT_NUM_WIDTH, MIDFONT_NUM_HEIGHT, NOINVERT, 0);
+    draw_bitmap(x, TIME_POS_Y, (const byte*)((*numFont16x32s[appConfig.watchface])[div10(num2)]), MIDFONT_NUM_WIDTH, MIDFONT_NUM_HEIGHT, NOINVERT, 0);
     x += 16;
-    draw_bitmap(x, TIME_POS_Y, numFont16x32[mod10(num2)], MIDFONT_NUM_WIDTH, MIDFONT_NUM_HEIGHT, NOINVERT, 0);
+    draw_bitmap(x, TIME_POS_Y, (const byte*)((*numFont16x32s[appConfig.watchface])[mod10(num2)]), MIDFONT_NUM_WIDTH, MIDFONT_NUM_HEIGHT, NOINVERT, 0);
     x += 16;
     // √Î2
-    draw_bitmap(x, TIME_POS_Y + 16, numFont16x16[div10(num3)], SMALLFONT_NUM_WIDTH, SMALLFONT_NUM_HEIGHT, NOINVERT, 0);
+    draw_bitmap(x, TIME_POS_Y + 16, (const byte*)((*numFont16x16s[appConfig.watchface])[div10(num3)]), SMALLFONT_NUM_WIDTH, SMALLFONT_NUM_HEIGHT, NOINVERT, 0);
     x += 16;
-    draw_bitmap(x, TIME_POS_Y + 16, numFont16x16[mod10(num3)], SMALLFONT_NUM_WIDTH, SMALLFONT_NUM_HEIGHT, NOINVERT, 0);
+    draw_bitmap(x, TIME_POS_Y + 16, (const byte*)((*numFont16x16s[appConfig.watchface])[mod10(num3)]), SMALLFONT_NUM_WIDTH, SMALLFONT_NUM_HEIGHT, NOINVERT, 0);
     x += 16;
 
     // Draw time

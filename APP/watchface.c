@@ -7,8 +7,6 @@
  */
 
 #include "common.h"
-
-#define TIME_POS_X 0
 #define TIME_POS_Y 17
 #define TICKER_GAP 4
 
@@ -155,23 +153,14 @@ static display_t ticker()
     byte midFontWidth;
     byte smallFontHeight;
     byte smallFontWidth;
-    byte timePosX;
+    byte timePosX = 0;
     byte timePosY;
 
-    if (appConfig.watchface == WATCHFACE_NWATCH) {
-        midFontHeight = MIDFONT_HEIGHT;
-        midFontWidth = MIDFONT_WIDTH;
-        smallFontHeight = FONT_SMALL2_HEIGHT;
-        smallFontWidth = FONT_SMALL2_WIDTH;
-        timePosY = 20;
-    }
-    else {
-        midFontHeight = MIDFONT_NUM_HEIGHT;
-        midFontWidth = MIDFONT_NUM_WIDTH;
-        smallFontHeight = SMALLFONT_NUM_HEIGHT;
-        smallFontWidth = SMALLFONT_NUM_WIDTH;
-        timePosY = 17;
-    }
+    midFontHeight = MIDFONT_NUM_HEIGHT;
+    midFontWidth = MIDFONT_NUM_WIDTH;
+    smallFontHeight = SMALLFONT_NUM_HEIGHT;
+    smallFontWidth = SMALLFONT_NUM_WIDTH;
+    timePosY = 17;
 
     if (appConfig.animations)
     {
@@ -269,26 +258,8 @@ static display_t ticker()
 
     byte *colon_big;
     byte *colon_small;
-
-    if (appConfig.watchface == WATCHFACE_WEIXUE) {
-        data.bitmap = (const byte *)&numFont16x32;
-        colon_big = (byte *)numFont16x32[10];
-    }
-    else if (appConfig.watchface == WATCHFACE_MICRO5) {
-        data.bitmap = (const byte *)&numFont16x32_micro5;
-        colon_big = (byte *)numFont16x32_micro5[10];
-    }
-    else if (appConfig.watchface == WATCHFACE_TINY5) {
-        data.bitmap = (const byte *)&numFont16x32_tiny5;
-        colon_big = (byte *)numFont16x32_tiny5[10];
-    }
-    else if (appConfig.watchface == WATCHFACE_JARO) {
-        data.bitmap = (const byte *)&numFont16x32_jaro;
-        colon_big = (byte *)numFont16x32_jaro[10];
-    }
-    else {
-        data.bitmap = (const byte*)&midFont;
-    }
+    data.bitmap = (const byte *)numFont16x32s[appConfig.watchface];
+    colon_big = (byte *)(*numFont16x32s[appConfig.watchface])[10];
 
     data.y = timePosY;
     data.offsetY = yPos;
@@ -300,46 +271,25 @@ static display_t ticker()
     data.moving = moving2[0];
     drawTickerNum(&data);
 
-    if (appConfig.watchface == WATCHFACE_NWATCH) {
-        data.x += 23;
-    } else {
-        data.x += 16;
-    }
+    data.x += 16;
     data.val = mod10(timeDate.time.hour);
     data.maxVal = 9;
     data.moving = moving2[1];
     drawTickerNum(&data);
 
-    if (appConfig.watchface == WATCHFACE_NWATCH) {
-        data.x += 23;
-    } else {
-        data.x += 16;
-    }
+    data.x += 16;
 
     // 时与分的冒号
-    if (appConfig.watchface == WATCHFACE_NWATCH) {
-        draw_bitmap(data.x, timePosY, colon, FONT_COLON_WIDTH, FONT_COLON_HEIGHT, NOINVERT, 0);
-    }
-    else {
-        draw_bitmap(data.x, timePosY, colon_big, midFontWidth, midFontHeight, NOINVERT, 0);
-    }
+    draw_bitmap(data.x, timePosY, colon_big, midFontWidth, midFontHeight, NOINVERT, 0);
 
     // Minutes
-    if (appConfig.watchface == WATCHFACE_NWATCH) {
-        data.x += 10;
-    } else {
-        data.x += 16;
-    }
+    data.x += 16;
     data.val = div10(timeDate.time.mins);
     data.maxVal = 5;
     data.moving = moving2[2];
     drawTickerNum(&data);
 
-    if (appConfig.watchface == WATCHFACE_NWATCH) {
-        data.x += 23;
-    } else {
-        data.x += 16;
-    }
+    data.x += 16;
     data.val = mod10(timeDate.time.mins);
     data.maxVal = 9;
     data.moving = moving2[3];
@@ -351,40 +301,16 @@ static display_t ticker()
 
     data.w = smallFontWidth;
     data.h = smallFontHeight;
-    if (appConfig.watchface == WATCHFACE_WEIXUE) {
-        data.bitmap = (const byte *)&numFont16x16;
-        colon_small = (byte *)numFont16x16[10];
-    }
-    else if (appConfig.watchface == WATCHFACE_MICRO5) {
-        data.bitmap = (const byte *)&numFont16x16_micro5;
-        colon_small = (byte *)numFont16x16_micro5[10];
-    }
-    else if (appConfig.watchface == WATCHFACE_TINY5) {
-        data.bitmap = (const byte *)&numFont16x16_tiny5;
-        colon_small = (byte *)numFont16x16_tiny5[10];
-    }
-    else if (appConfig.watchface == WATCHFACE_JARO) {
-        data.bitmap = (const byte *)&numFont16x16_jaro;
-        colon_small = (byte *)numFont16x16_jaro[10];
-    }
-    else {
-        data.bitmap = (const byte*)&small2Font;
-    }
+
+    data.bitmap = (const byte *)numFont16x16s[appConfig.watchface];
+    colon_small = (byte *)(*numFont16x16s[appConfig.watchface])[10];
 
     if (millis() % 1000 >= 500) // 0.5s 1秒分成两断, 后半秒显示, 前半秒隐藏
     {
-        if (appConfig.watchface == WATCHFACE_NWATCH) {
-        }
-        else {
-            draw_bitmap(data.x, data.y, colon_small, smallFontWidth, smallFontHeight, NOINVERT, 0);
-        }
+        draw_bitmap(data.x, data.y, colon_small, smallFontWidth, smallFontHeight, NOINVERT, 0);
     }
 
     data.x += 16;
-    if (appConfig.watchface == WATCHFACE_NWATCH) {
-        data.x = 104;
-        data.y = 28;
-    }
     data.offsetY = yPos_secs;
     data.val = div10(timeDate.time.secs);
     data.maxVal = 5;
@@ -392,9 +318,6 @@ static display_t ticker()
     drawTickerNum(&data);
 
     data.x += 16;
-    if (appConfig.watchface == WATCHFACE_NWATCH) {
-        data.x = 116;
-    }
     data.val = mod10(timeDate.time.secs);
     data.maxVal = 9;
     data.moving = moving;
