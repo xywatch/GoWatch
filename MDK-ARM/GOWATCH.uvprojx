@@ -744,11 +744,6 @@
               <FilePath>..\APP\resources\font_micro5.c</FilePath>
             </File>
             <File>
-              <FileName>font_nwatch.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\APP\resources\font_nwatch.c</FilePath>
-            </File>
-            <File>
               <FileName>font_tiny5.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\APP\resources\font_tiny5.c</FilePath>
@@ -762,6 +757,16 @@
               <FileName>resources.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\APP\resources\resources.c</FilePath>
+            </File>
+            <File>
+              <FileName>font_revoluzia.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\resources\font_revoluzia.c</FilePath>
+            </File>
+            <File>
+              <FileName>num_fonts.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\APP\resources\num_fonts.c</FilePath>
             </File>
           </Files>
         </Group>
