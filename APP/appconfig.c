@@ -71,6 +71,7 @@ void appconfig_reset()
     appConfig.showFPS = false;
     appConfig.timeMode = TIMEMODE_24HR;
     appConfig.moveCheckFlag = true;
+	appConfig.watchface = 0;
 
     appConfig.bme_log_time = 5; // 5∑÷÷”“ª¥Œ
     appConfig.bme_enable = true;

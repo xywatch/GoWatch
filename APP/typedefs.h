@@ -161,7 +161,7 @@ typedef struct
 #if COMPILE_ANIMATIONS
 	bool animations;
 #endif
-	// byte clockface;
+	byte watchface;
 	bool display180;
 	bool CTRL_LEDs;
 	bool showFPS;

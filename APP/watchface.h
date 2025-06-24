@@ -6,9 +6,9 @@
  * Web: http://blog.zakkemble.co.uk/diy-digital-wristwatch/
  */
 
-#ifndef NORMAL_H_
-#define NORMAL_H_
+#ifndef WATCHFACE_H_
+#define WATCHFACE_H_
 
 void watchface_normal(void);
 
-#endif /* NORMAL_H_ */
+#endif /* WATCHFACE_H_ */

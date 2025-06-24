@@ -83,7 +83,7 @@
 #define STR_DIAGNOSTICSMENU "< DIAGNOSTICS >"
 // #define STR_TEMPERATURE		"Temperature %hhd.%hhuC"
 // #define STR_BATTERY			"Battery    %umV"
-#define STR_SHOWFPS			"Show FPS%9c"
+// #define STR_SHOWFPS			"Show FPS%9c"
 
 #define STR_DISPLAYMENU "< DISPLAY >"
 #define STR_BRIGHTNESS "Brightness"
@@ -91,6 +91,8 @@
 #define STR_ROTATE "Rotate"
 #define STR_ANIMATIONS "Animations"
 #define STR_SETFPS "FPS"
+#define STR_SHOWFPS			"Show FPS%9c"
+#define STR_WATCHFACE "Watchface"
 
 #define STR_GAMESMENU "< GAMES >"
 
